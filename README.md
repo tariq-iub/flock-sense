@@ -14,3 +14,14 @@ Flock Sense integrates Laravel-powered APIs with a Vue.js web frontend and Flutt
 - Generate automated reports (feed intake, mortality, environmental stats).
 - Ensure a modular, scalable system for both web and mobile platforms.
 
+# App Structure
+The application is divided into two main areas:
+
+## Admin Area
+-	Used by internal administrators to manage clients, subscriptions, IoT devices, and global system settings.
+-	Allows issue tracking and resolution related to system or client operations.
+
+## Client Area
+-	Accessed by clients (farm owners) and their staff (Shed Managers).
+-	Facilitate farm, shed, and flock management.
+-	Offers real-time IoT monitoring, manual input capabilities, and report access.
