@@ -53,16 +53,18 @@
             @endphp
 			<a href="#" data-bs-toggle="dropdown" data-display="static" class="menu-link">
 				<div class="menu-img online">
+                    @if($user->avatar)
+                        <img src="assets/img/user/user.jpg" alt="" class="ms-100 mh-100 rounded-circle">
+                    @else
 					<div class="d-flex align-items-center justify-content-center w-100 h-100 bg-gray-800 text-gray-300 rounded-circle overflow-hidden">
 						<i class="fa fa-user fa-2x mb-n3"></i>
 					</div>
+                    @endif
 				</div>
 				<div class="menu-text">{{ $user->email }}</div>
 			</a>
 			<div class="dropdown-menu dropdown-menu-end me-lg-3">
 				<a class="dropdown-item d-flex align-items-center" href="#">Edit Profile <i class="fa fa-user-circle fa-fw ms-auto text-body text-opacity-50"></i></a>
-				<a class="dropdown-item d-flex align-items-center" href="#">Inbox <i class="fa fa-envelope fa-fw ms-auto text-body text-opacity-50"></i></a>
-				<a class="dropdown-item d-flex align-items-center" href="#">Calendar <i class="fa fa-calendar-alt fa-fw ms-auto text-body text-opacity-50"></i></a>
 				<a class="dropdown-item d-flex align-items-center" href="#">Setting <i class="fa fa-wrench fa-fw ms-auto text-body text-opacity-50"></i></a>
 				<div class="dropdown-divider"></div>
 				<a class="dropdown-item d-flex align-items-center" href="{{ route('logout') }}"

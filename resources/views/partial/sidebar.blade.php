@@ -91,11 +91,6 @@
 					}
 				}
 			@endphp
-			<div class="p-3 px-4 mt-auto hide-on-minified">
-				<a href="https://seantheme.com/studio/documentation/index.html" class="btn btn-secondary d-block w-100 fw-600 rounded-pill">
-					<i class="fa fa-code-branch me-1 ms-n1 opacity-5"></i> Documentation
-				</a>
-			</div>
     </div>
 		<!-- END menu -->
   </div>
