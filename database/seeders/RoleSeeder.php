@@ -17,6 +17,7 @@ class RoleSeeder extends Seeder
         Role::firstOrCreate(['name' => 'admin']);
         Role::firstOrCreate(['name' => 'owner']);
         Role::firstOrCreate(['name' => 'manager']);
+        Role::firstOrCreate(['name' => 'worker']);
 
         User::find(1)->assignRole('admin');
     }
