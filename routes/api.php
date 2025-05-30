@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\V1\BreedController;
+use App\Http\Controllers\Api\V1\FlockController;
+use App\Http\Controllers\Api\V1\SubscriptionController;
+use App\Http\Controllers\Api\V1\SubscriptionPlanController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\FarmController;
 use App\Http\Controllers\Api\V1\ShedController;
@@ -30,5 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
         'farms' => FarmController::class,
         'sheds' => ShedController::class,
         'devices' => DeviceController::class,
+        'plans' => SubscriptionPlanController::class,
+        'subscriptions' => SubscriptionController::class,
+        'breeds' => BreedController::class,
+        'flocks' => FlockController::class,
     ]);
 });
