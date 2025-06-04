@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\ApiController;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 
-class SubscriptionController extends Controller
+class SubscriptionController extends ApiController
 {
     /**
      * Display a listing of the resource.

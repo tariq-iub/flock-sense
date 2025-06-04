@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Models\Device;
 use Illuminate\Http\Request;
 
-class DeviceController extends Controller
+class DeviceController extends ApiController
 {
     /**
      * Display a listing of the resource.

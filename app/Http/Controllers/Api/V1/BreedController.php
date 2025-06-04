@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Models\Breed;
 use Illuminate\Http\Request;
 
-class BreedController extends Controller
+class BreedController extends ApiController
 {
     /**
      * Display a listing of the resource.
