@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 
 // Other routes
 Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('users', UserController::class)->except(['store']);
     Route::apiResources([
-        'users' => UserController::class,
         'farms' => FarmController::class,
         'sheds' => ShedController::class,
         'devices' => DeviceController::class,

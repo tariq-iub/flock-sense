@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -13,15 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        return "From User Controller";
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        return UserResource::collection(User::all());
     }
 
     /**
@@ -29,7 +22,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        //
+        return UserResource::make($user);
     }
 
     /**
