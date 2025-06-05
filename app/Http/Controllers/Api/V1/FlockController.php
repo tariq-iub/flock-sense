@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
+use App\Http\Resources\FlockResource;
 use App\Models\Flock;
 use Illuminate\Http\Request;
 
-class FlockController extends Controller
+class FlockController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return FlockResource::collection(Flock::with(['shed', 'breed'])->get());
     }
 
     /**
@@ -21,7 +22,22 @@ class FlockController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'shed_id' => ['required', 'exists:sheds,id'],
+            'breed_id' => ['required', 'exists:breeds,id'],
+            'start_date' => ['required', 'date'],
+            'initial_quantity' => ['required', 'integer', 'min:1'],
+            'current_quantity' => ['required', 'integer', 'min:0'],
+            'status' => ['required', 'in:active,sold,completed'],
+        ]);
+
+        $flock = Flock::create($validated);
+
+        return response()->json([
+            'message' => 'Flock created successfully.',
+            'flock' => new FlockResource($flock),
+        ], 201);
     }
 
     /**
@@ -29,7 +45,7 @@ class FlockController extends Controller
      */
     public function show(Flock $flock)
     {
-        //
+        return new FlockResource($flock->load(['shed', 'breed']));
     }
 
     /**
@@ -37,7 +53,22 @@ class FlockController extends Controller
      */
     public function update(Request $request, Flock $flock)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['sometimes', 'string', 'max:255'],
+            'shed_id' => ['sometimes', 'exists:sheds,id'],
+            'breed_id' => ['sometimes', 'exists:breeds,id'],
+            'start_date' => ['sometimes', 'date'],
+            'initial_quantity' => ['sometimes', 'integer', 'min:1'],
+            'current_quantity' => ['sometimes', 'integer', 'min:0'],
+            'status' => ['sometimes', 'in:active,sold,completed'],
+        ]);
+
+        $flock->update($validated);
+
+        return response()->json([
+            'message' => 'Flock updated successfully.',
+            'flock' => new FlockResource($flock),
+        ]);
     }
 
     /**
@@ -45,6 +76,10 @@ class FlockController extends Controller
      */
     public function destroy(Flock $flock)
     {
-        //
+        $flock->delete();
+
+        return response()->json([
+            'message' => 'Flock deleted successfully.',
+        ]);
     }
 }
