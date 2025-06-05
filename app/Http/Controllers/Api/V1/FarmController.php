@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\FarmResource;
 use App\Models\Farm;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class FarmController extends Controller
 {
@@ -13,7 +15,7 @@ class FarmController extends Controller
      */
     public function index()
     {
-        //
+        return FarmResource::collection(Farm::all());
     }
 
     /**
@@ -21,7 +23,20 @@ class FarmController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string'],
+            'address' => ['required', 'string'],
+            'owner_id' => ['required', 'exists:users,id'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+        ]);
+
+        $farm = Farm::create($validated);
+
+        return response()->json([
+            'message' => 'Farm created successfully.',
+            'farm' => FarmResource::make($farm),
+        ], 201);
     }
 
     /**
@@ -29,7 +44,7 @@ class FarmController extends Controller
      */
     public function show(Farm $farm)
     {
-        //
+        return FarmResource::make($farm);
     }
 
     /**
@@ -37,7 +52,20 @@ class FarmController extends Controller
      */
     public function update(Request $request, Farm $farm)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['string'],
+            'address' => ['string'],
+            'owner_id' => ['exists:users,id'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+        ]);
+
+        $farm->update($validated);
+
+        return response()->json([
+            'message' => 'Farm updated successfully.',
+            'farm' => FarmResource::make($farm),
+        ]);
     }
 
     /**
@@ -45,6 +73,10 @@ class FarmController extends Controller
      */
     public function destroy(Farm $farm)
     {
-        //
+        $farm->delete();
+
+        return response()->json([
+            'message' => 'Farm deleted successfully.',
+        ]);
     }
 }
