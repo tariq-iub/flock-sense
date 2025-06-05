@@ -21,6 +21,12 @@ class DatabaseSeeder extends Seeder
             'phone' => '+923346031105',
         ]);
 
+        User::factory()->create([
+            'name' => 'Abdullah Abid',
+            'email' => 'abdrps2004@gmail.com',
+            'phone' => '+923326334598',
+        ]);
+
         $this->call([
             RoleSeeder::class,
             // Add other seeders here as needed

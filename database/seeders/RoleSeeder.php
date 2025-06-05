@@ -20,5 +20,6 @@ class RoleSeeder extends Seeder
         Role::firstOrCreate(['name' => 'worker']);
 
         User::find(1)->assignRole('admin');
+        User::find(2)->assignRole('admin');
     }
 }
