@@ -6,9 +6,9 @@ use App\Http\Controllers\ApiController;
 use App\Http\Resources\SensorDataResource;
 use App\Models\Device;
 use App\Models\Shed;
+use App\Models\ShedDevice;
 use App\Services\DynamoDbService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SensorDataController extends ApiController
 {
@@ -37,10 +37,7 @@ class SensorDataController extends ApiController
             'range' => 'required|in:latest,last_hour,last_12_hours,day,week,month'
         ]);
 
-        $deviceIds = DB::table('shed_devices')
-            ->where('shed_id', $shedId)
-            ->pluck('device_id')
-            ->toArray();
+        $deviceIds = ShedDevice::where('shed_id', $shedId)->pluck('device_id')->toArray();
 
         $fromTimestamp = $this->getTimeRange($validated['range']);
 
@@ -57,10 +54,7 @@ class SensorDataController extends ApiController
 
         $shedIds = Shed::where('farm_id', $farmId)->pluck('id');
 
-        $deviceIds = DB::table('shed_devices')
-            ->whereIn('shed_id', $shedIds)
-            ->pluck('device_id')
-            ->toArray();
+        $deviceIds = ShedDevice::whereIn('shed_id', $shedIds)->pluck('device_id')->toArray();
 
         $fromTimestamp = $this->getTimeRange($validated['range']);
 
