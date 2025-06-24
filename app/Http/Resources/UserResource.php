@@ -19,8 +19,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'avatar' => $this->avatar,
-            'role' => 'admin',
+            'avatar' => $this->getFirstMedia()?->preview_url,
+            'roles' => 'admin',
             'email_verified' => ($this->email_verified_at) ? "Yes" : "No",
             'create_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
