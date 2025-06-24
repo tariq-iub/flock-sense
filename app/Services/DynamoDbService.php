@@ -32,9 +32,10 @@ class DynamoDbService
             'timestamp'  => ['N' => (string)$data['timestamp']],
         ];
 
-        foreach (['temperature', 'humidity', 'co2', 'nh3', 'electricity'] as $field) {
-            if (isset($data[$field])) {
-                $item[$field] = ['N' => (string)$data[$field]];
+        // Dynamically encode all additional sensor fields
+        foreach ($data as $key => $value) {
+            if (!in_array($key, ['device_id', 'timestamp']) && $value !== null) {
+                $item[$key] = ['N' => (string)$value];
             }
         }
 
@@ -56,7 +57,7 @@ class DynamoDbService
                     'ExpressionAttributeValues' => [
                         ':device_id' => ['N' => (string)$deviceId],
                     ],
-                    'ScanIndexForward' => false, // newest first
+                    'ScanIndexForward' => false,
                     'Limit' => 1,
                 ];
             } else {
@@ -75,15 +76,11 @@ class DynamoDbService
             $response = $this->client->query($query);
 
             foreach ($response['Items'] as $item) {
-                $results[] = [
-                    'device_id' => (int)$item['device_id']['N'],
-                    'timestamp' => (int)$item['timestamp']['N'],
-                    'temperature' => isset($item['temperature']) ? (float)$item['temperature']['N'] : null,
-                    'humidity' => isset($item['humidity']) ? (float)$item['humidity']['N'] : null,
-                    'co2' => isset($item['co2']) ? (float)$item['co2']['N'] : null,
-                    'nh3' => isset($item['nh3']) ? (float)$item['nh3']['N'] : null,
-                    'electricity' => isset($item['electricity']) ? (float)$item['electricity']['N'] : null,
-                ];
+                $record = [];
+                foreach ($item as $key => $value) {
+                    $record[$key] = isset($value['N']) ? (float)$value['N'] : (string)array_values($value)[0];
+                }
+                $results[] = $record;
             }
         }
 
