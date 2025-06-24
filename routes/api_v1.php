@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\BreedController;
 use App\Http\Controllers\Api\V1\FlockController;
+use App\Http\Controllers\Api\V1\SensorDataController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\SubscriptionPlanController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 // Other routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class)->except(['store']);
+
     Route::apiResources([
         'farms' => FarmController::class,
         'sheds' => ShedController::class,
@@ -23,4 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
         'breeds' => BreedController::class,
         'flocks' => FlockController::class,
     ]);
+
+    Route::prefix('sensor-data')->controller(SensorDataController::class)->group(function () {
+        Route::post('/', 'store');
+        Route::get('/shed/{shedId}', 'fetchByShed');
+        Route::get('/farm/{farmId}', 'fetchByFarm');
+    });
 });
