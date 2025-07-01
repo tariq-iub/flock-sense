@@ -15,12 +15,12 @@ return new class extends Migration {
             $table->string('email')->index();
             $table->string('otp'); // hashed
             $table->boolean('is_verified')->default(false);
-            $table->timestamp('verified_at')->nullable();
-            $table->timestamp('reset_at')->nullable();
+            $table->datetime('verified_at')->nullable();
+            $table->datetime('reset_at')->nullable();
             $table->integer('attempts')->default(3);
             $table->string('ip_address')->nullable();
             $table->string('user_agent')->nullable();
-            $table->timestamp('expires_at');
+            $table->datetime('expires_at');
             $table->timestamps();
         });
     }

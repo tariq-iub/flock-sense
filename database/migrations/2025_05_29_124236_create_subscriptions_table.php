@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('farm_id')->constrained();
             $table->foreignId('plan_id')->constrained('subscription_plans');
-            $table->timestamp('starts_at');
-            $table->timestamp('ends_at');
+            $table->datetime('starts_at');
+            $table->datetime('ends_at');
             $table->timestamps();
         });
     }
