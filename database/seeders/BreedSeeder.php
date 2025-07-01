@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Breed;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +13,8 @@ class BreedSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Breed::firstOrCreate(['Ross' => 'Misri']);
+        Breed::firstOrCreate(['Cobb' => 'Misri']);
+        Breed::firstOrCreate(['Arbor Acre' => 'Misri']);
     }
 }

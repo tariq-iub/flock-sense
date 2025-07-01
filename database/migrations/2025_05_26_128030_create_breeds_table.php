@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('breeds', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('category', ['layer', 'broiler', 'dual-purpose']);
-            $table->integer('hatching_period')->nullable();
+            $table->enum('category', ['broiler', 'layer'])->default('broiler');
             $table->timestamps();
         });
     }
