@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PasswordResetRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
@@ -12,6 +13,10 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Carbon;
+
 
 class AuthController extends Controller
 {
@@ -160,5 +165,170 @@ class AuthController extends Controller
         $request->user()->sendEmailVerificationNotification();
 
         return response()->json(['message' => 'Verification link sent']);
+    }
+
+    public function requestPasswordReset(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $otp = rand(100000, 999999); // 6-digit OTP
+
+        DB::table('password_resets')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => $otp,
+                'created_at' => Carbon::now(),
+            ]
+        );
+
+        // Send email with OTP
+        Mail::raw("Your password reset OTP is: {$otp}", function ($message) use ($request) {
+            $message->to($request->email)
+                ->subject('Your Password Reset OTP');
+        });
+
+        return response()->json(['message' => 'OTP sent to your email.']);
+    }
+
+
+    public function verifyResetOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+
+        if (!$record || $record->token !== $request->otp) {
+            return response()->json(['error' => 'Invalid OTP.'], 400);
+        }
+
+        // Optional: check OTP expiry (e.g., 15 min)
+        if (Carbon::parse($record->created_at)->addMinutes(15)->isPast()) {
+            return response()->json(['error' => 'OTP expired.'], 400);
+        }
+
+        // Store a flag in session/cache or just move on
+        return response()->json(['message' => 'OTP verified.']);
+    }
+
+
+    public function resetPasswordWithOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|digits:6',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+
+        if (!$record || $record->token !== $request->otp) {
+            return response()->json(['error' => 'Invalid OTP.'], 400);
+        }
+
+        // Optional expiry check
+        if (Carbon::parse($record->created_at)->addMinutes(15)->isPast()) {
+            return response()->json(['error' => 'OTP expired.'], 400);
+        }
+
+        // Reset password
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->setRememberToken(Str::random(60));
+        $user->save();
+
+        // Remove the OTP entry
+        DB::table('password_resets')->where('email', $request->email)->delete();
+
+        event(new PasswordReset($user));
+
+        return response()->json(['message' => 'Password reset successful.']);
+    }
+
+    public function requestOtp(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $otp = rand(100000, 999999);
+
+        PasswordResetRequest::updateOrCreate(
+            ['email' => $request->email],
+            [
+                'otp' => Hash::make($otp),
+                'is_verified' => false,
+                'attempts' => 0,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'expires_at' => now()->addMinutes(15),
+            ]
+        );
+
+        Mail::raw("Your OTP is: $otp", function ($message) use ($request) {
+            $message->to($request->email)->subject('Your Password Reset OTP');
+        });
+
+        return response()->json(['message' => 'OTP sent to your email.']);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $reset = PasswordResetRequest::where('email', $request->email)->first();
+
+        if (!$reset) {
+            return response()->json(['error' => 'No reset request found.'], 404);
+        }
+
+        if ($reset->expires_at->isPast()) {
+            return response()->json(['error' => 'OTP expired.'], 400);
+        }
+
+        if (!Hash::check($request->otp, $reset->otp)) {
+            $reset->increment('attempts');
+            return response()->json(['error' => 'Invalid OTP.'], 400);
+        }
+
+        $reset->update([
+            'is_verified' => true,
+            'verified_at' => now(),
+        ]);
+
+        return response()->json(['message' => 'OTP verified.']);
+    }
+
+    public function resetPasswordViaOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $reset = PasswordResetRequest::where('email', $request->email)->first();
+
+        if (!$reset || !$reset->is_verified) {
+            return response()->json(['error' => 'OTP not verified.'], 400);
+        }
+
+        if ($reset->reset_at) {
+            return response()->json(['error' => 'Password already reset.'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->update([
+            'password' => Hash::make($request->password),
+            'remember_token' => Str::random(60)
+        ]);
+
+        $reset->update(['reset_at' => now()]);
+
+        event(new PasswordReset($user));
+
+        return response()->json(['message' => 'Password reset successful.']);
     }
 }
