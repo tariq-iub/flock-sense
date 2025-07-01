@@ -13,8 +13,8 @@ class BreedSeeder extends Seeder
      */
     public function run(): void
     {
-        Breed::firstOrCreate(['Ross' => 'Misri']);
-        Breed::firstOrCreate(['Cobb' => 'Misri']);
-        Breed::firstOrCreate(['Arbor Acre' => 'Misri']);
+        Breed::firstOrCreate(['name' => 'Ross']);
+        Breed::firstOrCreate(['name' => 'Cobb']);
+        Breed::firstOrCreate(['name' => 'Arbor Acre']);
     }
 }
