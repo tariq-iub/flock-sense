@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Web;
 
-use App\Models\Feed;
+use App\Http\Controllers\Controller;
+use App\Models\FeedProfile;
 use Illuminate\Http\Request;
 
-class FeedController extends Controller
+class FeedProfileController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +35,7 @@ class FeedController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Feed $feed)
+    public function show(FeedProfile $feedProfile)
     {
         //
     }
@@ -42,7 +43,7 @@ class FeedController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Feed $feed)
+    public function edit(FeedProfile $feedProfile)
     {
         //
     }
@@ -50,7 +51,7 @@ class FeedController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Feed $feed)
+    public function update(Request $request, FeedProfile $feedProfile)
     {
         //
     }
@@ -58,7 +59,7 @@ class FeedController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Feed $feed)
+    public function destroy(FeedProfile $feedProfile)
     {
         //
     }
