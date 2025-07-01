@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PasswordResetRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,7 @@ class AuthController extends Controller
     /**
      * Register new user
      */
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -50,7 +51,7 @@ class AuthController extends Controller
     /**
      * Login user and create token
      */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -75,7 +76,7 @@ class AuthController extends Controller
     /**
      * Logout user (revoke token)
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
@@ -85,7 +86,7 @@ class AuthController extends Controller
     /**
      * Get authenticated user data
      */
-    public function user(Request $request)
+    public function user(Request $request): JsonResponse
     {
         return response()->json($request->user());
     }
@@ -93,7 +94,7 @@ class AuthController extends Controller
     /**
      * Send password reset link
      */
-    public function forgotPassword(Request $request)
+    public function forgotPassword(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email|exists:users,email'
@@ -111,7 +112,7 @@ class AuthController extends Controller
     /**
      * Handle password reset
      */
-    public function resetPassword(Request $request)
+    public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([
             'token' => 'required',
@@ -140,7 +141,7 @@ class AuthController extends Controller
     /**
      * Verify email (should be accessed via email link)
      */
-    public function verifyEmail(Request $request)
+    public function verifyEmail(Request $request): JsonResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json(['message' => 'Email already verified']);
@@ -156,7 +157,7 @@ class AuthController extends Controller
     /**
      * Resend email verification link
      */
-    public function resendVerificationEmail(Request $request)
+    public function resendVerificationEmail(Request $request): JsonResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
             return response()->json(['message' => 'Email already verified']);
@@ -167,7 +168,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Verification link sent']);
     }
 
-    public function requestPasswordReset(Request $request)
+    public function requestPasswordReset(Request $request) : JsonResponse
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
 
@@ -191,7 +192,7 @@ class AuthController extends Controller
     }
 
 
-    public function verifyResetOtp(Request $request)
+    public function verifyResetOtp(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -214,7 +215,7 @@ class AuthController extends Controller
     }
 
 
-    public function resetPasswordWithOtp(Request $request)
+    public function resetPasswordWithOtp(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email|exists:users,email',
@@ -247,7 +248,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Password reset successful.']);
     }
 
-    public function requestOtp(Request $request)
+    public function requestOtp(Request $request): JsonResponse
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
 
@@ -272,7 +273,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'OTP sent to your email.']);
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyOtp(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -302,7 +303,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'OTP verified.']);
     }
 
-    public function resetPasswordViaOtp(Request $request)
+    public function resetPasswordViaOtp(Request $request): JsonResponse
     {
         $request->validate([
             'email' => 'required|email|exists:users,email',
