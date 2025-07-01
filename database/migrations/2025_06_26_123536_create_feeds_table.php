@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('flocks', function (Blueprint $table) {
+        Schema::create('feeds', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('shed_id')->constrained();
-            $table->foreignId('breed_id')->constrained();
-            $table->integer('chicken_count')->default(0);
-            $table->date('start_date');
-            $table->date('end_date')->nullable();
+            $table->string('title');
+            $table->integer('start_day');
+            $table->integer('end_day')->nullable();
+            $table->string('feed_form', 100);
+            $table->text('particle_size')->nullable();
+            $table->enum('category', ['broiler', 'layer'])->default('broiler');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('flocks');
+        Schema::dropIfExists('feeds');
     }
 };
