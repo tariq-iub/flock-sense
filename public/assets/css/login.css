@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap');
+
 body {
     font-family: 'Outfit', sans-serif;
     font-weight: 400;
@@ -37,10 +39,6 @@ body {
 }
 
 .login-area {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
     padding: 0 24px;
 }
 
@@ -54,7 +52,6 @@ body {
 }
 
 .brand-info img {
-    margin-bottom: 24px;
     width: 170px;
 }
 
@@ -63,5 +60,5 @@ body {
     border: 1px #C0CFBD solid;
     border-radius: 15px;
     padding: 24px;
-    min-width: 400px;
+    min-width: 350px;
 }

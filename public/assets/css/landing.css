@@ -1,0 +1,70 @@
+@charset "UTF-8";
+/****** Utils ******/
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap");
+
+body {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    color: #2a2f2e;
+}
+p, h1, h2, h3, h4, h5, h6 {
+    color: #2a2f2e;
+}
+.alt-section:nth-child(even) {
+    background-color: #f4fce6;
+}
+.alt-section:nth-child(odd) {
+    background-color: #fbfff4;
+}
+.section-padding {
+    padding: 4rem 1rem;
+}
+.logo img {
+    height: 60px;
+    margin-right: 10px;
+}
+.login-btn {
+    background: #dcffad;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-weight: bold;
+    color: #2a2f2e;
+    text-decoration: none;
+}
+.badge-custom {
+    background: #dcffad;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    flex-direction: column;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+}
+
+.footer {
+    background-color: #dcffad;
+    color: #353d3c;
+}
+
+.scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #79c37d;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    display: none;
+    cursor: pointer;
+    z-index: 999;
+}
