@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\PasswordResetRequest;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -168,7 +168,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Verification link sent']);
     }
 
-    public function requestPasswordReset(Request $request) : JsonResponse
+    public function requestPasswordReset(Request $request): JsonResponse
     {
         $request->validate(['email' => 'required|email|exists:users,email']);
 

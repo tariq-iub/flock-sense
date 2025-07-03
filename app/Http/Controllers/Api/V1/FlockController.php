@@ -27,9 +27,8 @@ class FlockController extends ApiController
             'shed_id' => ['required', 'exists:sheds,id'],
             'breed_id' => ['required', 'exists:breeds,id'],
             'start_date' => ['required', 'date'],
-            'initial_quantity' => ['required', 'integer', 'min:1'],
-            'current_quantity' => ['required', 'integer', 'min:0'],
-            'status' => ['required', 'in:active,sold,completed'],
+            'end_date' => ['required', 'date'],
+            'chicken_count' => ['required', 'integer', 'min:1'],
         ]);
 
         $flock = Flock::create($validated);

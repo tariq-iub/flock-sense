@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\BreedController;
+use App\Http\Controllers\Api\V1\DeviceApplianceController;
 use App\Http\Controllers\Api\V1\FlockController;
 use App\Http\Controllers\Api\V1\SensorDataController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
@@ -32,3 +33,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/farm/{farmId}', 'fetchByFarm');
     });
 });
+
+
+// Main appliance CRUD routes
+Route::apiResource('device-appliances', DeviceApplianceController::class);
+
+// Status-specific routes for backward compatibility
+Route::get('device-appliance-statuses', [DeviceApplianceController::class, 'getAllStatuses']);
+Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'getStatus']);
+Route::patch('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'updateStatus']);
+Route::patch('device-appliance-statuses/update-all', [DeviceApplianceController::class, 'updateAllStatuses']);
+
+// Fetch by shed/device routes
+Route::get('sheds/{shedId}/appliances', [DeviceApplianceController::class, 'fetchByShed']);
+Route::get('devices/{deviceId}/appliances', [DeviceApplianceController::class, 'fetchByDevice']);
