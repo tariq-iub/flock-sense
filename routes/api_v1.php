@@ -34,16 +34,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-
-// Main appliance CRUD routes
+// Resource routes
 Route::apiResource('device-appliances', DeviceApplianceController::class);
 
-// Status-specific routes for backward compatibility
-Route::get('device-appliance-statuses', [DeviceApplianceController::class, 'getAllStatuses']);
-Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'getStatus']);
-Route::patch('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'updateStatus']);
-Route::patch('device-appliance-statuses/update-all', [DeviceApplianceController::class, 'updateAllStatuses']);
+// Custom routes
+Route::get('shed/{shedId}/appliances', [DeviceApplianceController::class, 'fetchByShed']);
+Route::get('device/{serial}/appliances', [DeviceApplianceController::class, 'fetchByDevice']);
+Route::get('device/{serial}/appliance-ids', [DeviceApplianceController::class, 'fetchDeviceApplianceIds']);
 
-// Fetch by shed/device routes
-Route::get('sheds/{shedId}/appliances', [DeviceApplianceController::class, 'fetchByShed']);
-Route::get('devices/{deviceId}/appliances', [DeviceApplianceController::class, 'fetchByDevice']);
+// Status routes
+Route::put('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'updateStatus']);
+Route::put('device-appliances/statuses/update', [DeviceApplianceController::class, 'updateAllStatuses']);
+Route::get('device-appliances/statuses', [DeviceApplianceController::class, 'getAllStatuses']);
+Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'getStatus']);

@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Resources\DeviceApplianceResource;
 use App\Models\DeviceAppliance;
 use App\Models\Device;
+use App\Models\Shed;
 use Illuminate\Http\Request;
 
 class DeviceApplianceController extends ApiController
@@ -154,26 +155,6 @@ class DeviceApplianceController extends ApiController
         }
 
         return response()->json(['message' => 'Statuses updated successfully']);
-    }
-
-    /**
-     * Get all statuses (maintains compatibility with old status controller)
-     */
-    public function getAllStatuses()
-    {
-        $appliances = DeviceAppliance::all();
-        $statuses = $appliances->map(function ($appliance) {
-            return [
-                'id' => $appliance->id,
-                'device_appliance_id' => $appliance->id,
-                'appliance' => $appliance,
-                'status' => $appliance->status,
-                'metrics' => $appliance->metrics,
-                'updated_at' => $appliance->status_updated_at
-            ];
-        });
-
-        return response()->json(['data' => $statuses]);
     }
 
     /**
