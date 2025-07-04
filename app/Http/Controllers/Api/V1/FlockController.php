@@ -6,15 +6,24 @@ use App\Http\Controllers\ApiController;
 use App\Http\Resources\FlockResource;
 use App\Models\Flock;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class FlockController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return FlockResource::collection(Flock::with(['shed', 'breed'])->get());
+        $flocks = QueryBuilder::for(Flock::class)
+            ->whereIn('shed_id', $request->user()->farms()->with('sheds')->get()->pluck('sheds.*.id')->flatten())
+            ->with(['shed.farm', 'breed'])
+            ->allowedFilters(['id', 'name', 'shed_id'])
+            ->allowedIncludes(['shed', 'breed'])
+            ->allowedSorts(['id', 'name', 'start_date', 'created_at'])
+            ->get();
+
+        return FlockResource::collection($flocks);
     }
 
     /**
@@ -27,7 +36,7 @@ class FlockController extends ApiController
             'shed_id' => ['required', 'exists:sheds,id'],
             'breed_id' => ['required', 'exists:breeds,id'],
             'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date'],
+            'end_date' => ['nullable', 'date'],
             'chicken_count' => ['required', 'integer', 'min:1'],
         ]);
 
@@ -35,7 +44,7 @@ class FlockController extends ApiController
 
         return response()->json([
             'message' => 'Flock created successfully.',
-            'flock' => new FlockResource($flock),
+            'flock' => FlockResource::make($flock),
         ], 201);
     }
 
@@ -44,7 +53,13 @@ class FlockController extends ApiController
      */
     public function show(Flock $flock)
     {
-        return new FlockResource($flock->load(['shed', 'breed']));
+        return FlockResource::make(
+            Flock::with([
+                'shed.farm',
+                'breed',
+            ])
+                ->findOrFail($flock->id)
+        );
     }
 
     /**
@@ -57,16 +72,15 @@ class FlockController extends ApiController
             'shed_id' => ['sometimes', 'exists:sheds,id'],
             'breed_id' => ['sometimes', 'exists:breeds,id'],
             'start_date' => ['sometimes', 'date'],
-            'initial_quantity' => ['sometimes', 'integer', 'min:1'],
-            'current_quantity' => ['sometimes', 'integer', 'min:0'],
-            'status' => ['sometimes', 'in:active,sold,completed'],
+            'end_date' => ['nullable', 'date'],
+            'chicken_count' => ['sometimes', 'integer', 'min:1'],
         ]);
 
         $flock->update($validated);
 
         return response()->json([
             'message' => 'Flock updated successfully.',
-            'flock' => new FlockResource($flock),
+            'flock' => FlockResource::make($flock),
         ]);
     }
 

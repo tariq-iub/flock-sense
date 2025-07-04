@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Farm extends Model
 {
-    protected $fillable = ['name', 'address', 'owner_id'];
+    protected $fillable = ['name', 'address', 'owner_id', 'latitude', 'longitude'];
 
     public function owner() : BelongsTo
     {

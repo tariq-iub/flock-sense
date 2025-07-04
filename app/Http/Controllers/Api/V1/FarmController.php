@@ -2,30 +2,28 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Http\Resources\FarmResource;
 use App\Models\Farm;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\QueryBuilder;
 
-class FarmController extends Controller
+class FarmController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Farm::query();
+        $farms = QueryBuilder::for(Farm::class)
+            ->where('owner_id', $request->user()->id)
+            ->allowedFilters(['id', 'name'])
+            ->allowedIncludes(['sheds'])
+            ->allowedSorts(['id', 'name'])
+            ->withCount('sheds')
+            ->get();
 
-        if ($request->has('owner_id')) {
-            $query->where('owner_id', $request->owner_id);
-
-            return FarmResource::collection(
-                $query->with(['owner', 'sheds'])->get()
-            );
-        }
-
-        return FarmResource::collection(Farm::all());
+        return FarmResource::collection($farms);
     }
 
     /**
@@ -54,6 +52,8 @@ class FarmController extends Controller
      */
     public function show(Farm $farm)
     {
+        $farm->load(['owner', 'sheds'])->loadCount('sheds');
+
         return FarmResource::make($farm);
     }
 
@@ -63,9 +63,9 @@ class FarmController extends Controller
     public function update(Request $request, Farm $farm)
     {
         $validated = $request->validate([
-            'name' => ['string'],
-            'address' => ['string'],
-            'owner_id' => ['exists:users,id'],
+            'name' => ['sometimes', 'string'],
+            'address' => ['sometimes', 'string'],
+            'owner_id' => ['sometimes', 'exists:users,id'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);

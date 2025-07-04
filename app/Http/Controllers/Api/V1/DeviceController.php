@@ -6,15 +6,24 @@ use App\Http\Controllers\ApiController;
 use App\Http\Resources\DeviceResource;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class DeviceController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return DeviceResource::collection(Device::all());
+        $devices = QueryBuilder::for(Device::class)
+            ->with('sheds')
+            ->withCount(['sheds', 'appliances'])
+            ->allowedFilters(['id', 'serial_no', 'firmware_version'])
+            ->allowedIncludes(['sheds', 'appliances'])
+            ->allowedSorts(['id', 'serial_no', 'created_at'])
+            ->get();
+
+        return DeviceResource::collection($devices);
     }
 
     /**
@@ -36,7 +45,7 @@ class DeviceController extends ApiController
 
         return response()->json([
             'message' => 'Device created successfully.',
-            'device' => new DeviceResource($device),
+            'device' => DeviceResource::make($device),
         ], 201);
     }
 
@@ -45,7 +54,14 @@ class DeviceController extends ApiController
      */
     public function show(Device $device)
     {
-        return new DeviceResource($device);
+        return DeviceResource::make(
+            Device::with([
+                'sheds',
+                'appliances' => fn($query) => $query->orderBy('type')->orderBy('name'),
+            ])
+                ->withCount(['sheds', 'appliances'])
+                ->findOrFail($device->id)
+        );
     }
 
     /**
@@ -69,7 +85,7 @@ class DeviceController extends ApiController
 
         return response()->json([
             'message' => 'Device updated successfully.',
-            'device' => new DeviceResource($device),
+            'device' => DeviceResource::make($device),
         ]);
     }
 

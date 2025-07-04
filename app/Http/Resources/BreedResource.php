@@ -14,6 +14,15 @@ class BreedResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'type' => 'breed',
+            'id' => $this->id,
+            'attributes' => [
+                'name' => $this->name,
+                'flocks_count' => $this->flocks_count,
+                'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+            ],
+        ];
     }
 }

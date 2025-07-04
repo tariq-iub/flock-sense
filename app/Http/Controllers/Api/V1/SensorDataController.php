@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Http\Resources\SensorDataResource;
 use App\Models\Device;
 use App\Models\Shed;
@@ -11,10 +11,11 @@ use App\Services\DynamoDbService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class SensorDataController extends Controller
+class SensorDataController extends ApiController
 {
     public function __construct(protected DynamoDbService $dynamoDbService)
     {
+        parent::__construct();
     }
 
     public function store(Request $request)

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Device extends Model
 {
@@ -17,4 +18,8 @@ class Device extends Model
             ->withTimestamps();
     }
 
+    public function appliances(): HasMany
+    {
+        return $this->hasMany(DeviceAppliance::class);
+    }
 }

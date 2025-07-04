@@ -2,19 +2,29 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Http\Resources\ShedResource;
 use App\Models\Shed;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
-class ShedController extends Controller
+class ShedController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return ShedResource::collection(Shed::all());
+        $sheds = QueryBuilder::for(Shed::class)
+            ->where('farm_id', $request->user()->farms()->pluck('farms.id'))
+            ->with('farm')
+            ->withCount(['flocks', 'devices'])
+            ->allowedFilters(['id', 'name', 'type', 'farm_id'])
+            ->allowedIncludes(['farm', 'flocks', 'devices'])
+            ->allowedSorts(['id', 'name', 'capacity', 'created_at'])
+            ->get();
+
+        return ShedResource::collection($sheds);
     }
 
     /**
@@ -24,7 +34,7 @@ class ShedController extends Controller
     {
         $validated = $request->validate([
             'farm_id' => ['required', 'exists:farms,id'],
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string', 'max:255'],
             'capacity' => ['required', 'integer', 'min:1'],
             'type' => ['required', 'in:default,brooder,layer,broiler,hatchery'],
             'description' => ['nullable', 'string'],
@@ -43,7 +53,15 @@ class ShedController extends Controller
      */
     public function show(Shed $shed)
     {
-        return ShedResource::make($shed);
+        return ShedResource::make(
+            Shed::with([
+                'farm',
+                'flocks.breed',
+                'devices' => fn($query) => $query->with('appliances'),
+            ])
+                ->withCount(['flocks', 'devices'])
+                ->findOrFail($shed->id)
+        );
     }
 
     /**
@@ -52,10 +70,10 @@ class ShedController extends Controller
     public function update(Request $request, Shed $shed)
     {
         $validated = $request->validate([
-            'farm_id' => ['exists:farms,id'],
-            'name' => ['string'],
-            'capacity' => ['integer', 'min:1'],
-            'type' => ['in:default,brooder,layer,broiler,hatchery'],
+            'farm_id' => ['sometimes', 'exists:farms,id'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'capacity' => ['sometimes', 'integer', 'min:1'],
+            'type' => ['sometimes', 'in:default,brooder,layer,broiler,hatchery'],
             'description' => ['nullable', 'string'],
         ]);
 

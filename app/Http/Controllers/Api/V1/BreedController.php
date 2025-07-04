@@ -6,15 +6,22 @@ use App\Http\Controllers\ApiController;
 use App\Http\Resources\BreedResource;
 use App\Models\Breed;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class BreedController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return BreedResource::collection(Breed::all());
+        $breeds = QueryBuilder::for(Breed::class)
+            ->withCount('flocks')
+            ->allowedFilters(['id', 'name', 'category'])
+            ->allowedSorts(['id', 'name', 'created_at'])
+            ->get();
+
+        return BreedResource::collection($breeds);
     }
 
     /**
@@ -24,15 +31,14 @@ class BreedController extends ApiController
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'in:layer,broiler,dual-purpose'],
-            'hatching_period' => ['nullable', 'integer', 'min:1'],
+            'category' => ['required', 'in:broiler,layer'],
         ]);
 
         $breed = Breed::create($validated);
 
         return response()->json([
             'message' => 'Breed created successfully.',
-            'breed' => new BreedResource($breed),
+            'breed' => BreedResource::make($breed),
         ], 201);
     }
 
@@ -41,7 +47,11 @@ class BreedController extends ApiController
      */
     public function show(Breed $breed)
     {
-        return new BreedResource($breed);
+        return BreedResource::make(
+            Breed::with(['flocks.shed.farm'])
+                ->withCount('flocks')
+                ->findOrFail($breed->id)
+        );
     }
 
     /**
@@ -51,15 +61,14 @@ class BreedController extends ApiController
     {
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
-            'category' => ['sometimes', 'in:layer,broiler,dual-purpose'],
-            'hatching_period' => ['nullable', 'integer', 'min:1'],
+            'category' => ['sometimes', 'in:broiler,layer'],
         ]);
 
         $breed->update($validated);
 
         return response()->json([
             'message' => 'Breed updated successfully.',
-            'breed' => new BreedResource($breed),
+            'breed' => BreedResource::make($breed),
         ]);
     }
 

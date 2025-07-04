@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Shed extends Model
 {
-    protected $fillable = ['farm_id', 'name', 'capacity'];
+    protected $fillable = ['farm_id', 'name', 'capacity', 'type', 'description'];
 
     public function farm(): BelongsTo
     {
