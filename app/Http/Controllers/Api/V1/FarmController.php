@@ -13,8 +13,18 @@ class FarmController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = Farm::query();
+
+        if ($request->has('owner_id')) {
+            $query->where('owner_id', $request->owner_id);
+
+            return FarmResource::collection(
+                $query->with(['owner', 'sheds'])->get()
+            );
+        }
+
         return FarmResource::collection(Farm::all());
     }
 
