@@ -19,16 +19,18 @@ trait HasMedia
         $name = time() . '_media';
         $filename = $name . '.' . $file->getClientOriginalExtension();
 
-        $destinationPath = public_path("admin/{$folder}");
+        $destinationPath = public_path("{$folder}");
         if (!file_exists($destinationPath)) {
             mkdir($destinationPath, 0775, true);
         }
+
         $file->move($destinationPath, $filename);
-        $path = "admin/{$folder}/{$filename}";
+        $path = "{$folder}/{$filename}";
 
         return $this->media()->create([
             'file_name' => $filename,
             'file_path' => $path,
+            'size' => $file->getSize(),
         ]);
     }
 

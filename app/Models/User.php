@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasMedia;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -51,5 +52,27 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function farms() : HasMany
+    {
+        return $this->hasMany(Farm::class, 'owner_id');
+    }
+
+    public function getShedsCountAttribute()
+    {
+        if (!$this->relationLoaded('farms')) return 0;
+        return $this->farms->sum('sheds_count');
+    }
+
+    public function getBirdsCountAttribute()
+    {
+        if (!$this->relationLoaded('farms')) return 0;
+
+        return $this->farms->sum(function ($farm) {
+            return $farm->sheds->sum(function ($shed) {
+                return $shed->flocks->sum('chicken_count');
+            });
+        });
     }
 }

@@ -2,21 +2,31 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\QueryBuilder;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return UserResource::collection(User::all());
+        $users = QueryBuilder::for(User::class)
+            ->with('media')
+            ->withCount('farms')
+            ->allowedFilters(['id', 'name'])
+            ->allowedIncludes('farms')
+            ->allowedSorts(['id', 'name'])
+            ->get();
+
+//        return $users;
+        return UserResource::collection($users);
     }
 
     /**
@@ -24,7 +34,14 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return UserResource::make($user);
+        return UserResource::make(
+            User::with([
+                'farms.sheds.flocks',
+                'farms' => fn($query) => $query->withCount('sheds'),
+            ])
+                ->withCount('farms')
+                ->findOrFail($user->id)
+        );
     }
 
     /**
