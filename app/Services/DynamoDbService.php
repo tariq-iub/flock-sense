@@ -20,12 +20,12 @@ class DynamoDbService
                 'key'    => config('aws.key'),
                 'secret' => config('aws.secret'),
             ],
+            'http' => [
+                'verify' => false, // Completely disable SSL verification
+                'timeout' => 30,
+                'connect_timeout' => 10,
+            ],
         ];
-
-        // Add HTTP configuration for SSL handling
-        if (config('aws.http')) {
-            $config['http'] = config('aws.http');
-        }
 
         $sdk = new Sdk($config);
         $this->client = $sdk->createDynamoDb();
