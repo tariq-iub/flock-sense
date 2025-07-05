@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class DeviceResource extends JsonResource
 {
@@ -23,8 +24,8 @@ class DeviceResource extends JsonResource
                 'capabilities' => json_decode($this->capabilities, true),
                 'sheds_count' => $this->sheds_count,
                 'appliances_count' => $this->appliances_count,
-                'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-                'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+                'created_at' => $this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s') : null,
+                'updated_at' => $this->updated_at ? Carbon::parse($this->updated_at)->format('Y-m-d H:i:s') : null,
                 $this->mergeWhen($request->routeIs('devices.show'), [
                     'sheds' => $this->whenLoaded('sheds', function () {
                         return $this->sheds->map(function ($shed) {
@@ -33,7 +34,7 @@ class DeviceResource extends JsonResource
                                 'name' => $shed->name,
                                 'capacity' => $shed->capacity,
                                 'type' => $shed->type,
-                                'link_date' => $shed->pivot->link_date?->format('Y-m-d H:i:s'),
+                                'link_date' => isset($shed->pivot->link_date) && $shed->pivot->link_date ? Carbon::parse($shed->pivot->link_date)->format('Y-m-d H:i:s') : null,
                             ];
                         });
                     }),
@@ -47,7 +48,7 @@ class DeviceResource extends JsonResource
                                 'config' => $appliance->config,
                                 'status' => $appliance->status,
                                 'metrics' => $appliance->metrics,
-                                'status_updated_at' => $appliance->status_updated_at?->format('Y-m-d H:i:s'),
+                                'status_updated_at' => isset($appliance->status_updated_at) && $appliance->status_updated_at ? Carbon::parse($appliance->status_updated_at)->format('Y-m-d H:i:s') : null,
                             ];
                         });
                     }),

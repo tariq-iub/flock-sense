@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
 
 class ShedResource extends JsonResource
 {
@@ -24,8 +25,8 @@ class ShedResource extends JsonResource
                 'description' => $this->description,
                 'flocks_count' => $this->flocks_count,
                 'devices_count' => $this->devices_count,
-                'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-                'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+                'created_at' => $this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s') : null,
+                'updated_at' => $this->updated_at ? Carbon::parse($this->updated_at)->format('Y-m-d H:i:s') : null,
                 $this->mergeWhen($this->relationLoaded('farm'), [
                     'farm' => [
                         'id' => $this->farm->id,
@@ -39,8 +40,8 @@ class ShedResource extends JsonResource
                             return [
                                 'id' => $flock->id,
                                 'name' => $flock->name,
-                                'start_date' => $flock->start_date?->format('Y-m-d'),
-                                'end_date' => $flock->end_date?->format('Y-m-d'),
+                                'start_date' => isset($flock->start_date) && $flock->start_date ? Carbon::parse($flock->start_date)->format('Y-m-d') : null,
+                                'end_date' => isset($flock->end_date) && $flock->end_date ? Carbon::parse($flock->end_date)->format('Y-m-d') : null,
                                 'chicken_count' => $flock->chicken_count,
                                 'status' => $flock->status,
                             ];
@@ -53,7 +54,7 @@ class ShedResource extends JsonResource
                                 'serial_no' => $device->serial_no,
                                 'firmware_version' => $device->firmware_version,
                                 'capabilities' => json_decode($device->capabilities, true),
-                                'link_date' => $device->pivot->link_date?->format('Y-m-d H:i:s'),
+                                'link_date' => isset($device->pivot->link_date) && $device->pivot->link_date ? Carbon::parse($device->pivot->link_date)->format('Y-m-d H:i:s') : null,
                             ];
                         });
                     }),

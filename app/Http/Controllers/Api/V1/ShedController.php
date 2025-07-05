@@ -38,9 +38,17 @@ class ShedController extends ApiController
             'capacity' => ['required', 'integer', 'min:1'],
             'type' => ['required', 'in:default,brooder,layer,broiler,hatchery'],
             'description' => ['nullable', 'string'],
+            'device_id' => ['nullable', 'exists:devices,id'],
         ]);
 
         $shed = Shed::create($validated);
+
+        // Link device to shed if device_id is provided
+        if (isset($validated['device_id'])) {
+            $shed->devices()->attach($validated['device_id'], [
+                'link_date' => now()
+            ]);
+        }
 
         return response()->json([
             'message' => 'Shed created successfully.',

@@ -24,8 +24,7 @@ class Shed extends Model
     public function devices(): BelongsToMany
     {
         return $this->belongsToMany(Device::class, 'shed_devices')
-            ->withPivot('link_date')
-            ->withTimestamps();
+            ->withPivot('link_date');
     }
 
 }

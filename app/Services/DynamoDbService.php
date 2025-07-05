@@ -13,15 +13,21 @@ class DynamoDbService
 
     public function __construct()
     {
-        $sdk = new Sdk([
+        $config = [
             'region'   => config('aws.region'),
             'version'  => 'latest',
             'credentials' => [
                 'key'    => config('aws.key'),
                 'secret' => config('aws.secret'),
             ],
-        ]);
+        ];
 
+        // Add HTTP configuration for SSL handling
+        if (config('aws.http')) {
+            $config['http'] = config('aws.http');
+        }
+
+        $sdk = new Sdk($config);
         $this->client = $sdk->createDynamoDb();
     }
 
