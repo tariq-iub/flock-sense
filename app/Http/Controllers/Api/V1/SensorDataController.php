@@ -34,10 +34,20 @@ class SensorDataController extends ApiController
         $validated['device_id'] = $device->id;
         unset($validated['serial_no']);
 
-        $this->dynamoDbService->putSensorData($validated);
+        // 👇 Merge dynamic sensor fields back into validated array
+        $sensorData = array_merge(
+            $validated,
+            collect($request->except(['serial_no']))  // All except serial_no
+                ->reject(fn($value) => is_null($value)) // Optional: skip nulls
+                ->toArray()
+        );
+
+        // ✅ Store in DynamoDB
+        $this->dynamoDbService->putSensorData($sensorData);
 
         return response()->json(['message' => 'Sensor data stored successfully.'], 201);
     }
+
 
     public function fetchByShed(Request $request, int $shedId)
     {
