@@ -9,6 +9,7 @@ class DeviceAppliance extends Model
 {
     protected $fillable = [
         'device_id',
+        'key',
         'type',
         'name',
         'channel',

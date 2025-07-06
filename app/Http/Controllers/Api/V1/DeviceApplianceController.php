@@ -117,44 +117,121 @@ class DeviceApplianceController extends ApiController
 
 
     /**
-     * Update status for a specific appliance
+     * Update status for a specific appliance by key
      */
-    public function updateStatus(Request $request, DeviceAppliance $deviceAppliance)
+    public function updateStatus(Request $request)
     {
         $validated = $request->validate([
+            'device_serial' => 'required|string',
+            'appliance_key' => 'required|string',
             'status' => 'required|boolean',
             'metrics' => 'nullable|array',
         ]);
 
-        $deviceAppliance->updateStatus(
-            $validated['status'],
-            $validated['metrics'] ?? null
-        );
+        // Get device by serial number
+        $device = Device::where('serial_no', $validated['device_serial'])->firstOrFail();
+        
+        // Find appliance by device ID and key
+        $appliance = DeviceAppliance::where('device_id', $device->id)
+            ->where('key', $validated['appliance_key'])
+            ->first();
+        
+        if (!$appliance) {
+            // Create new appliance with default type based on key
+            $type = $this->getApplianceTypeFromKey($validated['appliance_key']);
+            $appliance = DeviceAppliance::create([
+                'device_id' => $device->id,
+                'key' => $validated['appliance_key'],
+                'type' => $type,
+                'name' => ucfirst($type) . ' ' . strtoupper($validated['appliance_key']),
+                'status' => $validated['status'],
+                'status_updated_at' => now()
+            ]);
+        } else {
+            // Update existing appliance
+            $appliance->updateStatus(
+                $validated['status'],
+                $validated['metrics'] ?? null
+            );
+        }
 
-        return new DeviceApplianceResource($deviceAppliance);
+        return new DeviceApplianceResource($appliance);
     }
 
     /**
-     * Update multiple appliance statuses at once
+     * Update multiple appliance statuses at once using keys
      */
     public function updateAllStatuses(Request $request)
     {
         $validated = $request->validate([
-            'statuses' => 'required|array',
-            'statuses.*.appliance_id' => 'required|exists:device_appliances,id',
-            'statuses.*.status' => 'required|boolean',
-            'statuses.*.metrics' => 'nullable|array',
+            'device_serial' => 'required|string',
+            'appliances' => 'required|array',
+            'appliances.*' => 'required|boolean', // key => status mapping
         ]);
 
-        foreach ($validated['statuses'] as $item) {
-            $appliance = DeviceAppliance::find($item['appliance_id']);
-            $appliance->updateStatus(
-                $item['status'],
-                $item['metrics'] ?? null
-            );
+        // Get device by serial number
+        $device = Device::where('serial_no', $validated['device_serial'])->firstOrFail();
+        
+        $updatedAppliances = [];
+        
+        foreach ($validated['appliances'] as $key => $status) {
+            // Find existing appliance or create new one
+            $appliance = DeviceAppliance::where('device_id', $device->id)
+                ->where('key', $key)
+                ->first();
+            
+            if (!$appliance) {
+                // Create new appliance with default type based on key
+                $type = $this->getApplianceTypeFromKey($key);
+                $appliance = DeviceAppliance::create([
+                    'device_id' => $device->id,
+                    'key' => $key,
+                    'type' => $type,
+                    'name' => ucfirst($type) . ' ' . strtoupper($key),
+                    'status' => $status,
+                    'status_updated_at' => now()
+                ]);
+            } else {
+                // Update existing appliance
+                $appliance->updateStatus($status);
+            }
+            
+            $updatedAppliances[] = $appliance;
         }
 
-        return response()->json(['message' => 'Statuses updated successfully']);
+        return response()->json([
+            'message' => 'Statuses updated successfully',
+            'data' => DeviceApplianceResource::collection($updatedAppliances)
+        ]);
+    }
+
+    /**
+     * Helper method to determine appliance type from key
+     */
+    private function getApplianceTypeFromKey(string $key): string
+    {
+        $firstChar = strtolower(substr($key, 0, 1));
+        
+        return match($firstChar) {
+            'f' => 'fan',
+            'b' => 'brooder',
+            'c' => 'cooling_pad',
+            'l' => 'light',
+            'e' => 'exhaust',
+            'h' => 'heater',
+            default => 'appliance'
+        };
+    }
+
+    /**
+     * Get all appliance statuses
+     */
+    public function getAllStatuses()
+    {
+        $appliances = DeviceAppliance::all();
+        return response()->json([
+            'data' => DeviceApplianceResource::collection($appliances)
+        ]);
     }
 
     /**
