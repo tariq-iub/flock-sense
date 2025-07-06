@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\DeviceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+
 // Other routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class)->except(['store']);
@@ -28,11 +29,13 @@ Route::middleware('auth:sanctum')->group(function () {
     ]);
 
     Route::prefix('sensor-data')->controller(SensorDataController::class)->group(function () {
-        Route::post('/', 'store');
         Route::get('/shed/{shedId}', 'fetchByShed');
         Route::get('/farm/{farmId}', 'fetchByFarm');
     });
 });
+
+// Public sensor data store route (no auth required)
+Route::post('sensor-data', [SensorDataController::class, 'store']);
 
 // Resource routes
 Route::apiResource('device-appliances', DeviceApplianceController::class);
@@ -42,8 +45,10 @@ Route::get('shed/{shedId}/appliances', [DeviceApplianceController::class, 'fetch
 Route::get('device/{serial}/appliances', [DeviceApplianceController::class, 'fetchByDevice']);
 Route::get('device/{serial}/appliance-ids', [DeviceApplianceController::class, 'fetchDeviceApplianceIds']);
 
-// Status routes
-Route::put('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'updateStatus']);
-Route::put('device-appliances/statuses/update', [DeviceApplianceController::class, 'updateAllStatuses']);
+// Status routes - Updated for key-based approach
+Route::post('device-appliances/update-status', [DeviceApplianceController::class, 'updateStatus']);
+Route::post('device-appliances/update-all-statuses', [DeviceApplianceController::class, 'updateAllStatuses']);
+
+// Legacy routes
 Route::get('device-appliances/statuses', [DeviceApplianceController::class, 'getAllStatuses']);
 Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'getStatus']);
