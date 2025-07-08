@@ -15,7 +15,8 @@ class FarmManagerController extends ApiController
     {
         $managers = QueryBuilder::for($farm->managers())
             ->allowedFilters(['id', 'name', 'email'])
-            ->allowedSorts(['id', 'name', 'email']);
+            ->allowedSorts(['id', 'name', 'email'])
+            ->get();
         return ManagerResource::collection($managers);
     }
 

@@ -15,7 +15,8 @@ class FarmStaffController extends ApiController
     {
         $staff = QueryBuilder::for($farm->staff())
             ->allowedFilters(['id', 'name', 'email'])
-            ->allowedSorts(['id', 'name', 'email']);
+            ->allowedSorts(['id', 'name', 'email'])
+            ->get();
         return StaffResource::collection($staff);
     }
 
