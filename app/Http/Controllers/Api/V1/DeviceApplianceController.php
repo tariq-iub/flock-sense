@@ -150,9 +150,9 @@ class DeviceApplianceController extends ApiController
         } else {
             // Update existing appliance
             $appliance->updateStatus(
-                $validated['status'],
-                $validated['metrics'] ?? null
-            );
+            $validated['status'],
+            $validated['metrics'] ?? null
+        );
         }
 
         return new DeviceApplianceResource($appliance);
@@ -173,7 +173,7 @@ class DeviceApplianceController extends ApiController
         $device = Device::where('serial_no', $validated['device_serial'])->firstOrFail();
         
         $updatedAppliances = [];
-        
+
         foreach ($validated['appliances'] as $key => $status) {
             // Find existing appliance or create new one
             $appliance = DeviceAppliance::where('device_id', $device->id)

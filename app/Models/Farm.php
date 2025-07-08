@@ -19,4 +19,14 @@ class Farm extends Model
     {
         return $this->hasMany(Shed::class);
     }
+
+    public function managers()
+    {
+        return $this->belongsToMany(User::class, 'farm_managers', 'farm_id', 'manager_id')->withPivot('link_date');
+    }
+
+    public function staff()
+    {
+        return $this->belongsToMany(User::class, 'farm_staff', 'farm_id', 'worker_id')->withPivot('link_date');
+    }
 }

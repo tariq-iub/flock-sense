@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\FarmController;
 use App\Http\Controllers\Api\V1\ShedController;
 use App\Http\Controllers\Api\V1\DeviceController;
+use App\Http\Controllers\Api\V1\FarmManagerController;
+use App\Http\Controllers\Api\V1\FarmStaffController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +29,19 @@ Route::middleware('auth:sanctum')->group(function () {
         'breeds' => BreedController::class,
         'flocks' => FlockController::class,
     ]);
+
+    // Farm managers
+    Route::get('farms/{farm}/managers', [FarmManagerController::class, 'index']);
+    Route::post('farms/{farm}/managers', [FarmManagerController::class, 'store']);
+    Route::get('farms/{farm}/managers/{user}', [FarmManagerController::class, 'show']);
+    Route::put('farms/{farm}/managers/{user}', [FarmManagerController::class, 'update']);
+    Route::delete('farms/{farm}/managers/{user}', [FarmManagerController::class, 'destroy']);
+    // Farm staff
+    Route::get('farms/{farm}/staff', [FarmStaffController::class, 'index']);
+    Route::post('farms/{farm}/staff', [FarmStaffController::class, 'store']);
+    Route::get('farms/{farm}/staff/{user}', [FarmStaffController::class, 'show']);
+    Route::put('farms/{farm}/staff/{user}', [FarmStaffController::class, 'update']);
+    Route::delete('farms/{farm}/staff/{user}', [FarmStaffController::class, 'destroy']);
 
     Route::prefix('sensor-data')->controller(SensorDataController::class)->group(function () {
         Route::get('/shed/{shedId}', 'fetchByShed');
