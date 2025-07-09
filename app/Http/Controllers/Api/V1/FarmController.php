@@ -50,9 +50,16 @@ class FarmController extends ApiController
     /**
      * Display the specified resource.
      */
-    public function show(Farm $farm)
+    public function show(Request $request, Farm $farm)
     {
-        $farm->load(['owner', 'sheds'])->loadCount('sheds');
+        $includes = explode(',', $request->query('include', ''));
+
+        $farm->load(array_filter([
+            in_array('owner', $includes) ? 'owner' : null,
+            in_array('sheds', $includes) ? 'sheds' : null,
+            in_array('managers', $includes) ? 'managers' : null,
+            in_array('staff', $includes) ? 'staff' : null,
+        ]))->loadCount('sheds');
 
         return FarmResource::make($farm);
     }
