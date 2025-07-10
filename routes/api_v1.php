@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\ShedController;
 use App\Http\Controllers\Api\V1\DeviceController;
 use App\Http\Controllers\Api\V1\FarmManagerController;
 use App\Http\Controllers\Api\V1\FarmStaffController;
+use App\Http\Controllers\Api\V1\UserSettingsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'subscriptions' => SubscriptionController::class,
         'breeds' => BreedController::class,
         'flocks' => FlockController::class,
+        'settings' => UserSettingsController::class,
     ]);
 
     // Farm managers
