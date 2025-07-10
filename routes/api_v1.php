@@ -49,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/shed/{shedId}', 'fetchByShed');
         Route::get('/farm/{farmId}', 'fetchByFarm');
     });
+
+    Route::put('/settings/{user}', [UserSettingsController::class, 'update']);
 });
 
 // Public sensor data store route (no auth required)

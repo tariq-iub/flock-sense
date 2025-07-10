@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Http\Resources\UserSettingResource;
 use App\Models\UserSetting;
 use Illuminate\Http\Request;
@@ -14,14 +14,22 @@ class UserSettingsController extends ApiController
     public function index(Request $request)
     {
         $settings = UserSetting::where('user_id', $request->user()->id)->get();
-        return UserSettingResource::collection($settings);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => UserSettingResource::collection($settings),
+        ]);
     }
 
     // GET /api/v1/settings/{id}
     public function show(Request $request, $id)
     {
         $setting = UserSetting::where('user_id', $request->user()->id)->findOrFail($id);
-        return new UserSettingResource($setting);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => new UserSettingResource($setting),
+        ]);
     }
 
     // POST /api/v1/settings
@@ -43,14 +51,16 @@ class UserSettingsController extends ApiController
 
         $setting = UserSetting::create($validated);
 
-        return new UserSettingResource($setting);
+        return response()->json([
+            'status' => 'success',
+            'data' => new UserSettingResource($setting),
+            'message' => 'User setting created successfully.'
+        ], 201);
     }
 
-    // PUT /api/v1/settings/{id}
-    public function update(Request $request, $id)
+    // PUT /api/v1/settings/{userId}
+    public function update(Request $request, $userId)
     {
-        $setting = UserSetting::where('user_id', $request->user()->id)->findOrFail($id);
-
         $validated = $request->validate([
             'security_level' => ['sometimes', Rule::in(['low', 'medium', 'high'])],
             'backup_frequency' => ['sometimes', Rule::in(['daily', 'weekly', 'monthly'])],
@@ -61,14 +71,23 @@ class UserSettingsController extends ApiController
         ]);
 
         if (isset($validated['notifications'])) {
-            $validated['notifications_email'] = $validated['notifications']['email'] ?? $setting->notifications_email;
-            $validated['notifications_sms'] = $validated['notifications']['sms'] ?? $setting->notifications_sms;
+            $validated['notifications_email'] = $validated['notifications']['email'] ?? false;
+            $validated['notifications_sms'] = $validated['notifications']['sms'] ?? false;
             unset($validated['notifications']);
         }
 
-        $setting->update($validated);
+        $validated['user_id'] = $userId;
 
-        return new UserSettingResource($setting);
+        $setting = UserSetting::updateOrCreate(
+            ['user_id' => $userId],
+            $validated
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'data' => new UserSettingResource($setting),
+            'message' => 'User setting updated successfully.'
+        ]);
     }
 
     // DELETE /api/v1/settings/{id}
@@ -77,6 +96,10 @@ class UserSettingsController extends ApiController
         $setting = UserSetting::where('user_id', $request->user()->id)->findOrFail($id);
         $setting->delete();
 
-        return response()->json(['message' => 'User setting deleted successfully.'], 200);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User setting deleted successfully.',
+            'data' => null
+        ]);
     }
 }
