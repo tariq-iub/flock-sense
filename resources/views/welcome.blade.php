@@ -318,42 +318,6 @@
     </div>
 </section>
 
-<section id="trusted" class="alt-section section-padding text-center">
-    <div class="container">
-        <h2 class="fw-bold mb-4">Trusted by Leading Poultry Producers</h2>
-        <div class="row justify-content-center">
-            <div class="col-6 col-md-3 mb-4">
-                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
-                    <i class="bi bi-house-heart-fill text-success fs-1 mb-2"></i>
-                    <h3 class="fw-bold mb-1">500+</h3>
-                    <div class="fs-6 text-muted">Farms</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
-                    <i class="bi bi-egg-fill text-success fs-1 mb-2"></i>
-                    <h3 class="fw-bold mb-1">1 Million+</h3>
-                    <div class="fs-6 text-muted">Birds Monitored</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
-                    <i class="bi bi-patch-check-fill text-success fs-1 mb-2"></i>
-                    <h3 class="fw-bold mb-1">99%</h3>
-                    <div class="fs-6 text-muted">Accuracy</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3 mb-4">
-                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
-                    <i class="bi bi-headset text-success fs-1 mb-2"></i>
-                    <h3 class="fw-bold mb-1">24/7</h3>
-                    <div class="fs-6 text-muted">Support</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
 <section id="contact" class="alt-section section-padding">
     <div class="container">
         <div class="row align-items-center">
