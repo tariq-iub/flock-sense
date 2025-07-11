@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Farm extends Model
 {
-    protected $fillable = ['name', 'address', 'owner_id'];
+    protected $fillable = ['name', 'address', 'owner_id', 'latitude', 'longitude'];
 
     public function owner() : BelongsTo
     {
@@ -18,5 +18,15 @@ class Farm extends Model
     public function sheds() : HasMany
     {
         return $this->hasMany(Shed::class);
+    }
+
+    public function managers()
+    {
+        return $this->belongsToMany(User::class, 'farm_managers', 'farm_id', 'manager_id')->withPivot('link_date');
+    }
+
+    public function staff()
+    {
+        return $this->belongsToMany(User::class, 'farm_staff', 'farm_id', 'worker_id')->withPivot('link_date');
     }
 }

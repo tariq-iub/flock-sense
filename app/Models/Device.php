@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Device extends Model
 {
@@ -13,8 +14,11 @@ class Device extends Model
     public function sheds(): BelongsToMany
     {
         return $this->belongsToMany(Shed::class, 'shed_devices')
-            ->withPivot('link_date')
-            ->withTimestamps();
+            ->withPivot('link_date');
     }
 
+    public function appliances(): HasMany
+    {
+        return $this->hasMany(DeviceAppliance::class);
+    }
 }

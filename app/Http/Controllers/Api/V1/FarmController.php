@@ -2,20 +2,28 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ApiController;
 use App\Http\Resources\FarmResource;
 use App\Models\Farm;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Spatie\QueryBuilder\QueryBuilder;
 
-class FarmController extends Controller
+class FarmController extends ApiController
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return FarmResource::collection(Farm::all());
+        $farms = QueryBuilder::for(Farm::class)
+            ->where('owner_id', $request->user()->id)
+            ->allowedFilters(['id', 'name'])
+            ->allowedIncludes(['sheds'])
+            ->allowedSorts(['id', 'name'])
+            ->withCount('sheds')
+            ->get();
+
+        return FarmResource::collection($farms);
     }
 
     /**
@@ -42,8 +50,17 @@ class FarmController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Farm $farm)
+    public function show(Request $request, Farm $farm)
     {
+        $includes = explode(',', $request->query('include', ''));
+
+        $farm->load(array_filter([
+            in_array('owner', $includes) ? 'owner' : null,
+            in_array('sheds', $includes) ? 'sheds' : null,
+            in_array('managers', $includes) ? 'managers' : null,
+            in_array('staff', $includes) ? 'staff' : null,
+        ]))->loadCount('sheds');
+
         return FarmResource::make($farm);
     }
 
@@ -53,9 +70,9 @@ class FarmController extends Controller
     public function update(Request $request, Farm $farm)
     {
         $validated = $request->validate([
-            'name' => ['string'],
-            'address' => ['string'],
-            'owner_id' => ['exists:users,id'],
+            'name' => ['sometimes', 'string'],
+            'address' => ['sometimes', 'string'],
+            'owner_id' => ['sometimes', 'exists:users,id'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);

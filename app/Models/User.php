@@ -59,6 +59,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Farm::class, 'owner_id');
     }
 
+    public function managedFarms()
+    {
+        return $this->belongsToMany(Farm::class, 'farm_managers', 'manager_id', 'farm_id')->withPivot('link_date');
+    }
+
+    public function staffFarms()
+    {
+        return $this->belongsToMany(Farm::class, 'farm_staff', 'worker_id', 'farm_id')->withPivot('link_date');
+    }
+
     public function getShedsCountAttribute()
     {
         if (!$this->relationLoaded('farms')) return 0;
