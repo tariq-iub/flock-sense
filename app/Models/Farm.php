@@ -10,12 +10,12 @@ class Farm extends Model
 {
     protected $fillable = ['name', 'address', 'owner_id', 'latitude', 'longitude'];
 
-    public function owner() : BelongsTo
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
-    public function sheds() : HasMany
+    public function sheds(): HasMany
     {
         return $this->hasMany(Shed::class);
     }
@@ -28,5 +28,23 @@ class Farm extends Model
     public function staff()
     {
         return $this->belongsToMany(User::class, 'farm_staff', 'farm_id', 'worker_id')->withPivot('link_date');
+    }
+
+    public function getFlocksCountAttribute(): int
+    {
+        if (!$this->relationLoaded('sheds')) return 0;
+
+        return $this->sheds->sum(function ($shed) {
+            return $shed->flocks->count();
+        });
+    }
+
+    public function getBirdsCountAttribute(): int
+    {
+        if (!$this->relationLoaded('sheds')) return 0;
+
+        return $this->sheds->sum(function ($shed) {
+            return $shed->flocks->sum('chicken_count');
+        });
     }
 }
