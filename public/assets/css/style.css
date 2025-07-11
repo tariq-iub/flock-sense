@@ -1,5 +1,6 @@
 @charset "UTF-8";
 /****** Utils ******/
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&amp;display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&amp;display=swap");
 .search-dropdown .search-info .customers li a img {
@@ -11,7 +12,7 @@
 
 /******* Base *******/
 body {
-  font-family: "Nunito", sans-serif;
+  font-family: "Outfitt", "Nunito", sans-serif;
   font-size: 14px;
   color: #646B72;
   line-height: 1.5;
