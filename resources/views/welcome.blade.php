@@ -312,7 +312,7 @@
             <div class="col-lg-5 d-none d-lg-block position-relative">
                 <!-- The beak.svg image (right-side background) -->
                 <img src="{{ asset('assets/img/beak.png') }}" alt="Beak"
-                     class="trusted-beak-img top-0 end-0" style="overflow: clip;z-index:-1;">
+                     class="trusted-beak-img top-0 end-0" style="z-index:-99;">
             </div>
         </div>
     </div>

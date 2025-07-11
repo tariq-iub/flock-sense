@@ -165,6 +165,7 @@ p, h1, h2, h3, h4, h5, h6 {
 .trusted-stats {
     margin-top: 2.5rem;
 }
+
 .trusted-stat-card {
     background: #e5ffbe;
     border-radius: 24px;
@@ -172,12 +173,14 @@ p, h1, h2, h3, h4, h5, h6 {
     min-width: 150px;
     box-shadow: 0 1px 8px 0 rgba(170,210,140,0.08);
 }
+
 .trusted-stat-value {
     font-size: 2.2rem;
     font-weight: 700;
     color: #33413d;
     letter-spacing: 1px;
 }
+
 .trusted-stat-label {
     font-size: 1.08rem;
     color: #33413d;
