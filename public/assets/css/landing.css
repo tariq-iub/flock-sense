@@ -1,6 +1,6 @@
 @charset "UTF-8";
-/****** Utils ******/
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&amp;display=swap");
+/* Utils */
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap");
 
 body {
     font-family: 'Outfit', sans-serif;
@@ -9,7 +9,8 @@ body {
 }
 
 p, h1, h2, h3, h4, h5, h6 {
-    color: #2a2f2e;
+    /* Inherit from body, redundant but fine for specificity if you want */
+    color: inherit;
 }
 
 .image-frame {
@@ -39,6 +40,7 @@ p, h1, h2, h3, h4, h5, h6 {
     z-index: 5;
 }
 
+/* Alternating backgrounds for sections */
 .alt-section:nth-child(even) {
     background:
         radial-gradient(circle at 20% 30%, #e7fad9 0%, #f4fce6 70%, transparent 100%),
@@ -50,9 +52,11 @@ p, h1, h2, h3, h4, h5, h6 {
 .alt-section:nth-child(odd) {
     background-color: #fbfff4;
 }
+
 .section-padding {
     padding: 4rem 1rem;
 }
+
 .logo img {
     height: 35px;
     margin-right: 10px;
@@ -66,7 +70,7 @@ p, h1, h2, h3, h4, h5, h6 {
 .community img {
     width: 100px;
     height: 100px;
-    border: solid 3px white;
+    border: 3px solid #fff;
     border-radius: 50%;
     margin-right: -20px;
 }
@@ -84,6 +88,8 @@ p, h1, h2, h3, h4, h5, h6 {
     color: #2a2f2e;
     text-decoration: none;
 }
+
+/* Badge for highlights */
 .badge-custom {
     background: #dcffad;
     border-radius: 50%;
@@ -102,17 +108,19 @@ p, h1, h2, h3, h4, h5, h6 {
     left: -20px;
 }
 
+/* Footer */
 .footer {
     background-color: #dcffad;
     color: #353d3c;
 }
 
+/* Scroll to top button */
 .scroll-to-top {
     position: fixed;
     bottom: 20px;
     right: 20px;
     background-color: #79c37d;
-    color: white;
+    color: #fff;
     border: none;
     padding: 0.6rem 1rem;
     border-radius: 50px;
@@ -120,4 +128,96 @@ p, h1, h2, h3, h4, h5, h6 {
     display: none;
     cursor: pointer;
     z-index: 999;
+}
+
+.trusted-section {
+    background: #f4fce6;
+    position: relative;
+    overflow: hidden;
+    min-height: 500px;
+}
+
+.trusted-title {
+    font-size: 4rem;
+    font-weight: 800;
+    color: #33413d;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.trusted-badge svg {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.trusted-sub {
+    font-size: 2rem;
+    color: #33413d;
+    font-weight: 600;
+}
+
+.trusted-desc {
+    font-size: 1.3rem;
+    color: #33413d;
+    margin-bottom: 2rem;
+}
+
+.trusted-stats {
+    margin-top: 2.5rem;
+}
+.trusted-stat-card {
+    background: #e5ffbe;
+    border-radius: 24px;
+    padding: 1.3rem 0.5rem;
+    min-width: 150px;
+    box-shadow: 0 1px 8px 0 rgba(170,210,140,0.08);
+}
+.trusted-stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #33413d;
+    letter-spacing: 1px;
+}
+.trusted-stat-label {
+    font-size: 1.08rem;
+    color: #33413d;
+    font-weight: 400;
+}
+
+.trusted-beak-img {
+    top: 0;
+    right: -50px;
+    pointer-events: none;
+    opacity: 0.6;
+    max-height: 500px;
+    z-index: -1;
+}
+
+@media (max-width: 991px) {
+    .trusted-title {
+        font-size: 2.6rem;
+    }
+    .trusted-sub {
+        font-size: 1.2rem;
+    }
+    .trusted-section {
+        padding-bottom: 2rem;
+    }
+}
+@media (max-width: 767px) {
+    .trusted-section {
+        min-height: unset;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    .trusted-title {
+        font-size: 2.2rem;
+    }
+    .trusted-badge svg {
+        width: 50px;
+        height: 50px;
+    }
+    .trusted-stats {
+        margin-top: 1.5rem;
+    }
 }

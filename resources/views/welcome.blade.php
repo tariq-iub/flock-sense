@@ -7,6 +7,7 @@
     <link href="{{ asset('assets/img/favicon.png') }}" type="image/x-icon" rel="shortcut icon">
 
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('assets/css/landing.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
@@ -95,21 +96,47 @@
                 <img src="{{ asset('assets/img/model.png') }}" class="img-fluid rounded-3" alt="Model Image">
             </div>
             <div class="col-md-6">
-                <h2 class="fw-bold mb-3">Our Models</h2>
+                <h2 class="fw-bold mb-3">Advanced Monitoring Models</h2>
                 <p>
-                    We offer a comprehensive range of hardware and software models specifically designed to optimize environmental monitoring within poultry facilities.
-                    Our solutions ensure precise control over critical parameters to support healthier flocks and more efficient farm management.
+                    FlockSense delivers integrated hardware and software models, enabling intelligent, automated control and detailed insight into your poultry environment.
                 </p>
-                <ul>
-                    <li>Temperature Monitoring: Maintain ideal climate conditions to support bird health and productivity.</li>
-                    <li>Humidity Control: Track and manage humidity levels to reduce the risk of disease and respiratory issues.</li>
-                    <li>Feeding Schedule Automation: Monitor and automate feeding routines to ensure consistency and reduce manual effort.</li>
-                    <li>Multi-Parameter Monitoring: Track additional factors such as light intensity, CO₂ levels, and ventilation status.</li>
+                <ul class="list-unstyled fs-5">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-thermometer-sun text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Climate Sensors</strong><br>
+                            Real-time monitoring of temperature and humidity for optimal flock health.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-droplet-half text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Gas & Air Quality</strong><br>
+                            Continuous detection of CO₂ and ammonia for a safer environment.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-lightbulb text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Smart Lighting</strong><br>
+                            Automated control of light intensity and duration for improved growth.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-alarm text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Feed & Equipment Alerts</strong><br>
+                            Immediate notifications for feed delivery, equipment issues, and power outages.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-sliders2-vertical text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Customizable Automation</strong><br>
+                            Flexible models for single houses or complex, multi-site farms.
+                        </div>
+                    </li>
                 </ul>
-                <p>
-                    Whether you're managing a single broiler house or an integrated farming system, our solutions are engineered to deliver reliable data and smart control capabilities.
-                </p>
-
             </div>
         </div>
     </div>
@@ -119,16 +146,209 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <h2 class="fw-bold mb-3">Key Features</h2>
-                <ul>
-                    <li>Real-time monitoring of poultry conditions</li>
-                    <li>Automated alerts and notifications</li>
-                    <li>Data analytics for productivity and health</li>
-                    <li>Mobile and web-based dashboard</li>
+                <h2 class="fw-bold mb-4">Smart Features</h2>
+                <ul class="list-unstyled fs-5">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-speedometer2 text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Real-Time Monitoring</strong><br>
+                            24/7 sensor-based tracking of farm conditions.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-bar-chart-line text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Live Dashboards</strong><br>
+                            Visual KPIs, accessible on web and mobile.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-robot text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>AI Insights & Alerts</strong><br>
+                            Predictive analytics and instant notifications.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-graph-up-arrow text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Autonomous Weight Estimation</strong><br>
+                            Automated, daily flock weight updates.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-shield-lock text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Bio-Security</strong><br>
+                            Advanced safety and critical event alarms.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-phone text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Mobile Access</strong><br>
+                            Manage your farm from anywhere.
+                        </div>
+                    </li>
                 </ul>
             </div>
             <div class="col-md-6">
                 <img src="{{ asset('assets/img/features.png') }}" class="img-fluid rounded-3" alt="Features Image">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="services" class="alt-section section-padding">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <img src="{{ asset('assets/img/services.png') }}" class="img-fluid rounded-3" alt="Services">
+            </div>
+            <div class="col-md-6">
+                <h2 class="fw-bold mb-4">Our Services</h2>
+                <ul class="list-unstyled fs-5">
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-globe2 text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Remote Management</strong><br>
+                            Monitor and control your farm from anywhere.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-person-check text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Role-Based Access</strong><br>
+                            Custom permissions for staff and managers.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-diagram-3 text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Operations Control</strong><br>
+                            Streamlined SOPs and labor management.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-award text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Staff Training</strong><br>
+                            Continuous team development tools.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-plug text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Third-Party Integration</strong><br>
+                            Connect easily with other farm solutions.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-lightning-charge text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>Energy Optimization</strong><br>
+                            Smart controls to save energy.
+                        </div>
+                    </li>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="bi bi-headset text-success me-3 fs-3"></i>
+                        <div>
+                            <strong>24/7 Support</strong><br>
+                            Always-on expert assistance.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="trusted" class="trusted-section position-relative py-5">
+    <div class="container position-relative z-2">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="mb-4 d-flex align-items-center">
+                    <span class="trusted-title me-3">TRUSTED</span>
+                    <!-- Inline SVG checkmark badge -->
+                    <span class="trusted-badge">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="39" fill="#33413d"/>
+              <path d="M60 27L35 52l-10-10" fill="none" stroke="#d7fc97" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+                </div>
+                <h3 class="fw-normal trusted-sub mb-3">by Leading Poultry Producers</h3>
+                <div class="trusted-desc mb-5">
+                    Empowering farmers to achieve global benchmarks<br>
+                    of productivity and sustainability
+                </div>
+                <div class="row g-3 trusted-stats">
+                    <div class="col-6 col-md-3">
+                        <div class="trusted-stat-card text-center">
+                            <div class="trusted-stat-value">500+</div>
+                            <div class="trusted-stat-label">Farms</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="trusted-stat-card text-center">
+                            <div class="trusted-stat-value">1M+</div>
+                            <div class="trusted-stat-label">Birds Monitored</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="trusted-stat-card text-center">
+                            <div class="trusted-stat-value">99%</div>
+                            <div class="trusted-stat-label">Accuracy</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="trusted-stat-card text-center">
+                            <div class="trusted-stat-value">24/7</div>
+                            <div class="trusted-stat-label">Support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block position-relative">
+                <!-- The beak.svg image (right-side background) -->
+                <img src="{{ asset('assets/img/beak.png') }}" alt="Beak"
+                     class="trusted-beak-img top-0 end-0" style="overflow: clip;z-index:-1;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="trusted" class="alt-section section-padding text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-4">Trusted by Leading Poultry Producers</h2>
+        <div class="row justify-content-center">
+            <div class="col-6 col-md-3 mb-4">
+                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
+                    <i class="bi bi-house-heart-fill text-success fs-1 mb-2"></i>
+                    <h3 class="fw-bold mb-1">500+</h3>
+                    <div class="fs-6 text-muted">Farms</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
+                    <i class="bi bi-egg-fill text-success fs-1 mb-2"></i>
+                    <h3 class="fw-bold mb-1">1 Million+</h3>
+                    <div class="fs-6 text-muted">Birds Monitored</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
+                    <i class="bi bi-patch-check-fill text-success fs-1 mb-2"></i>
+                    <h3 class="fw-bold mb-1">99%</h3>
+                    <div class="fs-6 text-muted">Accuracy</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-4">
+                <div class="border rounded-4 py-4 px-2 h-100 bg-white shadow-sm">
+                    <i class="bi bi-headset text-success fs-1 mb-2"></i>
+                    <h3 class="fw-bold mb-1">24/7</h3>
+                    <div class="fs-6 text-muted">Support</div>
+                </div>
             </div>
         </div>
     </div>
