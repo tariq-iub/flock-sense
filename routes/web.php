@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Web\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\UserController;
 
@@ -22,7 +23,7 @@ Route::group(['prefix' => 'admin','middleware' => ['auth', 'role:admin']], funct
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('/dashboard', [AuthController::class, 'logout'])->name('dashboard');
+    Route::post('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::resources([
         'users' => UserController::class,
