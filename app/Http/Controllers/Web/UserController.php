@@ -15,7 +15,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('media')->get();
-        return $users;
+        return view('admin.users.index', compact('users'));
     }
 
     /**
@@ -23,7 +23,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.users.create');
     }
 
     /**

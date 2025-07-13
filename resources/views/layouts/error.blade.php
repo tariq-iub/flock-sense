@@ -8,53 +8,19 @@
     <meta name="author" content="FlockSense">
     <meta name="robots" content="index, follow">
     <title>FlockSense - @yield('title')</title>
-
     <link href="{{ asset('assets/img/favicon.png') }}" type="image/x-icon" rel="shortcut icon">
-    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/animate.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/css/dataTables.bootstrap5.min.css') }}" rel="stylesheet">
 
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}" rel="stylesheet" >
+    <link href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
-
-    @stack('css')
 </head>
 <body>
-    <div class="main-wrapper">
-        @include('partial.admin.topbar')
-        @include('partial.admin.sidebar')
-        <div class="page-wrapper">
-            @yield('content')
-            @include('partial.admin.footer')
-        </div>
-    </div>
+@yield('content')
 
-    <!-- jQuery -->
-    <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="text/javascript"></script>
-
-    <!-- Feather Icon JS -->
-    <script src="{{ asset('assets/js/feather.min.js') }}" type="text/javascript"></script>
-
-    <!-- Slimscroll JS -->
-    <script src="{{ asset('assets/js/jquery.slimscroll.min.js') }}" type="text/javascript"></script>
-
-    <!-- Datatable JS -->
-    <script src="{{ asset('assets/js/jquery.dataTables.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/js/dataTables.bootstrap5.min.js') }}" type="text/javascript"></script>
-
-    <!-- Bootstrap Core JS -->
-    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
-
-    <!-- Daterangepikcer JS -->
-    <script src="{{ asset('assets/js/moment.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/plugins/daterangepicker/daterangepicker.js') }}" type="text/javascript"></script>
-
-    <script src="{{ asset('assets/js/script.js') }}" type="text/javascript"></script>
-
-    @stack('js')
+<script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('assets/js/feather.min.js') }}" type="text/javascript"></script>
+<script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
 </body>
 </html>
