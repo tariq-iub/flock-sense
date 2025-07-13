@@ -28,5 +28,3 @@ Route::group(['prefix' => 'admin','middleware' => ['auth', 'role:admin']], funct
         'users' => UserController::class,
     ]);
 });
-
-
