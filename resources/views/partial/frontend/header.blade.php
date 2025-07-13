@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="FlockSense is an advanced smart farm management platform designed specifically for modern poultry producers, empowering farmers to remotely monitor, analyze, and optimize every aspect of their poultry operations. Leveraging IoT sensors, real-time data analytics, and AI-powered insights, FlockSense enables seamless control over environmental factors, feed efficiency, bio-security, and flock health, resulting in higher productivity, improved animal welfare, and greater sustainability. With intuitive dashboards, mobile access, and robust security, FlockSense delivers a scalable, data-driven solution trusted by leading poultry farms worldwide.">
     <meta name="keywords" content="Smart farm management, poultry farm automation, IoT poultry farming, poultry monitoring system, real-time farm analytics, AI poultry management, poultry health monitoring, feed efficiency solutions, biosecurity poultry, smart poultry sensors, modern poultry farming, digital poultry solutions, flock management platform, poultry farm control system, smart poultry environment, poultry data analytics, automated poultry operations, remote poultry monitoring, sustainable poultry farming, advanced poultry technology, smart chicken farm, poultry performance optimization, cloud-based poultry management, AI farm insights, smart livestock solutions">
-    <meta name="author" content="FlockSense">
+    <meta name="author" content="Flock Sense">
     <meta name="robots" content="index, follow">
     <title>FlockSense - @yield('title')</title>
     <link href="{{ asset('assets/img/favicon.png') }}" type="image/x-icon" rel="shortcut icon">
@@ -16,8 +16,18 @@
     @stack('css')
 </head>
 <body>
-    @yield('content')
-
-    @stack('js')
-</body>
-</html>
+<div class="container py-3">
+    <header class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center logo">
+            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo">
+        </div>
+        <nav>
+            <a href="/" class="me-3 fw-semibold text-decoration-none text-dark">Home</a>
+            <a href="#models" class="me-3 fw-semibold text-decoration-none text-dark">Models</a>
+            <a href="#features" class="me-3 fw-semibold text-decoration-none text-dark">Features</a>
+            <a href="#services" class="me-3 fw-semibold text-decoration-none text-dark">Services</a>
+            <a href="#contact" class="me-3 fw-semibold text-decoration-none text-dark">Contact Us</a>
+            <a href="/login" class="login-btn">Login</a>
+        </nav>
+    </header>
+</div>

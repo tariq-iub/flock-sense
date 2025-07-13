@@ -9,15 +9,21 @@
     <meta name="robots" content="index, follow">
     <title>FlockSense - @yield('title')</title>
     <link href="{{ asset('assets/img/favicon.png') }}" type="image/x-icon" rel="shortcut icon">
+
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
 
     @stack('css')
 </head>
 <body>
     @yield('content')
 
-    @stack('js')
+    <script src="{{ asset('assets/js/jquery-3.7.1.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/feather.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/script.js') }}" type="text/javascript"></script>
 </body>
 </html>

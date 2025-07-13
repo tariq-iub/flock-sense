@@ -5,7 +5,7 @@
 body {
     font-family: 'Outfit', sans-serif;
     font-size: 16px;
-    color: #2a2f2e;
+    color: #334547;
 }
 
 p, h1, h2, h3, h4, h5, h6 {
@@ -81,17 +81,18 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 
 .login-btn {
-    background: #dcffad;
+    background: #DCFFAD;
+    color: #334547;
     padding: 0.6rem 1rem;
     border-radius: 10px;
     font-weight: bold;
-    color: #2a2f2e;
     text-decoration: none;
 }
 
 /* Badge for highlights */
 .badge-custom {
-    background: #dcffad;
+    background: #DCFFAD;
+    color: #334547;
     border-radius: 50%;
     width: 100px;
     height: 100px;
@@ -110,8 +111,8 @@ p, h1, h2, h3, h4, h5, h6 {
 
 /* Footer */
 .footer {
-    background-color: #dcffad;
-    color: #353d3c;
+    background-color: #DCFFAD;
+    color: #334547;
 }
 
 /* Scroll to top button */
@@ -140,7 +141,7 @@ p, h1, h2, h3, h4, h5, h6 {
 .trusted-title {
     font-size: 4rem;
     font-weight: 800;
-    color: #33413d;
+    color: #334547;
     letter-spacing: 2px;
     line-height: 1;
 }
@@ -152,13 +153,13 @@ p, h1, h2, h3, h4, h5, h6 {
 
 .trusted-sub {
     font-size: 2rem;
-    color: #33413d;
+    color: #334547;
     font-weight: 600;
 }
 
 .trusted-desc {
     font-size: 1.3rem;
-    color: #33413d;
+    color: #556D6F;
     margin-bottom: 2rem;
 }
 
@@ -167,7 +168,7 @@ p, h1, h2, h3, h4, h5, h6 {
 }
 
 .trusted-stat-card {
-    background: #e5ffbe;
+    background: #DCFFAD;
     border-radius: 24px;
     padding: 1.3rem 0.5rem;
     min-width: 150px;

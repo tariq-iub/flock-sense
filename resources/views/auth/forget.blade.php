@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Login')
+@section('title', 'Forget Password')
 
 @section('content')
     <div class="main-wrapper">
@@ -15,13 +15,13 @@
                                     <img src="{{ asset('assets/img/logo-white.svg') }}"  alt="Img">
                                 </a>
                             </div>
-                            <form action="{{ route('login') }}" method="POST">
+                            <form action="{{ route('forget') }}" method="POST">
                                 @csrf
                                 <div class="card">
                                     <div class="card-body p-5">
                                         <div class="login-userheading">
-                                            <h3>Welcome Back</h3>
-                                            <h4>Sign in to your admin account.</h4>
+                                            <h3>Forget Your Password</h3>
+                                            <h4>If you forgot your password, well, then we’ll email you instructions to reset your password.</h4>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Email <span class="text-danger"> *</span></label>
@@ -32,30 +32,11 @@
                                                     </span>
                                             </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Password <span class="text-danger"> *</span></label>
-                                            <div class="pass-group">
-                                                <input type="password" class="pass-input form-control">
-                                                <span class="ti toggle-password ti-eye-off text-gray-9"></span>
-                                            </div>
-                                        </div>
-                                        <div class="form-login authentication-check">
-                                            <div class="row">
-                                                <div class="col-12 d-flex align-items-center justify-content-between">
-                                                    <div class="custom-control custom-checkbox">
-                                                        <label class="checkboxs ps-4 mb-0 pb-0 line-height-1 fs-16 text-gray-6">
-                                                            <input type="checkbox" class="form-control">
-                                                            <span class="checkmarks"></span>Remember me
-                                                        </label>
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <a class="text-orange fs-14 fw-medium" href="/forget-password">Forgot Password?</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="form-login">
-                                            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                                            <button type="submit" class="btn btn-primary w-100">Get Reset Link</button>
+                                        </div>
+                                        <div class="signinform text-center">
+                                            <h4>Return to<a href="/login" class="hover-a"> login </a></h4>
                                         </div>
                                     </div>
                                 </div>
