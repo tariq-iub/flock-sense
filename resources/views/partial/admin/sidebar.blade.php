@@ -3,13 +3,13 @@
     <!-- Logo -->
     <div class="sidebar-logo">
         <a href="{{ route('dashboard') }}" class="logo logo-normal">
-            <img src="assets/img/logo.svg" alt="Img">
+            <img src="{{ asset('assets/img/logo.svg') }}" alt="Img">
         </a>
         <a href="{{ route('dashboard') }}" class="logo logo-white">
-            <img src="assets/img/logo-white.svg" alt="Img">
+            <img src="{{ asset('assets/img/logo-white.svg') }}" alt="Img">
         </a>
         <a href="{{ route('dashboard') }}" class="logo-small">
-            <img src="assets/img/logo-small.png" alt="Img">
+            <img src="{{ asset('assets/img/logo-small.png') }}" alt="Img">
         </a>
         <a id="toggle_btn" href="javascript:void(0);" class="active">
             <i data-feather="chevrons-right" class="feather-16"></i>

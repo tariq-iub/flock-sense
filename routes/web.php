@@ -19,6 +19,10 @@ Route::get('/forget-password', function() {
 });
 Route::post('/forget-password', [AuthController::class, 'forgotPassword'])->name('forget');
 
+Route::resources([
+    'users' => UserController::class,
+]);
+
 Route::group(['prefix' => 'admin','middleware' => ['auth', 'role:admin']], function() {
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
@@ -26,7 +30,7 @@ Route::group(['prefix' => 'admin','middleware' => ['auth', 'role:admin']], funct
     Route::post('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::resources([
-        'users' => UserController::class,
+        'devices' => UserController::class,
     ]);
 });
 

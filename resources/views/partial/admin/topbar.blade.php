@@ -17,11 +17,11 @@
         <!-- /Logo -->
 
         <a id="mobile_btn" class="mobile_btn" href="#sidebar">
-						<span class="bar-icon">
-							<span></span>
-							<span></span>
-							<span></span>
-						</span>
+            <span class="bar-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
         </a>
 
         <!-- Header Menu -->
@@ -39,8 +39,8 @@
                                 <span><i class="ti ti-search"></i></span>
                             </div>
                             <span class="input-group-text">
-											<kbd class="d-flex align-items-center"><img src="assets/img/icons/command.svg" alt="img" class="me-1">K</kbd>
-										</span>
+                                <kbd class="d-flex align-items-center"><img src="{{ asset('assets/img/icons/command.svg') }}" alt="img" class="me-1">K</kbd>
+                            </span>
                         </div>
                         <div class="dropdown-menu search-dropdown" aria-labelledby="dropdownMenuClickable">
                             <div class="search-info">
@@ -71,35 +71,7 @@
             </li>
             <!-- /Search -->
 
-            <!-- Select Farm -->
-            <li class="nav-item dropdown has-arrow main-drop select-store-dropdown">
-                <a href="javascript:void(0);" class="dropdown-toggle nav-link select-store"
-                   data-bs-toggle="dropdown">
-								<span class="user-info">
-									<span class="user-letter">
-										<img src="assets/img/store/store-01.png" alt="Store Logo" class="img-fluid">
-									</span>
-									<span class="user-detail">
-										<span class="user-name">Freshmart</span>
-									</span>
-								</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="assets/img/store/store-01.png" alt="Store Logo" class="img-fluid">Freshmart
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="assets/img/store/store-02.png" alt="Store Logo" class="img-fluid">Grocery Apex
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="assets/img/store/store-03.png" alt="Store Logo" class="img-fluid">Grocery Bevy
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="assets/img/store/store-04.png" alt="Store Logo" class="img-fluid">Grocery Eden
-                    </a>
-                </div>
-            </li>
-
+            <!-- Add New Overall -->
             <li class="nav-item dropdown link-nav">
                 <a href="javascript:void(0);" class="btn btn-primary btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
                     <i class="ti ti-circle-plus me-1"></i>Add New
@@ -196,9 +168,9 @@
                         </div>
                         <div class="col-md-2">
                             <a href="stock-transfer.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-truck"></i>
-											</span>
+                                <span class="link-icon">
+                                    <i class="ti ti-truck"></i>
+                                </span>
                                 <p>Transfer</p>
                             </a>
                         </div>
@@ -206,40 +178,12 @@
                 </div>
             </li>
 
-            <li class="nav-item pos-nav">
-                <a href="pos.html" class="btn btn-dark btn-md d-inline-flex align-items-center">
-                    <i class="ti ti-device-laptop me-1"></i>POS
-                </a>
-            </li>
-
-            <!-- Flag -->
-            <li class="nav-item dropdown has-arrow flag-nav nav-item-box">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="javascript:void(0);"
-                   role="button">
-                    <img src="assets/img/flags/us-flag.svg" alt="Language" class="img-fluid">
-                </a>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="assets/img/flags/english.svg" alt="Img" height="16">English
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="assets/img/flags/arabic.svg" alt="Img" height="16">Arabic
-                    </a>
-                </div>
-            </li>
-            <!-- /Flag -->
-
             <li class="nav-item nav-item-box">
                 <a href="javascript:void(0);" id="btnFullscreen">
                     <i class="ti ti-maximize"></i>
                 </a>
             </li>
-            <li class="nav-item nav-item-box">
-                <a href="email.html">
-                    <i class="ti ti-mail"></i>
-                    <span class="badge rounded-pill">1</span>
-                </a>
-            </li>
+
             <!-- Notifications -->
             <li class="nav-item dropdown nav-item-box">
                 <a href="javascript:void(0);" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
