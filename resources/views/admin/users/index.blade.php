@@ -61,50 +61,24 @@
                         <span class="btn-searchset"><i class="ti ti-search fs-14 feather-search"></i></span>
                     </div>
                 </div>
-                <div class="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-                    <div class="dropdown me-2">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                            Category
-                        </a>
-                        <ul class="dropdown-menu  dropdown-menu-end p-3">
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Computers</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Electronics</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Shoe</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Electronics</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                            Brand
-                        </a>
-                        <ul class="dropdown-menu  dropdown-menu-end p-3">
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Lenovo</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Beats</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Nike</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);" class="dropdown-item rounded-1">Apple</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="d-flex my-xl-auto right-content align-items-center row-gap-3">
+                    <select id="rolesFilter" class="form-select me-2">
+                        <option value="">All Roles</option>
+                        @foreach($roles as $role)
+                            <option value="{{ ucfirst($role->name) }}">{{ ucfirst($role->name) }}</option>
+                        @endforeach
+                    </select>
+
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="Active">Active</option>
+                        <option value="Blocked">Blocked</option>
+                    </select>
                 </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table datatable">
+                    <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
                             <th class="no-sort">
@@ -195,3 +169,42 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+    <script>
+        $(function() {
+            // Datatable
+            if($('.datatable-custom').length > 0) {
+                var table = $('.datatable-custom').DataTable({
+                    "bFilter": true,
+                    "sDom": 'fBtlpi',
+                    "ordering": true,
+                    "language": {
+                        search: ' ',
+                        sLengthMenu: '_MENU_',
+                        searchPlaceholder: "Search",
+                        sLengthMenu: 'Rows Per Page _MENU_ Entries',
+                        info: "_START_ - _END_ of _TOTAL_ items",
+                        paginate: {
+                            next: ' <i class=" fa fa-angle-right"></i>',
+                            previous: '<i class="fa fa-angle-left"></i> '
+                        },
+                    },
+                    initComplete: (settings, json)=> {
+                        $('.dataTables_filter').appendTo('#tableSearch');
+                        $('.dataTables_filter').appendTo('.search-input');
+                    },
+                });
+
+                $('#rolesFilter').on('change', function() {
+                    var selected = $(this).val();
+                    table.column(4).search(selected).draw();
+                });
+                $('#statusFilter').on('change', function() {
+                    var selected = $(this).val();
+                    table.column(6).search(selected).draw();
+                });
+            }
+        });
+    </script>
+@endpush

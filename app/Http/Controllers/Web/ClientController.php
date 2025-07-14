@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Services\MediaService;
+use Spatie\Permission\Models\Role;
 
 class ClientController extends Controller
 {
@@ -15,7 +15,11 @@ class ClientController extends Controller
     public function index()
     {
         $users = User::with(['media', 'farms'])->get();
-        return view('admin.users.index', compact('users'));
+        $roles = Role::all();
+        return view(
+            'admin.users.index',
+            compact('users', 'roles')
+        );
     }
 
     /**
