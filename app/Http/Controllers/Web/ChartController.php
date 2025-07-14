@@ -78,7 +78,9 @@ class ChartController extends Controller
             'settings' => $validated['settings'],
         ]);
 
-        return redirect('charts.index')->with('success', 'Baseline charts updated successfully.');
+        return redirect()
+            ->route('charts.index')
+            ->with('success', 'Baseline charts updated successfully.');
     }
 
     /**
@@ -87,7 +89,9 @@ class ChartController extends Controller
     public function destroy(Chart $chart)
     {
         $chart->delete();
-        return redirect('/admin/charts')->with('success', 'Baseline chart deleted successfully.');
+        return redirect()
+            ->route('charts.index')
+            ->with('success', 'Baseline chart deleted successfully.');
     }
 
     public function import(Request $request)

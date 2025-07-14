@@ -71,11 +71,18 @@ class AuthController extends Controller
     /**
      * Logout user (revoke token)
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        // Invalidate the user's session and regenerate the CSRF token for security
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Redirect to login page or home
+        return redirect()
+            ->route('login')
+            ->with('status', 'You have been logged out successfully.');
     }
 
     /**
