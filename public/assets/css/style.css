@@ -1136,7 +1136,7 @@ ul .btn-primary:not(:disabled):not(.disabled):active:focus, ul .btn-primary:not(
   background: #556D6F;
   color: #ffffff;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 400;
   padding: 10px 20px;
   -webkit-transition: all 0.2s ease;
   -ms-transition: all 0.2s ease;
@@ -1390,7 +1390,7 @@ button:focus {
   padding: 0.4rem 0.85rem;
   font-size: 0.85rem;
   transition: all 0.5s;
-  font-weight: 600;
+  font-weight:400;
 }
 .btn:focus {
   box-shadow: none !important;
@@ -16510,7 +16510,6 @@ div#global-loader .whirly-loader:not(:required) {
   align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
-  font-weight: 500;
   font-size: 14px;
   position: relative;
   width: 100%;

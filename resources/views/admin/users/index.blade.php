@@ -1,7 +1,21 @@
 @extends('layouts.app')
-
+@push('css')
+    <style>
+        .profile-pic img {
+            width: 100px;
+            height: 100px;
+            border-radius: 5%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto 5px auto;
+        }
+        .profile-pic span {
+            display: block;
+            text-align: center;
+        }
+    </style>
+@endpush
 @section('title', 'System Users')
-
 @section('content')
     <div class="content">
         <div class="page-header">
@@ -17,7 +31,9 @@
                 </li>
             </ul>
             <div class="page-btn">
-                <a href="#" class="btn btn-primary"><i class="ti ti-circle-plus me-1"></i>Add User</a>
+                <a href="javascript:void(0)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="ti ti-circle-plus me-1"></i>Add User
+                </a>
             </div>
         </div>
 
@@ -149,15 +165,22 @@
                                 </td>
                                 <td class="action-table-data">
                                     <div class="edit-delete-action">
-                                        <a class="me-2 edit-icon  p-2" href="product-details.html">
+                                        <a class="me-2 edit-icon  p-2" href="{{ route('users.show', $user) }}">
                                             <i data-feather="eye" class="feather-eye"></i>
                                         </a>
-                                        <a class="me-2 p-2" href="edit-product.html" >
+                                        <a class="me-2 p-2" href="{{ route('users.show', $user) }}" >
                                             <i data-feather="edit" class="feather-edit"></i>
                                         </a>
-                                        <a data-bs-toggle="modal" data-bs-target="#delete-modal" class="p-2" href="javascript:void(0);">
+                                        @if(Auth::user()->hasRole('admin'))
+                                            <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete-modal"
+                                               data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}" class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
+                                        <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete{{ $user->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -168,9 +191,169 @@
             </div>
         </div>
     </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="{{ route('clients.store') }}" class="needs-validation" novalidate
+                      method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="profile-pic-upload d-flex flex-column align-content-between mb-2">
+                                    <div class="profile-pic" id="profilePicPreview">
+                                        <!-- The preview image will go here -->
+                                        <span>
+                                            <i data-feather="plus-circle" class="plus-down-add"></i>Add Image
+                                        </span>
+                                    </div>
+                                    <div class="mt-4 me-3">
+                                        <button type="button" class="btn btn-sm btn-success-light" onclick="$('#profileImageInput').click()">
+                                            Upload Image
+                                        </button>
+                                        <input type="file" id="profileImageInput" class="d-none" accept="image/*">
+                                        <p class="text-center fs-10 mt-2">JPEG, PNG up to 2 MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-9">
+                                <div class="mb-3">
+                                    <label for="chart_name" class="form-label">User Name<span class="text-danger ms-1">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <div class="invalid-feedback">
+                                        You have to name baseline data for identification.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Role<span class="text-danger ms-1">*</span></label>
+                                    <select class="select"  id="role" name="role" required>
+                                        <option>Select Role</option>
+                                        @foreach($roles as $role)
+                                            <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Role has been assigned to user.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Email<span class="text-danger ms-1">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <div class="invalid-feedback">
+                                        Valid email of user must be provided.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Phone<span class="text-danger ms-1">*</span></label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                                    <div class="invalid-feedback">
+                                        Valid phone no. of user must be provided.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Password<span class="text-danger ms-1">*</span></label>
+                                    <div class="pass-group">
+                                        <input type="password" class="pass-input form-control" id="password" name="password" required>
+                                        <i class="ti ti-eye-off toggle-password"></i>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Password must be provided.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Confirm Password<span class="text-danger ms-1">*</span></label>
+                                    <div class="pass-group">
+                                        <input type="password" class="pass-input form-control" id="password-confirmation" name="password-confirmation" required>
+                                        <i class="ti ti-eye-off toggle-password"></i>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Password needs to be confirmed.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Save User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Delete Modal -->
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="page-wrapper-new p-0">
+                    <div class="p-5 px-3 text-center">
+                    <span class="rounded-circle d-inline-flex p-2 bg-danger-transparent mb-2">
+                        <i class="ti ti-trash fs-24 text-danger"></i>
+                    </span>
+                        <h4 class="fs-20 fw-bold mb-2 mt-1">Delete User</h4>
+                        <p class="mb-0 fs-16" id="delete-modal-message">
+                            Are you sure you want to delete this User?
+                        </p>
+                        <div class="modal-footer-btn mt-3 d-flex justify-content-center">
+                            <button type="button" class="btn btn-secondary fs-13 fw-medium p-2 px-3 me-2" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn-danger fs-13 fw-medium p-2 px-3" id="confirm-delete-btn">
+                                Yes Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('profileImageInput');
+            const previewDiv = document.getElementById('profilePicPreview');
+
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        // Remove previous img if any
+                        let img = previewDiv.querySelector('img');
+                        if (!img) {
+                            img = document.createElement('img');
+                            previewDiv.insertBefore(img, previewDiv.firstChild);
+                        }
+                        img.src = ev.target.result;
+                        // Optionally, hide the "Add Image" text/icon
+                        previewDiv.querySelector('span').style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Reset to original state if file is not valid
+                    const img = previewDiv.querySelector('img');
+                    if (img) img.remove();
+                    previewDiv.querySelector('span').style.display = '';
+                }
+            });
+        });
+    </script>
+
     <script>
         $(function() {
             // Datatable
@@ -205,6 +388,26 @@
                     table.column(6).search(selected).draw();
                 });
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let deleteUserId = null;
+
+            document.querySelectorAll('.open-delete-modal').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    deleteUserId = this.getAttribute('data-user-id');
+                    const userName = this.getAttribute('data-user-name');
+                    document.getElementById('delete-modal-message').textContent =
+                        `Are you sure you want to delete "${userName}"?`;
+                });
+            });
+
+            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+                if (deleteUserId) {
+                    document.getElementById('delete' + deleteUserId).submit();
+                }
+            });
         });
     </script>
 @endpush
