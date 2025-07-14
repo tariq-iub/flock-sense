@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\ApiController;
+use App\Http\Controllers\Controller;
 use App\Models\PasswordResetRequest;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +22,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Carbon;
 
 
-class AuthController extends Controller
+class AuthController extends ApiController
 {
     /**
      * Register new user
@@ -51,26 +54,19 @@ class AuthController extends Controller
     /**
      * Login user and create token
      */
-    public function login(Request $request): JsonResponse
+    public function login(Request $request): RedirectResponse
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $credentials = $request->only('email', 'password');
 
-        $user = User::where('email', $request->email)->first();
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            $request->session()->regenerate();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            return redirect()->route('dashboard');
         }
 
-        return response()->json([
-            'access_token' => $user->createToken($user->name)->plainTextToken,
-            'token_type' => 'Bearer',
-            'user' => $user
-        ]);
+        return back()->withErrors([
+            'email' => 'Invalid credentials provided.',
+        ])->onlyInput('email');
     }
 
     /**

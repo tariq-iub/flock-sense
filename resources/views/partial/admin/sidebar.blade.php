@@ -99,12 +99,25 @@
                                     </a>
                                 </li>
                                 <li><a href="subscription.html">Subscriptions</a></li>
+                                <li class="submenu submenu-two">
+                                    <a href="javascript:void(0);">
+                                        Device Management<span class="menu-arrow inside-submenu"></span>
+                                    </a>
+                                    <ul>
+                                        <li><a href="video-call.html">IoT Devices</a></li>
+                                        <li><a href="audio-call.html">Farm Devices</a></li>
+                                        <li><a href="call-history.html">Alerts</a></li>
+                                    </ul>
+                                </li>
+
                                 <li><a href="packages.html">Packages</a></li>
                                 <li><a href="purchase-transaction.html">Purchase Transaction</a></li>
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);"><i class="ti ti-brand-apple-arcade fs-16 me-2"></i><span>Application</span><span class="menu-arrow"></span></a>
+                            <a href="javascript:void(0);">
+                                <i class="ti ti-brand-apple-arcade fs-16 me-2"></i><span>Application</span><span class="menu-arrow"></span>
+                            </a>
                             <ul>
                                 <li><a href="chat.html">Chat</a></li>
                                 <li class="submenu submenu-two"><a href="javascript:void(0);">Call<span class="menu-arrow inside-submenu"></span></a>

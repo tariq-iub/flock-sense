@@ -17,20 +17,20 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Muhammad Tariq',
-            'email' => 'saaim01@gmail.com',
-            'phone' => '+923346031105',
+            'email' => 'saaim02@gmail.com',
+            'phone' => '+923346031107',
         ]);
 
-        User::factory()->create([
-            'name' => 'Abdullah Abid',
-            'email' => 'abdrps2004@gmail.com',
-            'phone' => '+923326334598',
-        ]);
+//        User::factory()->create([
+//            'name' => 'Abdullah Abid',
+//            'email' => 'abdrps2004@gmail.com',
+//            'phone' => '+923326334598',
+//        ]);
 
         $this->call([
             RoleSeeder::class,
-            BreedSeeder::class,
-            FeedSeeder::class,
+//            BreedSeeder::class,
+//            FeedSeeder::class,
             // Add other seeders here as needed
         ]);
     }
