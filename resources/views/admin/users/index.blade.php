@@ -7,7 +7,7 @@
         <div class="page-header">
             <div class="add-item d-flex">
                 <div class="page-title">
-                    <h4 class="fw-bold">System Users</h4>
+                    <h4 class="fw-bold">Users and Clients</h4>
                     <h6>Manage system users - owners and managers.</h6>
                 </div>
             </div>
@@ -20,6 +20,39 @@
                 <a href="#" class="btn btn-primary"><i class="ti ti-circle-plus me-1"></i>Add User</a>
             </div>
         </div>
+
+        @if (session('success'))
+            <div class="container mb-3">
+                <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
+                    <div>
+                        <i class="feather-check-circle flex-shrink-0 me-2"></i>
+                        {{ session('success') }}
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="container mb-3">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>
+                        <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
+                        There were some errors with your submission:
+                    </strong>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        @endif
 
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
@@ -85,7 +118,7 @@
                             <th>Contact No</th>
                             <th>Roles</th>
                             <th>Farms Attached</th>
-                            <th>Devices Attached</th>
+                            <th>Status</th>
                             <th class="no-sort"></th>
                         </tr>
                         </thead>
@@ -119,14 +152,26 @@
                                 <td>{{ $user->phone }}</td>
                                 <td>
                                     @foreach($user->getRoleNames() as $role)
-                                        <span class="badge bg-soft-info text-primary">{{ $role }}</span>
+                                    <span class="p-1 pe-2 rounded-1 text-primary bg-info-transparent fs-10">{{ ucfirst($role) }}</span>
                                     @endforeach
                                 </td>
                                 <td>
-                                    <span class="badge bg-soft-success text-primary">Farm 1</span>
+                                @forelse($user->farms as $farm)
+                                    <span class="p-1 pe-2 rounded-1 text-primary bg-info-transparent fs-10">{{ $farm->name }}</span>
+                                @empty
+                                    <p class="text-danger fs-10">No Farm Registered</p>
+                                @endforelse
                                 </td>
                                 <td>
-                                    <span class="badge bg-soft-warning text-primary">Device 1</span>
+                                    @if($user->is_active)
+                                    <span class="p-1 pe-2 rounded-1 text-primary bg-success-transparent fs-10">
+                                        <i class="ti ti-check me-1 fs-11"></i> Active
+                                    </span>
+                                    @else
+                                    <span class="p-1 pe-2 rounded-1 text-danger bg-danger-transparent fs-10">
+                                        <i class="ti ti-ban me-1 fs-11"></i> Blocked
+                                    </span>
+                                    @endif
                                 </td>
                                 <td class="action-table-data">
                                     <div class="edit-delete-action">

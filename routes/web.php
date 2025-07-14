@@ -27,17 +27,18 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     // Register routes (GET and POST)
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
-    
+
     // Logout route (POST)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    
+
     // Dashboard routes (both GET and POST)
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::post('/dashboard', DashboardController::class)->name('dashboard');
-    
+
     // Import chart route (POST)
     Route::post('/import-chart', [ChartController::class, 'import'])->name('import.chart');
-    
+    Route::get('/charts/data/{chart}', [ChartController::class, 'chartData'])->name('charts.data');
+
     // Resource routes for clients and charts
     Route::resources([
         'clients' => ClientController::class,

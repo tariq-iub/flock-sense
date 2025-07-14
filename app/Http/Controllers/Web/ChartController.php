@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Imports\ChartDataImport;
 use App\Models\Chart;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -16,7 +17,11 @@ class ChartController extends Controller
     public function index()
     {
         $charts = Chart::with('data')->get();
-        return view('admin.charts.index', compact('charts'));
+        $sources = $charts->pluck('source');
+        return view(
+            'admin.charts.index',
+            compact('charts', 'sources')
+        );
     }
 
     /**
@@ -24,7 +29,7 @@ class ChartController extends Controller
      */
     public function create()
     {
-        //
+        // No implementation is required
     }
 
     /**
@@ -32,7 +37,7 @@ class ChartController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // No implementation is required
     }
 
     /**
@@ -40,9 +45,7 @@ class ChartController extends Controller
      */
     public function show(Chart $chart)
     {
-        // $chart->load('data');
-        $chart = Chart::with('data')->findOrFail($chart->id);
-        return view('charts.show', compact('chart'));
+        // No implementation is required
     }
 
     /**
@@ -50,7 +53,8 @@ class ChartController extends Controller
      */
     public function edit(Chart $chart)
     {
-        //
+        $chart->load('data');
+        return view('admin.charts.edit', compact('chart'));
     }
 
     /**
@@ -58,7 +62,23 @@ class ChartController extends Controller
      */
     public function update(Request $request, Chart $chart)
     {
-        //
+        $validated = $request->validate([
+            'chart_name' => 'required|string',
+            'source' => 'required|string',
+            'description' => 'nullable|string',
+            'unit' => 'nullable|string',
+            'settings' => 'nullable|string',
+        ]);
+
+        Chart::update([
+            'chart_name' => $validated['chart_name'],
+            'source' => $validated['source'],
+            'description' => $validated['description'],
+            'unit' => $validated['unit'],
+            'settings' => $validated['settings'],
+        ]);
+
+        return redirect('charts.index')->with('success', 'Baseline charts updated successfully.');
     }
 
     /**
@@ -66,7 +86,8 @@ class ChartController extends Controller
      */
     public function destroy(Chart $chart)
     {
-        //
+        $chart->delete();
+        return redirect('/admin/charts')->with('success', 'Baseline chart deleted successfully.');
     }
 
     public function import(Request $request)
@@ -91,9 +112,19 @@ class ChartController extends Controller
         ]);
 
         // Import Excel file
-        $file = $request->file('data');
+        $file = $request->file('file');
         Excel::import(new ChartDataImport($chart->id), $file);
 
-        return back()->with('success', 'Excel data imported successfully!');
+        return back()->with('success', 'Baseline data imported successfully.');
+    }
+
+    public function chartData(Chart $chart) : JsonResponse
+    {
+        $chart->load('data');
+        $view = view('admin.charts.data', compact('chart'))->render();
+        return response()->json([
+            'title' => $chart->chart_name . ' - ' . $chart->source,
+            'data' => $view,
+        ]);
     }
 }

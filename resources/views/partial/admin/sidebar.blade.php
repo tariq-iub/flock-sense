@@ -78,7 +78,7 @@
                     <h6 class="submenu-hdr">PLATFORM</h6>
                     <ul>
                         <li class="{{ Route::is('dashboard') ? 'active' : '' }}">
-                            <a href="/">
+                            <a href="{{ route('dashboard') }}">
                                 <i class="ti ti-home fs-16 me-2"></i><span>Dashboard</span>
                             </a>
                         </li>
@@ -89,8 +89,13 @@
                             </a>
                             <ul>
                                 <li>
-                                    <a href="{{ route('charts.index') }}" class="{{ Route::is('charts.*') ? 'active' : '' }}">
-                                        Benchmarking Data
+                                    <a href="{{ route('charts.index') }}" class="{{ request()->routeIs('charts.index') ? 'active' : '' }}">
+                                        Baseline Data
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="subscription.html">
+                                        Subscription Plans
                                     </a>
                                 </li>
                                 <li>
@@ -98,7 +103,7 @@
                                         Users and Clients
                                     </a>
                                 </li>
-                                <li><a href="subscription.html">Subscriptions</a></li>
+
                                 <li class="submenu submenu-two">
                                     <a href="javascript:void(0);">
                                         Device Management<span class="menu-arrow inside-submenu"></span>
@@ -109,9 +114,6 @@
                                         <li><a href="call-history.html">Alerts</a></li>
                                     </ul>
                                 </li>
-
-                                <li><a href="packages.html">Packages</a></li>
-                                <li><a href="purchase-transaction.html">Purchase Transaction</a></li>
                             </ul>
                         </li>
                         <li class="submenu">

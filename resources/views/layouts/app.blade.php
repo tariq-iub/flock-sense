@@ -17,6 +17,7 @@
 
     <link href="{{ asset('assets/plugins/fontawesome/css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/feather.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}" rel="stylesheet" >
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
@@ -48,6 +49,10 @@
 
     <!-- Bootstrap Core JS -->
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}" type="text/javascript"></script>
+
+    <!-- Select2 JS -->
+    <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/custom-select2.js') }}" type="text/javascript"></script>
 
     <!-- Daterangepikcer JS -->
     <script src="{{ asset('assets/js/moment.min.js') }}" type="text/javascript"></script>

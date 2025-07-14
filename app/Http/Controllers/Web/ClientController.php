@@ -14,7 +14,7 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $users = User::with('media')->get();
+        $users = User::with(['media', 'farms'])->get();
         return view('admin.users.index', compact('users'));
     }
 

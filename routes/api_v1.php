@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\V1\UserSettingsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
 // Other routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class)->except(['store']);

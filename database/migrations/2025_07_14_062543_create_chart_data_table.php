@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('chart_data', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('chart_id')->constrained('charts')->onDelete('restrict');
+            $table->foreignId('chart_id')->constrained('charts')->onDelete('cascade');
             $table->string('type');
             $table->integer('day');
             $table->integer('weight');

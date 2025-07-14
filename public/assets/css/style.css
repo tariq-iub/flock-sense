@@ -11189,12 +11189,11 @@ svg.collapse-open, svg.collapse-close {
   height: 20px;
   border: 0;
   font-weight: 700;
-  background-color: #FF0000;
   border-radius: 50px;
 }
 .modal .close:hover,
 .modal .btn-close:hover {
-  background-color: rgb(239.7, 0, 0);
+  background-color: rgb(231, 255, 198, 0.8);
   color: #ffffff;
 }
 .modal .modal-footer {
@@ -16527,13 +16526,13 @@ div#global-loader .whirly-loader:not(:required) {
   color: #646B72;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open ul li a.active, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul li a.active {
-  color: #556D6F;
+  color: #009688;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open ul li a.active a span, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul li a.active a span {
-  color: #556D6F;
+  color: #009688;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open ul li a.active:after, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul li a.active:after {
-  background: #556D6F;
+  background: #009688;
   border: 2px solid #E7FFC6;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open ul li a:hover, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul li a:hover {
