@@ -7,8 +7,8 @@
         <div class="page-header">
             <div class="add-item d-flex">
                 <div class="page-title">
-                    <h4 class="fw-bold">System Users</h4>
-                    <h6>Manage system users - owners and managers.</h6>
+                    <h4 class="fw-bold">Benchmarking Data</h4>
+                    <h6>Manage daily performance charts data.</h6>
                 </div>
             </div>
             <ul class="table-top-head">
@@ -17,7 +17,7 @@
                 </li>
             </ul>
             <div class="page-btn">
-                <a href="#" class="btn btn-primary"><i class="ti ti-circle-plus me-1"></i>Add User</a>
+                <a href="#" class="btn btn-primary"><i class="ti ti-circle-plus me-1"></i>Import</a>
             </div>
         </div>
 
@@ -80,53 +80,43 @@
                                     <span class="checkmarks"></span>
                                 </label>
                             </th>
-                            <th>User Name</th>
-                            <th>Email</th>
-                            <th>Contact No</th>
-                            <th>Roles</th>
-                            <th>Farms Attached</th>
-                            <th>Devices Attached</th>
+                            <th>Chart Name</th>
+                            <th>Source</th>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>Settings</th>
+                            <th>Active</th>
+                            <th>Data</th>
                             <th class="no-sort"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($users as $user)
+                        @foreach($charts as $chart)
                             <tr>
                                 <td>
                                     <label class="checkboxs">
-                                        <input type="checkbox">
+                                        <input type="checkbox" value="{{ $chart->id }}">
                                         <span class="checkmarks"></span>
                                     </label>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <a href="javascript:void(0);" class="avatar avatar-md me-2">
-                                        @php
-                                            $firstMedia = $user->media()->orderBy('order_column')->first();
-                                            $path = asset("assets/img/user.jpg");
-                                            if ($firstMedia && \File::exists(public_path($firstMedia->file_path))) {
-                                                $path = asset($firstMedia->file_path);
-                                            }
-                                        @endphp
-                                            <img src="{{ $path }}" alt="avatar">
-                                        </a>
-                                        <a href="javascript:void(0);">
-                                            {{ $user->name }}
-                                        </a>
+                                        {{ $chart->chart_name }}
                                     </div>
                                 </td>
-                                <td>{{ $user->email }}</td>
-                                <td>{{ $user->phone }}</td>
+                                <td>{{ $chart->source }}</td>
+                                <td>{{ $chart->description }}</td>
                                 <td>
-                                    @foreach($user->getRoleNames() as $role)
-                                        <span class="badge bg-soft-info text-primary">{{ $role }}</span>
-                                    @endforeach
+                                    {{ $chart->unit }}
                                 </td>
                                 <td>
-                                    <span class="badge bg-soft-success text-primary">Farm 1</span>
+                                    Settings
                                 </td>
                                 <td>
-                                    <span class="badge bg-soft-warning text-primary">Device 1</span>
+                                    {{ $chart->is_active }}
+                                </td>
+                                <td>
+                                    Data
                                 </td>
                                 <td class="action-table-data">
                                     <div class="edit-delete-action">

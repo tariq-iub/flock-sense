@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Services\MediaService;
 
-class UserController extends Controller
+class ClientController extends Controller
 {
     /**
      * Display a listing of the resource.

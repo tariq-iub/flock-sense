@@ -77,33 +77,29 @@
                 <li class="submenu-open">
                     <h6 class="submenu-hdr">PLATFORM</h6>
                     <ul>
-                        <li class="{{ (request()->Is('/')) ? 'active' : '' }}">
+                        <li class="{{ Route::is('dashboard') ? 'active' : '' }}">
                             <a href="/">
                                 <i class="ti ti-home fs-16 me-2"></i><span>Dashboard</span>
                             </a>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);">
-                                <i class="ti ti-layout-grid fs-16 me-2"></i>
-                                <span>Dashboard</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li><a href="index.html">Admin Dashboard</a></li>
-                                <li><a href="admin-dashboard.html">Admin Dashboard 2</a></li>
-                                <li><a href="sales-dashboard.html">Sales Dashboard</a></li>
-                            </ul>
-                        </li>
-                        <li class="submenu">
-                            <a href="javascript:void(0);" class="">
+                            <a href="javascript:void(0);" class="{{ Route::is('charts.*') || Route::is('clients.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>Super Admin</span><span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="companies.html">Companies</a></li>
+                                <li>
+                                    <a href="{{ route('charts.index') }}" class="{{ Route::is('charts.*') ? 'active' : '' }}">
+                                        Benchmarking Data
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('clients.index') }}" class="{{ Route::is('clients.*') ? 'active' : '' }}">
+                                        Users and Clients
+                                    </a>
+                                </li>
                                 <li><a href="subscription.html">Subscriptions</a></li>
                                 <li><a href="packages.html">Packages</a></li>
-                                <li><a href="domain.html">Domain</a></li>
                                 <li><a href="purchase-transaction.html">Purchase Transaction</a></li>
                             </ul>
                         </li>

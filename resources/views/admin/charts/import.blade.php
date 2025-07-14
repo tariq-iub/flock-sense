@@ -80,12 +80,13 @@
                                     <span class="checkmarks"></span>
                                 </label>
                             </th>
-                            <th>User Name</th>
-                            <th>Email</th>
-                            <th>Contact No</th>
-                            <th>Roles</th>
-                            <th>Farms Attached</th>
-                            <th>Devices Attached</th>
+                            <th>Chart Name</th>
+                            <th>Source</th>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>Settings</th>
+                            <th>Active</th>
+                            <th>Data</th>
                             <th class="no-sort"></th>
                         </tr>
                         </thead>
