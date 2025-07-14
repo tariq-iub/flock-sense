@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\UserController;
@@ -27,11 +28,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/import-chart', function() {
+        return view('admin.charts.import');
+    });
+    Route::post('/import-chart', [ChartController::class, 'import'])->name('import.chart');
+
     Route::post('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::resources([
+        'charts' => ChartController::class,
         'devices' => UserController::class,
     ]);
 });
+
+
