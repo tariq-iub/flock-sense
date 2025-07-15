@@ -15,8 +15,22 @@
                                     <img src="{{ asset('assets/img/logo-white.svg') }}"  alt="Img">
                                 </a>
                             </div>
-                            <form action="{{ route('forget') }}" method="POST">
+                            @if (session('status'))
+                                <div class="alert alert-success">{{ session('status') }}</div>
+                            @endif
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                            <form action="{{ route('password.update') }}" method="POST">
                                 @csrf
+                                <input type="hidden" name="token" value="{{ $token ?? '' }}">
+                                <input type="hidden" name="email" value="{{ $email ?? request('email') }}">
                                 <div class="card">
                                     <div class="card-body p-5">
                                         <div class="login-userheading">
@@ -24,23 +38,16 @@
                                             <h4>Enter New Password & Confirm Password to get inside.</h4>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Old Password <span class="text-danger"> *</span></label>
-                                            <div class="pass-group">
-                                                <input type="password" class="pass-input form-control">
-                                                <span class="ti toggle-password ti-eye-off text-gray-9"></span>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
                                             <label class="form-label">New Password <span class="text-danger"> *</span></label>
                                             <div class="pass-group">
-                                                <input type="password" class="pass-inputs form-control">
+                                                <input type="password" name="password" class="pass-inputs form-control" required>
                                                 <span class="ti toggle-passwords ti-eye-off text-gray-9"></span>
                                             </div>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Confirm Password <span class="text-danger"> *</span></label>
                                             <div class="pass-group">
-                                                <input type="password" class="pass-inputa form-control">
+                                                <input type="password" name="password_confirmation" class="pass-inputa form-control" required>
                                                 <span class="ti toggle-passworda ti-eye-off text-gray-9"></span>
                                             </div>
                                         </div>

@@ -96,7 +96,7 @@ class AuthController extends Controller
     /**
      * Send password reset link
      */
-    public function forgotPassword(Request $request): JsonResponse
+    public function forgotPassword(Request $request)
     {
         $request->validate([
             'email' => 'required|email|exists:users,email'
@@ -107,14 +107,14 @@ class AuthController extends Controller
         );
 
         return $status === Password::RESET_LINK_SENT
-            ? response()->json(['message' => __($status)])
-            : response()->json(['error' => __($status)], 400);
+            ? back()->with('status', __($status))
+            : back()->withErrors(['email' => __($status)]);
     }
 
     /**
      * Handle password reset
      */
-    public function resetPassword(Request $request): JsonResponse
+    public function resetPassword(Request $request)
     {
         $request->validate([
             'token' => 'required',
@@ -136,38 +136,38 @@ class AuthController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-            ? response()->json(['message' => __($status)])
-            : response()->json(['error' => __($status)], 400);
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withErrors(['email' => [__($status)]])->withInput();
     }
 
     /**
      * Verify email (should be accessed via email link)
      */
-    public function verifyEmail(Request $request): JsonResponse
+    public function verifyEmail(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified']);
+            return redirect()->route('dashboard')->with('status', 'Email already verified.');
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
-        return response()->json(['message' => 'Email successfully verified']);
+        return redirect()->route('dashboard')->with('status', 'Email successfully verified.');
     }
 
     /**
      * Resend email verification link
      */
-    public function resendVerificationEmail(Request $request): JsonResponse
+    public function resendVerificationEmail(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified']);
+            return back()->with('status', 'Email already verified.');
         }
 
         $request->user()->sendEmailVerificationNotification();
 
-        return response()->json(['message' => 'Verification link sent']);
+        return back()->with('status', 'Verification link sent!');
     }
 
     public function requestPasswordReset(Request $request): JsonResponse
