@@ -23,38 +23,38 @@
             </div>
         </div>
 
-        @if (session('success'))
-            <div class="container mb-3">
-                <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
-                    <div>
-                        <i class="feather-check-circle flex-shrink-0 me-2"></i>
-                        {{ session('success') }}
+        <div class="container-fluid">
+            <div class="row mb-3">
+                @if (session('success'))
+                    <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
+                        <div>
+                            <i class="feather-check-circle flex-shrink-0 me-2"></i>
+                            {{ session('success') }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="fas fa-xmark"></i>
+                        </button>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <i class="fas fa-xmark"></i>
-                    </button>
-                </div>
-            </div>
-        @endif
+                @endif
 
-        @if ($errors->any())
-            <div class="container mb-3">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>
-                        <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
-                        There were some errors with your submission:
-                    </strong>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <i class="fas fa-xmark"></i>
-                    </button>
-                </div>
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>
+                            <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
+                            There were some errors with your submission:
+                        </strong>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>
+                @endif
             </div>
-        @endif
+        </div>
 
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">

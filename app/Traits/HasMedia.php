@@ -24,13 +24,14 @@ trait HasMedia
             mkdir($destinationPath, 0775, true);
         }
 
+        $size = $file->getSize();
         $file->move($destinationPath, $filename);
         $path = "{$folder}/{$filename}";
 
         return $this->media()->create([
             'file_name' => $filename,
             'file_path' => $path,
-            'size' => $file->getSize(),
+            'size' => $size,
         ]);
     }
 

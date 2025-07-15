@@ -37,22 +37,21 @@
             </div>
         </div>
 
-        @if (session('success'))
-            <div class="container mb-3">
-                <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
-                    <div>
-                        <i class="feather-check-circle flex-shrink-0 me-2"></i>
-                        {{ session('success') }}
+        <div class="container-fluid">
+            <div class="row mb-3">
+                @if (session('success'))
+                    <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
+                        <div>
+                            <i class="feather-check-circle flex-shrink-0 me-2"></i>
+                            {{ session('success') }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="fas fa-xmark"></i>
+                        </button>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <i class="fas fa-xmark"></i>
-                    </button>
-                </div>
-            </div>
-        @endif
+                @endif
 
-        @if ($errors->any())
-            <div class="container mb-3">
+                @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <strong>
                         <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
@@ -67,8 +66,9 @@
                         <i class="fas fa-xmark"></i>
                     </button>
                 </div>
+                @endif
             </div>
-        @endif
+        </div>
 
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
@@ -165,10 +165,10 @@
                                 </td>
                                 <td class="action-table-data">
                                     <div class="edit-delete-action">
-                                        <a class="me-2 edit-icon  p-2" href="{{ route('users.show', $user) }}">
+                                        <a class="me-2 edit-icon  p-2" href="{{ route('clients.show', $user) }}">
                                             <i data-feather="eye" class="feather-eye"></i>
                                         </a>
-                                        <a class="me-2 p-2" href="{{ route('users.show', $user) }}" >
+                                        <a class="me-2 p-2" href="{{ route('clients.show', $user) }}" >
                                             <i data-feather="edit" class="feather-edit"></i>
                                         </a>
                                         @if(Auth::user()->hasRole('admin'))
@@ -176,7 +176,7 @@
                                                data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}" class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
-                                        <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete{{ $user->id }}">
+                                        <form action="{{ route('clients.destroy', $user->id) }}" method="POST" id="delete{{ $user->id }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -217,7 +217,7 @@
                                         <button type="button" class="btn btn-sm btn-success-light" onclick="$('#profileImageInput').click()">
                                             Upload Image
                                         </button>
-                                        <input type="file" id="profileImageInput" class="d-none" accept="image/*">
+                                        <input type="file" id="profileImageInput" name="file" class="d-none" accept="image/*">
                                         <p class="text-center fs-10 mt-2">JPEG, PNG up to 2 MB</p>
                                     </div>
                                 </div>
@@ -253,8 +253,8 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Phone<span class="text-danger ms-1">*</span></label>
-                                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                                    <label for="phone" class="form-label">Phone<span class="text-danger ms-1">*</span></label>
+                                    <input type="tel" class="form-control" id="phone_no" name="phone" required>
                                     <div class="invalid-feedback">
                                         Valid phone no. of user must be provided.
                                     </div>
@@ -274,7 +274,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Confirm Password<span class="text-danger ms-1">*</span></label>
                                     <div class="pass-group">
-                                        <input type="password" class="pass-input form-control" id="password-confirmation" name="password-confirmation" required>
+                                        <input type="password" class="pass-input form-control" id="password_confirmation" name="password_confirmation" required>
                                         <i class="ti ti-eye-off toggle-password"></i>
                                     </div>
                                     <div class="invalid-feedback">
@@ -353,7 +353,6 @@
             });
         });
     </script>
-
     <script>
         $(function() {
             // Datatable

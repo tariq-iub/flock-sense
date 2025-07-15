@@ -4,6 +4,7 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\RoleController;
 use Illuminate\Support\Facades\Route;
 
 // Welcome page
@@ -53,9 +54,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::post('/import-chart', [ChartController::class, 'import'])->name('import.chart');
     Route::get('/charts/data/{chart}', [ChartController::class, 'chartData'])->name('charts.data');
 
+    Route::get('/roles/{role}/permissions', [RoleController::class, 'getPermissions'])->name('roles.permissions');
+    Route::post('/roles/permissions', [RoleController::class, 'setPermissions'])->name('roles.set-permissions');
+    Route::get('/roles/{role}/users', [RoleController::class, 'attachedUsers'])->name('roles.users');
+
     // Resource routes for clients and charts
     Route::resources([
         'clients' => ClientController::class,
+        'roles' => RoleController::class,
         'charts' => ChartController::class,
     ]);
 });
