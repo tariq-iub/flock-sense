@@ -16554,7 +16554,7 @@ div#global-loader .whirly-loader:not(:required) {
   color: #556D6F;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open .submenu-hdr, .settings-sidebar .sidebar-menu > ul > li.submenu-open .submenu-hdr {
-  font-weight: 700;
+  font-weight: 500;
   font-size: 12px;
   color: #092C4C;
   margin: 0 0 8px 0;
