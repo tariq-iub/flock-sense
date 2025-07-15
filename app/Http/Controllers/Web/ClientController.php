@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
@@ -27,7 +28,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return view('admin.users.create');
+        // No implementation is required
     }
 
     /**
@@ -35,7 +36,32 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'phone' => 'required|string|max:20|unique:users',
+            'role' => 'required|string|exists:roles,name',
+            'file' => 'nullable|mimes:jpeg,jpg,png|max:2000',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'phone' => $validated['phone'],
+        ]);
+
+        $user->assignRole($validated['role']);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $user->addMedia($file);
+        }
+
+        return redirect()
+            ->route('clients.index')
+            ->with('success', 'User is added successfully.');
     }
 
     /**
@@ -65,11 +91,14 @@ class ClientController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($userId)
     {
+        $user = User::with('media')->findOrFail($userId);
+        $media = $user->media->first();
+        if($media) $user->deleteMedia($media->id);
         $user->delete();
         return redirect()
-            ->route('users.index')
-            ->with('success', 'User deleted successfully.');
+            ->route('clients.index')
+            ->with('success', 'User is deleted successfully.');
     }
 }

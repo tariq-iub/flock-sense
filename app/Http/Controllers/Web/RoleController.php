@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
@@ -65,6 +66,7 @@ class RoleController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
+        $validated['name'] = strtolower($validated['name']);
         $role->update($validated);
         return redirect()
             ->route('roles.index')
