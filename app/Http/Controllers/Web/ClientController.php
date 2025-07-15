@@ -67,9 +67,16 @@ class ClientController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show($userId)
     {
-        //
+        $user = User::with([
+            'farms.sheds.flocks',
+            'settings',
+            'farms' => fn($query) => $query->withCount('sheds'),
+        ])->withCount('farms')
+            ->findOrFail($userId);
+
+        return view('admin.users.show', compact('user'));
     }
 
     /**
