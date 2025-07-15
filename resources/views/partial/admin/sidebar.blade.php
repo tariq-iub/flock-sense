@@ -83,7 +83,7 @@
                             </a>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);" class="{{ Route::is('charts.*') ? 'subdrop active' : '' }}">
+                            <a href="javascript:void(0);" class="{{ Route::is('charts.*') || Route::is('breeding.*') || Route::is('feeds.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>Super Admin</span><span class="menu-arrow"></span>
                             </a>
@@ -91,6 +91,16 @@
                                 <li>
                                     <a href="{{ route('charts.index') }}" class="{{ request()->routeIs('charts.index') ? 'active' : '' }}">
                                         Baseline Data
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('breeding.index') }}" class="{{ request()->routeIs('breeding.index') ? 'active' : '' }}">
+                                        Breeds
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('feeds.index') }}" class="{{ request()->routeIs('feeds.index') ? 'active' : '' }}">
+                                        Feeds
                                     </a>
                                 </li>
                                 <li>

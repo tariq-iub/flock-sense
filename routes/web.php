@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\BreedController;
 use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\FarmController;
+use App\Http\Controllers\Web\FeedController;
 use App\Http\Controllers\Web\RoleController;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +68,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         'clients' => ClientController::class,
         'roles' => RoleController::class,
         'charts' => ChartController::class,
+        'breeding' => BreedController::class,
+        'feeds' => FeedController::class,
         'farms' => FarmController::class,
     ]);
 });
