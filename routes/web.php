@@ -4,6 +4,7 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\FarmController;
 use App\Http\Controllers\Web\RoleController;
 use Illuminate\Support\Facades\Route;
 
@@ -58,10 +59,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::post('/roles/permissions', [RoleController::class, 'setPermissions'])->name('roles.set-permissions');
     Route::get('/roles/{role}/users', [RoleController::class, 'attachedUsers'])->name('roles.users');
 
+    Route::get('/farms/{farm}/data', [FarmController::class, 'farmData'])->name('farms.data');
+
     // Resource routes for clients and charts
     Route::resources([
         'clients' => ClientController::class,
         'roles' => RoleController::class,
         'charts' => ChartController::class,
+        'farms' => FarmController::class,
     ]);
 });

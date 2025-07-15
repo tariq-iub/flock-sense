@@ -5,7 +5,7 @@
 @section('content')
     <div class="content pb-0">
         <div class="row">
-            <div class="col-xl-3 theiaStickySidebar">
+            <div class="col-xl-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="bg-light rounded p-3 mb-4">
@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="rounded bg-white text-center py-1">
-                                        <h4 class="mb-1">{{ $user->birds_count }}</h4>
+                                        <h4 class="mb-1">{{ ($user->birds_count / 1000) }}K</h4>
                                         <p class="fs-12">Birds</p>
                                     </div>
                                 </div>
@@ -49,508 +49,76 @@
                                 <i class="ti ti-circle-plus me-2"></i>Add Farm
                             </a>
                         </div>
-                        <div class="files-list border-bottom pb-2 mb-4">
-                            @foreach($user->farms as $key => $farm)
-                                <a href="javascript:void(0);" class="d-flex align-items-center justify-content-between fw-medium p-2 @if($key == 0) active @endif">
-                                    <span><i class="ti ti-building me-2"></i>{{ $farm->name }}</span>
-                                    <span class="badge badge-success badge-xs rounded-pill"
-                                          data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Sheds">
-                                        {{ $farm->sheds_count }}
-                                    </span>
+                        <div class="list-group" id="farmList">
+                            @foreach($user->farms as $farm)
+                                <a href="javascript:void(0)" class="list-group-item list-group-item-action farm-item"
+                                   data-farm-id="{{ $farm->id }}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="fs-14 mb-1">{{ $farm->name }}</h5>
+                                        <small class="text-body-secondary">{{ $farm->sheds_count }} Sheds</small>
+                                    </div>
+                                    <small class="text-body-secondary">{{ $farm->address }}</small>
                                 </a>
                             @endforeach
                         </div>
-
+                        <hr>
                         <div>
                             <div class="mb-2">
-                                <h5>Pages You Liked</h5>
+                                <h5>User Settings</h5>
                             </div>
                             <div>
-                                <a href="javscript:void(0);" class="fw-medium d-flex align-items-center justify-content-between text-dark py-1 mb-2">
-												<span class="d-inline-flex align-items-center">
-													<img src="assets/img/icons/liked-page-01.svg" class="me-2" alt="Img">Dribble
-												</span>
-                                    <span class="btn btn-icon btn-sm"><i class="ti ti-thumb-down"></i></span>
-                                </a>
-                                <a href="javscript:void(0);" class="fw-medium d-flex align-items-center justify-content-between text-dark py-1 mb-2">
-												<span class="d-inline-flex align-items-center">
-													<img src="assets/img/icons/liked-page-02.svg" class="me-2" alt="Img">UI/UX Designs
-												</span>
-                                    <span class="btn btn-icon btn-sm"><i class="ti ti-thumb-down"></i></span>
-                                </a>
-                                <a href="javscript:void(0);" class="fw-medium d-flex align-items-center justify-content-between text-dark py-1">
-												<span class="d-inline-flex align-items-center">
-													<img src="assets/img/icons/liked-page-03.svg" class="me-2" alt="Img">Figma Update
-												</span>
-                                    <span class="btn btn-icon btn-sm"><i class="ti ti-thumb-down"></i></span>
-                                </a>
-                                <div>
-                                    <div class="more-menu-3">
-                                        <a href="javscript:void(0);" class="fw-medium d-flex align-items-center justify-content-between text-dark py-1 mb-2">
-														<span class="d-inline-flex align-items-center">
-															<img src="assets/img/icons/liked-page-04.svg" class="me-2" alt="Img">I Am Techie
-														</span>
-                                            <span class="btn btn-icon btn-sm"><i class="ti ti-thumb-down"></i></span>
-                                        </a>
-                                    </div>
-                                    <div class="view-all mt-2">
-                                        <a href="javascript:void(0);" class="viewall-button-3 fw-medium"><span>Show More</span><i class="fa fa-chevron-down fs-10 ms-2"></i></a>
-                                    </div>
-                                </div>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        Email Notification
+                                        <div class="form-check form-check-md form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                   id="email-{{ $user->settings->id }}" {{ $user->settings->notifications_email ? 'checked' : '' }}>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        SMS Notification
+                                        <div class="form-check form-check-md form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                   id="sms-{{ $user->settings->id }}" {{ $user->settings->notifications_sms ? 'checked' : '' }}>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        Timezone
+                                        <span>{{ $user->settings->timezone }}</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-9">
-                <div>
-                    <div class="card">
-                        <div class="card-body">
-                            <form action="https://dreamspos.dreamstechnologies.com/html/template/social-feed.html">
-                                <div class="mb-3">
-                                    <label class="form-label fs-16">Create Post</label>
-                                    <div class="position-relative">
-                                        <textarea class="form-control post-textarea" rows="3" placeholder="What's on your mind?"></textarea>
-                                        <span class="avatar avatar-lg avatar-rounded text-area-avatar">
-														<img src="assets/img/users/user-11.jpg" alt="Img">
-													</span>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                                    <div class="d-flex align-items-center">
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-photo fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-link fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-paperclip fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-video fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-hash fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-map-pin-heart fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-mood-smile fs-16"></i></a>
-                                    </div>
-                                    <div class="d-flex align-items-center">
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-refresh fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-trash fs-16"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-world fs-16"></i></a>
-                                        <button type="submit" class="btn btn-primary d-inline-flex align-items-center ms-2"><i class="ti ti-circle-plus fs-16 me-2"></i>Share Post</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                <h5 class="me-2">Popular Channels</h5>
-                                <div class="owl-nav custom-nav nav-control"></div>
-                            </div>
-                            <div class="channels-slider owl-carousel">
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-01.svg" alt="Img">
-                                </a>
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-02.svg" alt="Img">
-                                </a>
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-03.svg" alt="Img">
-                                </a>
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-04.svg" alt="Img">
-                                </a>
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-05.svg" alt="Img">
-                                </a>
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-06.svg" alt="Img">
-                                </a>
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-07.svg" alt="Img">
-                                </a>
-                                <a href="javascript:void(0);">
-                                    <img src="assets/img/icons/channel-08.svg" alt="Img">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header border-0 pb-0">
-                            <div class="d-flex align-items-center justify-content-between border-bottom flex-wrap row-gap-3 pb-3">
-                                <div class="d-flex align-items-center">
-                                    <a href="javascript:void(0);" class="avatar avatar-lg avatar-rounded flex-shrink-0 me-2"><img src="assets/img/users/user-03.jpg" alt="Img"></a>
-                                    <div>
-                                        <h5 class="mb-1"><a href="javascript:void(0);">Richard Smith <i class="ti ti-circle-check-filled text-success"></i></a></h5>
-                                        <p class="d-flex align-items-center">
-                                            <span class="text-info">@richard442</span>
-                                            <i class="ti ti-circle-filled fs-5 mx-2"></i>
-                                            United Kingdom
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <p class="mb-0 text-dark">About 1 hr ago</p>
-                                    <div class="dropdown ms-3 me-1">
-                                        <button class="btn btn-icon dropdown-toggle bg-transparent d-flex align-items-center text-dark border-0 p-0 btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-world pe-1"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li>
-                                                <a class="dropdown-item" href="javascript:void(0);">Private</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="javascript:void(0);">Public</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="dropdown">
-                                        <a href="javascript:void(0);" class="d-inline-flex align-items-center show" data-bs-toggle="dropdown" aria-expanded="true">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-menu-end p-3">
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-edit me-2"></i>Edit</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-eye me-2"></i>Hide Post</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-report me-2"></i>Report</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-trash-x me-2"></i>Delete</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-2">
-                                <p class="text-dark fw-medium">"Believe in yourself and all that you are. Know that there is
-                                    something inside you that is greater than any obstacle.
-                                    <a href="javascript:void(0);" class="text-info link-hover">#MotivationMonday</a>
-                                    <a href="javascript:void(0);" class="text-info link-hover">#Inspiration</a>
-                                    🌟"
-                                </p>
-                            </div>
-                            <div class="mb-2">
-                                <img src="assets/img/social/social-feed-01.jpg" class="rounded" alt="Img">
-                            </div>
-                            <div class="social-gallery-slider owl-carousel mb-3">
-                                <a href="assets/img/social/gallery-big-01.jpg" data-fancybox="gallery" class="gallery-item">
-                                    <img src="assets/img/social/gallery-01.jpg" class="rounded" alt="img">
-                                    <span class="avatar avatar-md avatar-rounded"><i class="ti ti-eye"></i></span>
-                                </a>
-                                <a href="assets/img/social/gallery-big-02.jpg" data-fancybox="gallery" class="gallery-item">
-                                    <img src="assets/img/social/gallery-02.jpg" class="rounded" alt="img">
-                                    <span class="avatar avatar-md avatar-rounded"><i class="ti ti-eye"></i></span>
-                                </a>
-                                <a href="assets/img/social/gallery-big-03.jpg" data-fancybox="gallery" class="gallery-item">
-                                    <img src="assets/img/social/gallery-03.jpg" class="rounded" alt="img">
-                                    <span class="avatar avatar-md avatar-rounded"><i class="ti ti-eye"></i></span>
-                                </a>
-                                <a href="assets/img/social/gallery-big-04.jpg" data-fancybox="gallery" class="gallery-item">
-                                    <img src="assets/img/social/gallery-04.jpg" class="rounded" alt="img">
-                                    <span class="avatar avatar-md avatar-rounded"><i class="ti ti-eye"></i></span>
-                                </a>
-                                <a href="assets/img/social/gallery-big-01.jpg" data-fancybox="gallery" class="gallery-item">
-                                    <img src="assets/img/social/gallery-01.jpg" class="rounded" alt="img">
-                                    <span class="avatar avatar-md avatar-rounded"><i class="ti ti-eye"></i></span>
-                                </a>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-                                <div class="d-flex align-items-center flex-wrap row-gap-3">
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center me-3">
-                                        <i class="ti ti-heart me-2"></i>340K Likes
-                                    </a>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center me-3">
-                                        <i class="ti ti-message-dots me-2"></i>45 Comments
-                                    </a>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center">
-                                        <i class="ti ti-share-3 me-2"></i>28 Share
-                                    </a>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-heart-filled text-danger"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-share"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-message-star"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-bookmark-filled text-warning"></i></a>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <a href="javascript:void(0);" class="avatar avatar-rounded me-2 flex-shrink-0"><img src="assets/img/users/user-11.jpg" alt="Img"></a>
-                                <input type="text" class="form-control" placeholder="Enter Comments">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header border-0 pb-0">
-                            <div class="d-flex align-items-center justify-content-between border-bottom flex-wrap row-gap-3 pb-3">
-                                <div class="d-flex align-items-center">
-                                    <a href="javascript:void(0);" class="avatar avatar-lg avatar-rounded flex-shrink-0 me-2"><img src="assets/img/users/user-05.jpg" alt="Img"></a>
-                                    <div>
-                                        <h5 class="mb-1"><a href="javascript:void(0);">Jason Heier <i class="ti ti-circle-check-filled text-success"></i></a></h5>
-                                        <p class="d-flex align-items-center">
-                                            <span class="text-info">@jason118</span>
-                                            <i class="ti ti-circle-filled fs-5 mx-2"></i>
-                                            United Kingdom
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <p class="mb-0 text-dark">About 1 hr ago</p>
-                                    <div class="dropdown ms-3 me-1">
-                                        <button class="btn btn-icon dropdown-toggle bg-transparent d-flex align-items-center text-dark border-0 p-0 btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-world pe-1"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li>
-                                                <a class="dropdown-item" href="javascript:void(0);">Private</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="javascript:void(0);">Public</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="dropdown">
-                                        <a href="javascript:void(0);" class="d-inline-flex align-items-center show" data-bs-toggle="dropdown" aria-expanded="true">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-menu-end p-3">
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-edit me-2"></i>Edit</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-eye me-2"></i>Hide Post</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-report me-2"></i>Report</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-trash-x me-2"></i>Delete</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-2">
-                                <p class="text-dark fw-medium">
-                                    Drinking water boosts skin health and beauty. Stay hydrated!
-                                    <a href="javascript:void(0);" class="text-info link-hover">#HealthTips </a>
-                                    <a href="javascript:void(0);" class="text-info link-hover"> #Wellness</a>
-                                    💧
-                                </p>
-                            </div>
-                            <div class="card shadow-none mb-3">
-                                <div class="card-img card-img-hover rounded-0">
-                                    <a href="javascript:void(0);" class="rounded-top"><img src="assets/img/social/social-feed-02.jpg" class="rounded-top" alt="Img"></a>
-                                </div>
-                                <div class="card-body p-2">
-                                    <h6 class="mb-1 text-truncate"><a href="javascript:void(0);">Drinking water boosts skin health and beauty. Stay hydrated!💧</a></h6>
-                                    <a href="javascript:void(0);">Health.com</a>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                                <div class="d-flex align-items-center flex-wrap row-gap-3">
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center me-3">
-                                        <i class="ti ti-heart me-2"></i>340K Likes
-                                    </a>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center me-3">
-                                        <i class="ti ti-message-dots me-2"></i>45 Comments
-                                    </a>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center">
-                                        <i class="ti ti-share-3 me-2"></i>28 Share
-                                    </a>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-heart"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-share"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-message-star"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-bookmark"></i></a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header border-0 pb-0">
-                            <div class="d-flex align-items-center justify-content-between border-bottom flex-wrap row-gap-3 pb-3">
-                                <div class="d-flex align-items-center">
-                                    <span class="avatar avatar-lg avatar-rounded flex-shrink-0 me-2"><img src="assets/img/users/user-04.jpg" alt="Img"></span>
-                                    <div>
-                                        <h5 class="mb-1"><a href="javascript:void(0);">Sophie Headrick <i class="ti ti-circle-check-filled text-success"></i></a></h5>
-                                        <p class="d-flex align-items-center">
-                                            <span class="text-info">@sophie241</span>
-                                            <i class="ti ti-circle-filled fs-5 mx-2"></i>
-                                            United Kingdom
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <p class="mb-0 text-dark">About 1 hr ago</p>
-                                    <div class="dropdown ms-3 me-1">
-                                        <button class="btn btn-icon dropdown-toggle bg-transparent d-flex align-items-center text-dark border-0 p-0 btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ti ti-world pe-1"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li>
-                                                <a class="dropdown-item" href="javascript:void(0);">Private</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="javascript:void(0);">Public</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="dropdown">
-                                        <a href="javascript:void(0);" class="d-inline-flex align-items-center show" data-bs-toggle="dropdown" aria-expanded="true">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-menu-end p-3">
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-edit me-2"></i>Edit</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-eye me-2"></i>Hide Post</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-report me-2"></i>Report</a>
-                                            </li>
-                                            <li>
-                                                <a href="javascript:void(0);" class="dropdown-item rounded-1"><i class="ti ti-trash-x me-2"></i>Delete</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-2">
-                                <p class="text-dark fw-medium">
-                                    Excited to announce the launch of our new product! Get yours now and enjoy a special discount.
-                                    <a href="javascript:void(0);" class="text-info link-hover">#NewRelease </a>
-                                    <a href="javascript:void(0);" class="text-info link-hover">  #Innovation</a>
-                                    🎉
-                                </p>
-                            </div>
-                            <div class="mb-2">
-                                <img src="assets/img/social/social-feed-03.jpg" class="rounded" alt="Img">
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-                                <div class="d-flex align-items-center flex-wrap row-gap-3">
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center me-3">
-                                        <i class="ti ti-heart me-2"></i>340K Likes
-                                    </a>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center me-3">
-                                        <i class="ti ti-message-dots me-2"></i>45 Comments
-                                    </a>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center">
-                                        <i class="ti ti-share-3 me-2"></i>28 Share
-                                    </a>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-heart-filled text-danger"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-share"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-message-star"></i></a>
-                                    <a href="javascript:void(0);" class="btn btn-icon btn-sm rounded-circle"><i class="ti ti-bookmark-filled text-warning"></i></a>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start mb-3">
-                                <a href="javascript:void(0);" class="avatar avatar-rounded flex-shrink-0 me-2">
-                                    <img src="assets/img/profiles/avatar-02.jpg" alt="Img">
-                                </a>
-                                <div class="bg-light rounded flex-fill p-2">
-                                    <div class="d-flex align-items-center mb-1">
-                                        <h5><a href="javascript:void(0);">Frank Hoffman</a></h5>
-                                        <span class="ms-2">12:45 PM</span>
-                                    </div>
-                                    <p class="mb-1">Congratulations on the launch! I've been eagerly waiting for this
-                                        product, and the special discount makes it even more exciting.
-                                    </p>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center"><i class="ti ti-share-3 me-2"></i>Reply</a>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start mb-3 ms-4 ps-2">
-                                <a href="javascript:void(0);" class="avatar avatar-rounded flex-shrink-0 me-2">
-                                    <img src="assets/img/profiles/avatar-01.jpg" alt="Img">
-                                </a>
-                                <div class="bg-light rounded flex-fill p-2">
-                                    <div class="d-flex align-items-center mb-1">
-                                        <h5><a href="javascript:void(0);">Sophie Headrick</a></h5>
-                                        <span class="ms-2">12:45 PM</span>
-                                    </div>
-                                    <p class="mb-1">
-                                        Thank you so much for your enthusiasm and support!
-                                    </p>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center"><i class="ti ti-share-3 me-2"></i>Reply</a>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start mb-3">
-                                <a href="javascript:void(0);" class="avatar avatar-rounded flex-shrink-0 me-2">
-                                    <img src="assets/img/profiles/avatar-04.jpg" alt="Img">
-                                </a>
-                                <div class="bg-light rounded flex-fill p-2">
-                                    <div class="d-flex align-items-center mb-1">
-                                        <h5><a href="javascript:void(0);">Samuel Butler</a></h5>
-                                        <span class="ms-2">12:40 PM</span>
-                                    </div>
-                                    <p class="mb-1">
-                                        So thrilled to see this product finally launched! I've heard
-                                        amazing things about it and am excited to see how it lives up to the hype.
-                                    </p>
-                                    <a href="javascript:void(0);" class="d-inline-flex align-items-center"><i class="ti ti-share-3 me-2"></i>Reply</a>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="more-menu">
-                                    <div class="d-flex align-items-start mb-3">
-                                        <a href="javascript:void(0);" class="avatar avatar-rounded flex-shrink-0 me-2">
-                                            <img src="assets/img/profiles/avatar-05.jpg" alt="Img">
-                                        </a>
-                                        <div class="bg-light rounded flex-fill p-2">
-                                            <div class="d-flex align-items-center mb-1">
-                                                <h5><a href="javascript:void(0);">Samuel Butler</a></h5>
-                                                <span class="ms-2">12:40 PM</span>
-                                            </div>
-                                            <p class="mb-1">
-                                                So thrilled to see this product finally launched! I've heard
-                                                amazing things about it and am excited to see how it lives up to the hype.
-                                            </p>
-                                            <a href="javascript:void(0);" class="d-inline-flex align-items-center"><i class="ti ti-share-3 me-2"></i>Reply</a>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-start mb-3">
-                                        <a href="javascript:void(0);" class="avatar avatar-rounded flex-shrink-0 me-2">
-                                            <img src="assets/img/profiles/avatar-06.jpg" alt="Img">
-                                        </a>
-                                        <div class="bg-light rounded flex-fill p-2">
-                                            <div class="d-flex align-items-center mb-1">
-                                                <h5><a href="javascript:void(0);">Samuel Butler</a></h5>
-                                                <span class="ms-2">12:40 PM</span>
-                                            </div>
-                                            <p class="mb-1">
-                                                So thrilled to see this product finally launched! I've heard
-                                                amazing things about it and am excited to see how it lives up to the hype.
-                                            </p>
-                                            <a href="javascript:void(0);" class="d-inline-flex align-items-center"><i class="ti ti-share-3 me-2"></i>Reply</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="view-all text-center mb-3">
-                                    <a href="javascript:void(0);" class="viewall-button text-primary fw-medium"><span>View All 200 Comments</span><i class="fa fa-chevron-down fs-10 ms-2"></i></a>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <span class="avatar avatar-rounded me-2 flex-shrink-0"><img src="assets/img/users/user-11.jpg" alt="Img"></span>
-                                <input type="text" class="form-control" placeholder="Enter Comments">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-xl-8" id="farmDetailsContainer">
+
             </div>
         </div>
     </div>
 @endsection
 
 @push('js')
-    <script src="{{ asset('assets/js/owl.carousel.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/plugins/theia-sticky-sidebar/ResizeSensor.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js') }}" type="text/javascript"></script>
+    <script>
+        $(function(){
+            $('#farmList').on('click', '.farm-item', function() {
+                var farmId = $(this).data('farm-id');
+                // Optionally, show a loading spinner
+                $('#farmDetailsContainer').html('<div class="text-center py-5"><div class="spinner-border text-success"></div></div>');
+
+                $.get('/admin/farms/' + farmId + '/data', function(data) {
+                    $('#farmDetailsContainer').html(data.html);
+
+                    // If you use Bootstrap's JS tabs, initialize them
+                    var triggerTabList = [].slice.call(document.querySelectorAll('#farmDetailsContainer .nav-link'));
+                    triggerTabList.forEach(function (triggerEl) {
+                        var tabTrigger = new bootstrap.Tab(triggerEl);
+                    });
+                }).fail(function() {
+                    $('#farmDetailsContainer').html('<div class="alert alert-danger"><i class="feather-alert-triangle flex-shrink-0 me-2"></i>Failed to load farm details.</div>');
+                });
+            });
+        });
+    </script>
 @endpush

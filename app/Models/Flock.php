@@ -16,6 +16,11 @@ class Flock extends Model
         'chicken_count',
     ];
 
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
     public function shed() : BelongsTo
     {
         return $this->belongsTo(Shed::class);

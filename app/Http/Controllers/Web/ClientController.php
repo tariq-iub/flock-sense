@@ -75,7 +75,16 @@ class ClientController extends Controller
             'farms' => fn($query) => $query->withCount('sheds'),
         ])->withCount('farms')
             ->findOrFail($userId);
-
+        if($user->settings == null){
+            $user->settings = $user->settings()->create([
+                'security_level' => 'medium',
+                'backup_frequency' => 'daily',
+                'language' => 'en',
+                'timezone' => 'UTC',
+                'notifications_email' => true,
+                'notifications_sms' => false,
+            ]);
+        }
         return view('admin.users.show', compact('user'));
     }
 
