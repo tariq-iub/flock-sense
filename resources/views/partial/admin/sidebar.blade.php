@@ -83,7 +83,7 @@
                             </a>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);" class="{{ Route::is('charts.*') || Route::is('clients.*') ? 'subdrop active' : '' }}">
+                            <a href="javascript:void(0);" class="{{ Route::is('charts.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>Super Admin</span><span class="menu-arrow"></span>
                             </a>
@@ -98,12 +98,6 @@
                                         Subscription Plans
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="{{ route('clients.index') }}" class="{{ Route::is('clients.*') ? 'active' : '' }}">
-                                        Users and Clients
-                                    </a>
-                                </li>
-
                                 <li class="submenu submenu-two">
                                     <a href="javascript:void(0);">
                                         Device Management<span class="menu-arrow inside-submenu"></span>
@@ -117,38 +111,21 @@
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);">
-                                <i class="ti ti-brand-apple-arcade fs-16 me-2"></i><span>Application</span><span class="menu-arrow"></span>
+                            <a href="javascript:void(0);" class="{{ Route::is('clients.*') || Route::is('roles.*') ? 'subdrop active' : '' }}">
+                                <i class="ti ti-users-group fs-16 me-2"></i><span>Users and Clients</span>
+                                <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="chat.html">Chat</a></li>
-                                <li class="submenu submenu-two"><a href="javascript:void(0);">Call<span class="menu-arrow inside-submenu"></span></a>
-                                    <ul>
-                                        <li><a href="video-call.html">Video Call</a></li>
-                                        <li><a href="audio-call.html">Audio Call</a></li>
-                                        <li><a href="call-history.html">Call History</a></li>
-                                    </ul>
+                                <li>
+                                    <a href="{{ route('clients.index') }}" class="{{ Route::is('clients.*') ? 'active' : '' }}">
+                                        All Users
+                                    </a>
                                 </li>
-                                <li><a href="calendar.html">Calendar</a></li>
-                                <li><a href="contacts.html">Contacts</a></li>
-                                <li><a href="email.html">Email</a></li>
-                                <li><a href="todo.html">To Do</a></li>
-                                <li><a href="notes.html">Notes</a></li>
-                                <li><a href="file-manager.html">File Manager</a></li>
-                                <li><a href="projects.html">Projects</a></li>
-                                <li class="submenu submenu-two"><a href="javascript:void(0);">Ecommerce<span class="menu-arrow inside-submenu"></span></a>
-                                    <ul>
-                                        <li><a href="products.html">Products</a></li>
-                                        <li><a href="orders.html">Orders</a></li>
-                                        <li><a href="customers.html">Customers</a></li>
-                                        <li><a href="cart.html">Cart</a></li>
-                                        <li><a href="checkout.html">Checkout</a></li>
-                                        <li><a href="wishlist.html">Wishlist</a></li>
-                                        <li><a href="reviews.html">Reviews</a></li>
-                                    </ul>
+                                <li>
+                                    <a href="{{ route('roles.index') }}" class="{{ Route::is('roles.*') ? 'active' : '' }}">
+                                        Roles and Permissions
+                                    </a>
                                 </li>
-                                <li><a href="social-feed.html">Social Feed</a></li>
-                                <li><a href="search-list.html">Search List</a></li>
                             </ul>
                         </li>
                         <li class="submenu">
