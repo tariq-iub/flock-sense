@@ -15,7 +15,7 @@
                                     <img src="{{ asset('assets/img/logo-white.svg') }}"  alt="Img">
                                 </a>
                             </div>
-                            <form action="{{ route('login') }}" method="POST">
+                            <form action="{{ route('login') }}" method="POST" class="row g-3 needs-validation" novalidate>
                                 @csrf
                                 <div class="card">
                                     <div class="card-body p-5">
@@ -26,17 +26,19 @@
                                         <div class="mb-3">
                                             <label class="form-label">Email <span class="text-danger"> *</span></label>
                                             <div class="input-group">
-                                                <input name="email" type="text" value="" class="form-control border-end-0">
+                                                <input type="text" name="email" value="" class="form-control border-end-0" required>
                                                 <span class="input-group-text border-start-0">
-                                                        <i class="ti ti-mail"></i>
-                                                    </span>
+                                                    <i class="ti ti-mail"></i>
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Password <span class="text-danger"> *</span></label>
                                             <div class="pass-group">
-                                                <input name="password" type="password" class="pass-input form-control">
-                                                <span class="ti toggle-password ti-eye-off text-gray-9"></span>
+                                                <input name="password" type="password" class="pass-input form-control" required>
+                                                <span class="border-start-0">
+                                                    <i class="ti ti-eye-off toggle-password text-gray-9"></i>
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="form-login authentication-check">

@@ -26,10 +26,10 @@
                                         <div class="mb-3">
                                             <label class="form-label">Email <span class="text-danger"> *</span></label>
                                             <div class="input-group">
-                                                <input type="text" value="" class="form-control border-end-0">
+                                                <input type="text" name="email" value="" class="form-control border-end-0" required>
                                                 <span class="input-group-text border-start-0">
-                                                        <i class="ti ti-mail"></i>
-                                                    </span>
+                                                    <i class="ti ti-mail"></i>
+                                                </span>
                                             </div>
                                         </div>
                                         <div class="form-login">
