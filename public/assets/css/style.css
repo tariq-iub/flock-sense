@@ -16546,9 +16546,9 @@ div#global-loader .whirly-loader:not(:required) {
   color: #212B36;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a {
-  background: rgba(190, 255, 105, 0.2);
-  border-radius: 5px;
-  color: #556D6F;
+    background: #E7FFC6;
+    color: #556D6F;
+    border-radius: 8px;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a span, .sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a i, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a span, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a i {
   color: #556D6F;
@@ -16576,7 +16576,7 @@ div#global-loader .whirly-loader:not(:required) {
   color: #556D6F;
 }
 .sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow, .settings-sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow {
-  background: #D3DDD1;
+  background: #C0CFBD;
 }
 .sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow::before, .settings-sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow::before {
   border-color: #556D6F;
