@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'System Users')
+@section('title', 'Feeds')
 @section('content')
     <div class="content">
         <div class="page-header">
             <div class="add-item d-flex">
                 <div class="page-title">
-                    <h4 class="fw-bold">Chicken Breeds</h4>
-                    <h6>Manage data for chicken breeds.</h6>
+                    <h4 class="fw-bold">Chicken Feeds</h4>
+                    <h6>Manage data for chicken feeds.</h6>
                 </div>
             </div>
             <ul class="table-top-head">
@@ -18,8 +18,8 @@
                 </li>
             </ul>
             <div class="page-btn">
-                <a href="javascript:void(0)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBreedModal">
-                    <i class="ti ti-circle-plus me-1"></i>Add Breed
+                <a href="javascript:void(0)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFeedModal">
+                    <i class="ti ti-circle-plus me-1"></i>Add Feed
                 </a>
             </div>
         </div>
@@ -84,40 +84,51 @@
                                     <span class="checkmarks"></span>
                                 </label>
                             </th>
-                            <th class="w-100">Breed</th>
+                            <th class="">Feed Title</th>
+                            <th class="text-center">Start Day</th>
+                            <th class="text-center">End Day</th>
+                            <th class="text-center">Feed Form</th>
+                            <th class="w-100">Particle Size</th>
                             <th class="text-center">Category</th>
-                            <th class="text-center">Flock Count</th>
-                            <th class="text-center">Create Date</th>
                             <th class="no-sort"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($breeds as $breed)
+                        @foreach($feeds as $feed)
                             <tr>
                                 <td>
                                     <label class="checkboxs">
-                                        <input type="checkbox" value="{{ $breed->id }}">
+                                        <input type="checkbox" value="{{ $feed->id }}">
                                         <span class="checkmarks"></span>
                                     </label>
                                 </td>
-                                <td>
-                                    {{ ucfirst($breed->name) }}
-                                </td>
-                                <td class="text-center">{{ ucfirst($breed->category) }}</td>
-                                <td class="text-center">{{ $breed->flocks_count }}</td>
-                                <td class="text-center">
-                                   {{ $breed->created_at->format('d-m-Y') }}
-                                </td>
+                                <td>{{ ucfirst($feed->title) }}</td>
+                                <td class="text-center">{{ $feed->start_day }}</td>
+                                <td class="text-center">{{ $feed->end_day }}</td>
+                                <td class="text-center">{{ $feed->feed_form }}</td>
+                                <td class="">{{ $feed->particle_size }}</td>
+                                <td class="text-center">{{ ucfirst($feed->category) }}</td>
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
+                                        <a href="javascript:void(0)"
+                                           class="me-2 d-flex align-items-center p-2 border rounded profiles"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title=""
+                                           data-bs-original-title="Feed Profiles"
+                                           data-feed-id="{{ $feed->id }}"
+                                           data-feed-name="{{ $feed->name }}">
+                                            <i class="ti ti-list"></i>
+                                        </a>
+
                                         <a href="javascript:void(0)"
                                            class="me-2 d-flex align-items-center p-2 border rounded edit-breed"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
                                            data-bs-original-title="Edit Breed"
-                                           data-breed-id="{{ $breed->id }}"
-                                           data-breed-name="{{ $breed->name }}">
+                                           data-breed-id="{{ $feed->id }}"
+                                           data-breed-name="{{ $feed->name }}">
                                             <i class="ti ti-edit"></i>
                                         </a>
 
@@ -126,12 +137,12 @@
                                            data-bs-placement="top"
                                            title=""
                                            data-bs-original-title="Delete Breed"
-                                           data-breed-id="{{ $breed->id }}"
-                                           data-breed-name="{{ $breed->name }}"
+                                           data-breed-id="{{ $feed->id }}"
+                                           data-breed-name="{{ $feed->name }}"
                                            class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
-                                        <form action="{{ route('breeding.destroy', $breed->id) }}" method="POST" id="delete{{ $breed->id }}">
+                                        <form action="{{ route('feeds.destroy', $feed->id) }}" method="POST" id="delete{{ $feed->id }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -147,13 +158,13 @@
     </div>
 
     <!-- Add Breed Modal -->
-    <div class="modal fade" id="addBreedModal" tabindex="-1" aria-labelledby="addBreedModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="addFeedModal" tabindex="-1" aria-labelledby="addFeedModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form action="{{ route('breeding.store') }}" class="needs-validation" novalidate method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addBreedModalLabel">Add Breed</h5>
+                        <h5 class="modal-title" id="addFeedModalLabel">Add Feed</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -234,7 +245,7 @@
         </div>
     </div>
 
-    <!-- Chart Delete Modal -->
+    <!-- Delete Modal -->
     <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -290,7 +301,7 @@
 
                 $('#statusFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(2).search(selected).draw();
+                    table.column(6).search(selected).draw();
                 });
             }
         });

@@ -13,7 +13,14 @@ class FeedController extends Controller
      */
     public function index()
     {
-        //
+        $feeds = Feed::with('feedProfiles')->get();
+        $breeds = [];
+        $categories = ['broiler', 'layer'];
+
+        return view(
+            'admin.feeds.index',
+            compact('feeds', 'breeds', 'categories')
+        );
     }
 
     /**

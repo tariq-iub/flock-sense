@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'System Users')
+@section('title', 'Breeds')
 @section('content')
     <div class="content">
         <div class="page-header">
@@ -234,7 +234,7 @@
         </div>
     </div>
 
-    <!-- Chart Delete Modal -->
+    <!-- Delete Modal -->
     <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
