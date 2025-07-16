@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\BreedController;
 use App\Http\Controllers\Api\V1\DeviceApplianceController;
 use App\Http\Controllers\Api\V1\FlockController;
+use App\Http\Controllers\Api\V1\ProductionLogController;
 use App\Http\Controllers\Api\V1\SensorDataController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\SubscriptionPlanController;
@@ -29,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'breeds' => BreedController::class,
         'flocks' => FlockController::class,
         'settings' => UserSettingsController::class,
+        'production' => ProductionLogController::class,
     ]);
 
     // Farm managers
