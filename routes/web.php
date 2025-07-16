@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\FarmController;
 use App\Http\Controllers\Web\FeedController;
+use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\RoleController;
 use Illuminate\Support\Facades\Route;
 
@@ -71,5 +72,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
         'farms' => FarmController::class,
+        'log/productions' => ProductionLogController::class,
     ]);
 });

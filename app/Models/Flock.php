@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Flock extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'shed_id',
@@ -29,5 +33,10 @@ class Flock extends Model
     public function breed(): BelongsTo
     {
         return $this->belongsTo(Breed::class);
+    }
+
+    public function weightLog() : HasMany
+    {
+        return $this->hasMany(WeightLog::class);
     }
 }
