@@ -126,9 +126,9 @@
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Edit Breed"
-                                           data-breed-id="{{ $feed->id }}"
-                                           data-breed-name="{{ $feed->name }}">
+                                           data-bs-original-title="Edit Feed"
+                                           data-feed-id="{{ $feed->id }}"
+                                           data-feed-name="{{ $feed->name }}">
                                             <i class="ti ti-edit"></i>
                                         </a>
 
@@ -136,9 +136,9 @@
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Delete Breed"
-                                           data-breed-id="{{ $feed->id }}"
-                                           data-breed-name="{{ $feed->name }}"
+                                           data-bs-original-title="Delete Feed"
+                                           data-feed-id="{{ $feed->id }}"
+                                           data-feed-name="{{ $feed->name }}"
                                            class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
