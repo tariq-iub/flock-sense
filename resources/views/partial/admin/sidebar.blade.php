@@ -108,6 +108,11 @@
                                         Packages
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="#">
+                                        Frontend Management
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li class="submenu">
@@ -135,9 +140,9 @@
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="video-call.html">IoT Devices</a></li>
+                                <li><a href="video-call.html">Devices Inventory</a></li>
                                 <li><a href="audio-call.html">Farm Devices</a></li>
-                                <li><a href="call-history.html">Alerts</a></li>
+                                <li><a href="call-history.html">Alerts and Logs</a></li>
                             </ul>
                         </li>
                     </ul>

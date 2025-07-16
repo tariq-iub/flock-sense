@@ -23,7 +23,7 @@ class Shed extends Model
 
     public function latestFlocks() : HasMany
     {
-        return $this->hasMany(Flock::class)->orderByDesc('created_at')->limit(10);
+        return $this->hasMany(Flock::class)->orderByDesc('created_at')->limit(5);
     }
 
     public function devices(): BelongsToMany
