@@ -26,9 +26,14 @@ class ProductionLogController extends Controller
         $farms = Farm::with('sheds.flocks')->orderBy('name')->get();
         $logs = collect();
         $farmId = null;
+        $ages = null;
+        $dailyMortality = null;
+        $livability = null;
+        $dailyFeed = null;
 
         // Only show logs if all three selected
-        if ($request->filled('filter.shed_id') && $request->filled('filter.flock_id')) {
+        if ($request->filled('filter.shed_id') && $request->filled('filter.flock_id'))
+        {
             $logs = QueryBuilder::for(ProductionLog::class)
                 ->with(['shed', 'flock', 'user', 'weightLog'])
                 ->allowedFilters([
@@ -37,12 +42,26 @@ class ProductionLogController extends Controller
                 ])
                 ->latest('production_log_date')
                 ->get();
+
             $farmId = Shed::find($request->filled('filter.shed_id'))->farm->id;
+            $reverseLogs = $logs->sortBy('age')->values();
+            // Age labels in ascending order
+            $ages = $reverseLogs->pluck('age')->values()->toArray();
+            // Daily Mortality = day + night
+            $dailyMortality = $reverseLogs->map(function($log) {
+                return $log->day_mortality_count + $log->night_mortality_count;
+            })->values()->toArray();
+            // Daily Feed = day + night
+            $dailyFeed = $reverseLogs->map(function($log) {
+                return ($log->day_feed_consumed + $log->night_feed_consumed) / 1000;
+            })->values()->toArray();
+            // Livability as before
+            $livability = $reverseLogs->pluck('livability')->values()->toArray();
         }
 
         return view(
             'admin.logs.index',
-            compact('logs', 'farms', 'farmId')
+            compact('logs', 'farms', 'farmId', 'ages', 'dailyMortality', 'livability', 'dailyFeed')
         );
     }
 

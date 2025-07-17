@@ -138,8 +138,9 @@
                         <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample" style="">
                             <div class="accordion-body">
                                 <div class="row">
-                                    <div class="col-md-6"></div>
-                                    <div class="col-md-6"></div>
+                                    <div class="col-md-12">
+                                        <canvas id="productionCombinedChart" height="150"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -279,6 +280,86 @@
 @endsection
 
 @push('js')
+    <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}" type="text/javascript"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('productionCombinedChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @json($ages), // Age (days)
+                    datasets: [
+                        {
+                            label: 'Daily Mortality',
+                            data: @json($dailyMortality),
+                            borderColor: 'rgba(220,38,38,1)', // Red-600
+                            backgroundColor: 'rgba(220,38,38,0.1)',
+                            tension: 0.3,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Livability (%)',
+                            data: @json($livability),
+                            borderColor: 'rgba(34,197,94,1)', // Green-500
+                            backgroundColor: 'rgba(34,197,94,0.1)',
+                            tension: 0.3,
+                            yAxisID: 'y1',
+                        },
+                        {
+                            label: 'Daily Feed Consumption',
+                            data: @json($dailyFeed),
+                            borderColor: 'rgba(59,130,246,1)', // Blue-500
+                            backgroundColor: 'rgba(59,130,246,0.1)',
+                            tension: 0.3,
+                            yAxisID: 'y2',
+                        },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    stacked: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: {
+                            display: true,
+                            text: 'Production Parameters by Age'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Age (Days)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Daily Mortality' },
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: 'Livability (%)' },
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: 'Daily Feed Consumption (Kg)' },
+                            offset: true,
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
     <script>
         $(function() {
             // When farm changes, load sheds
