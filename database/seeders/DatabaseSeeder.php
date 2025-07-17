@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,21 +16,27 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Muhammad Tariq',
-            'email' => 'saaim02@gmail.com',
+            'email' => 'saaim01@gmail.com',
             'phone' => '+923346031107',
         ]);
 
-//        User::factory()->create([
-//            'name' => 'Abdullah Abid',
-//            'email' => 'abdrps2004@gmail.com',
-//            'phone' => '+923326334598',
-//        ]);
+        User::factory()->create([
+            'name' => 'Abdullah Abid',
+            'email' => 'abdrps2004@gmail.com',
+            'phone' => '+923326334598',
+        ]);
 
         $this->call([
             RoleSeeder::class,
-//            BreedSeeder::class,
-//            FeedSeeder::class,
-            // Add other seeders here as needed
+            BreedSeeder::class,
+            FeedSeeder::class,
+            FarmSeeder::class,
+            ShedSeeder::class,
+            FlockSeeder::class,
+            MedicineSeeder::class,
+            ChartSeeder::class,
+            ProductionLogSeeder::class,
+            WeightLogSeeder::class,
         ]);
     }
 }

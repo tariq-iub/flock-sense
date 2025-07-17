@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Shed extends Model
 {
-    protected $fillable = ['farm_id', 'name', 'capacity', 'type', 'description'];
+    use HasFactory;
+
+    protected $fillable = ['farm_id', 'name', 'capacity', 'type'];
 
     public function farm(): BelongsTo
     {
@@ -19,6 +22,11 @@ class Shed extends Model
     public function flocks(): HasMany
     {
         return $this->hasMany(Flock::class);
+    }
+
+    public function latestFlocks() : HasMany
+    {
+        return $this->hasMany(Flock::class)->orderByDesc('created_at')->limit(5);
     }
 
     public function devices(): BelongsToMany

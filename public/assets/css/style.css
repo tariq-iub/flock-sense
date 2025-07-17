@@ -16546,7 +16546,7 @@ div#global-loader .whirly-loader:not(:required) {
   color: #212B36;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a, .settings-sidebar .sidebar-menu > ul > li.submenu-open ul > li.active a {
-    background: #E7FFC6;
+    background: #F0FAFA;
     color: #556D6F;
     border-radius: 8px;
 }
@@ -16554,9 +16554,9 @@ div#global-loader .whirly-loader:not(:required) {
   color: #556D6F;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open .submenu-hdr, .settings-sidebar .sidebar-menu > ul > li.submenu-open .submenu-hdr {
-  font-weight: 700;
-  font-size: 12px;
-  color: #092C4C;
+  font-weight: 400;
+  font-size: 11px;
+  color: grey;
   margin: 0 0 8px 0;
 }
 .sidebar .sidebar-menu > ul > li.submenu-open:first-child h6, .settings-sidebar .sidebar-menu > ul > li.submenu-open:first-child h6 {
@@ -16568,7 +16568,7 @@ div#global-loader .whirly-loader:not(:required) {
   padding: 4px 0 0;
 }
 .sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop, .settings-sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop {
-  background: #E7FFC6;
+  background: #F0FAFA;
   color: #556D6F;
   border-radius: 8px;
 }
@@ -16576,7 +16576,7 @@ div#global-loader .whirly-loader:not(:required) {
   color: #556D6F;
 }
 .sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow, .settings-sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow {
-  background: #C0CFBD;
+  background: #EAEAEA;
 }
 .sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow::before, .settings-sidebar .sidebar-menu > ul > li > ul > li.submenu > a.subdrop .menu-arrow::before {
   border-color: #556D6F;
@@ -16588,7 +16588,7 @@ div#global-loader .whirly-loader:not(:required) {
   color: #556D6F;
 }
 .sidebar .sidebar-menu > ul li .submenu > a.active, .settings-sidebar .sidebar-menu > ul li .submenu > a.active {
-  background: #E7FFC6;
+  background: #F2F2F2;
   color: #556D6F;
   border-radius: 8px;
 }
@@ -16596,7 +16596,7 @@ div#global-loader .whirly-loader:not(:required) {
   color: #556D6F;
 }
 .sidebar .sidebar-menu > ul li .submenu > a.active .menu-arrow, .settings-sidebar .sidebar-menu > ul li .submenu > a.active .menu-arrow {
-  background: #D3DDD1;
+  background: #F2F2F2;
 }
 .sidebar .sidebar-menu > ul li .submenu > a.active .menu-arrow::before, .settings-sidebar .sidebar-menu > ul li .submenu > a.active .menu-arrow::before {
   border-color: #556D6F;

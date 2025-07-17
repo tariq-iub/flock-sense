@@ -172,8 +172,8 @@
                                             <i data-feather="edit" class="feather-edit"></i>
                                         </a>
                                         @if(Auth::user()->hasRole('admin'))
-                                            <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete-modal"
-                                               data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}" class="p-2 open-delete-modal">
+                                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete-modal"
+                                           data-user-id="{{ $user->id }}" data-user-name="{{ $user->name }}" class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
                                         <form action="{{ route('clients.destroy', $user->id) }}" method="POST" id="delete{{ $user->id }}">
