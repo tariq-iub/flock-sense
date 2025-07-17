@@ -30,6 +30,9 @@ class ProductionLogController extends Controller
         $dailyMortality = null;
         $livability = null;
         $dailyFeed = null;
+        $feedConversionRatio       = null;
+        $coefficientOfVariation    = null;
+        $productionEfficiencyFactor = null;
 
         // Only show logs if all three selected
         if ($request->filled('filter.shed_id') && $request->filled('filter.flock_id'))
