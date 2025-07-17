@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Farm;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class FarmSeeder extends Seeder
 {
@@ -16,8 +17,8 @@ class FarmSeeder extends Seeder
             'name' => 'Sadoki Farm',
             'address' => 'Sadoki',
             'owner_id' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
         ]);
     }
 }

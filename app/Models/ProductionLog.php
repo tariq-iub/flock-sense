@@ -29,6 +29,10 @@ class ProductionLog extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'production_log_date' => 'datetime',
+    ];
+
     public function flock() : BelongsTo
     {
         return $this->belongsTo(Flock::class);

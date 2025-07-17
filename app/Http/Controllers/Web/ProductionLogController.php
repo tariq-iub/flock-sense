@@ -35,7 +35,7 @@ class ProductionLogController extends Controller
                     AllowedFilter::exact('shed_id'),
                     AllowedFilter::exact('flock_id'),
                 ])
-                ->latest()
+                ->latest('production_log_date')
                 ->get();
             $farmId = Shed::find($request->filled('filter.shed_id'))->farm->id;
         }
@@ -115,79 +115,16 @@ class ProductionLogController extends Controller
         ]);
 
         // Optionally: Only create weight log if provided and valid
-        if(
-            !empty($validated['with_weight_log'])
-            && !empty($validated['weighted_chickens_count'])
-            && !empty($validated['total_weight'])
+        if (
+            !empty($validated['with_weight_log']) &&
+            !empty($validated['weighted_chickens_count']) &&
+            !empty($validated['total_weight'])
         ) {
-            // Calculate avg_weight
-            $avg_weight = $validated['weighted_chickens_count'] > 0
-                ? round($validated['total_weight'] / $validated['weighted_chickens_count'], 3)
-                : 0;
-
-            // Previous avg_weight for gain calculation
-            $previousWeightLog = WeightLog::whereHas('productionLog', function($q) use ($flock) {
-                $q->where('flock_id', $flock->id);
-            })->latest()->first();
-
-            $avg_weight_gain = $previousWeightLog
-                ? round($avg_weight - $previousWeightLog->avg_weight, 3)
-                : $avg_weight;
-
-            // Aggregated total weight
-            $aggregated_total_weight = round($avg_weight * $productionLog->net_count, 3);
-
-            // Feed efficiency
-            $total_feed = $productionLog->day_feed_consumed + $productionLog->night_feed_consumed;
-            $feed_efficiency = $total_feed > 0
-                ? round($aggregated_total_weight / $total_feed, 3)
-                : 0;
-
-            // Feed conversion ratio
-            $feed_conversion_ratio = $aggregated_total_weight > 0
-                ? round($total_feed / $aggregated_total_weight, 3)
-                : 0;
-
-            // Standard/benchmark chart for this day (optional)
-            $chart = Chart::where(['type' => 'General', 'day' => $productionLog->age])->first();
-            $expected_weight = $chart ? $chart->weight : $avg_weight;
-            $adjusted_fcr = $feed_conversion_ratio + ($expected_weight - $avg_weight);
-            $fcr_standard_diff = $chart && $chart->fcr
-                ? $chart->fcr - $feed_conversion_ratio
-                : 0;
-
-            // Standard deviation and coefficient of variation for avg_weight
-            $previousLogs = ProductionLog::with('weightLog')
-                ->where('flock_id', $flock->id)->get();
-            $avgWeightCollection = $previousLogs->flatMap(function ($log) {
-                return $log->weightLogs->pluck('avg_weight');
-            });
-            $standard_deviation = $avgWeightCollection->count() > 0 ? $avgWeightCollection->stdDev() : 0;
-            $coefficient_of_variation = ($avg_weight > 0)
-                ? ($standard_deviation / $avg_weight) * 100
-                : 0;
-
-            // Production Efficiency Factor
-            $production_efficiency_factor = ($productionLog->age > 0 && $feed_conversion_ratio > 0)
-                ? $livability * ($aggregated_total_weight / 1000) / ($productionLog->age * $feed_conversion_ratio)
-                : 0;
-
-            // Create WeightLog
-            WeightLog::create([
-                'production_log_id'           => $productionLog->id,
-                'weighted_chickens_count'     => $validated['weighted_chickens_count'],
-                'total_weight'                => $validated['total_weight'],
-                'avg_weight'                  => $avg_weight,
-                'avg_weight_gain'             => $avg_weight_gain,
-                'aggregated_total_weight'     => $aggregated_total_weight,
-                'feed_efficiency'             => $feed_efficiency,
-                'feed_conversion_ratio'       => $feed_conversion_ratio,
-                'adjusted_feed_conversion_ratio' => $adjusted_fcr,
-                'fcr_standard_diff'           => $fcr_standard_diff,
-                'standard_deviation'          => $standard_deviation,
-                'coefficient_of_variation'    => $coefficient_of_variation,
-                'production_efficiency_factor'=> $production_efficiency_factor,
-            ]);
+            app(WeightLogService::class)->createOrUpdateWeightLog(
+                $productionLog,
+                $validated['weighted_chickens_count'],
+                $validated['total_weight']
+            );
         }
 
         return redirect()
@@ -246,6 +183,5 @@ class ProductionLogController extends Controller
         $logs = $query->get();
 
         return Excel::download(new ProductionLogsExport($logs), 'production-logs.xlsx');
-//        return Excel::download(new ProductionLogsExport, 'production-logs.xlsx');
     }
 }

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -35,7 +34,9 @@ class DatabaseSeeder extends Seeder
             ShedSeeder::class,
             FlockSeeder::class,
             MedicineSeeder::class,
-            ProductionSeeder::class,
+            ChartSeeder::class,
+            ProductionLogSeeder::class,
+            WeightLogSeeder::class,
         ]);
     }
 }

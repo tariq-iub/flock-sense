@@ -109,6 +109,7 @@
                             <th>Log Date</th>
                             <th>Flock</th>
                             <th>Shed</th>
+
                             <th class="text-center">Age (Days)</th>
                             <th class="text-center">Mortality (D/N)</th>
                             <th class="text-center">Opening Count</th>
@@ -116,6 +117,8 @@
                             <th class="text-center">Livability (%)</th>
                             <th class="text-center">Feed (D/N)</th>
                             <th class="text-center">Water (D/N)</th>
+                            <th class="text-center">Medicine (D/N)</th>
+
                             <th class="text-center">Weighted Chickens</th>
                             <th class="text-center">Recorded Weight</th>
                             <th class="text-center">Avg Weight</th>
@@ -139,24 +142,27 @@
                                 </td>
                                 <td>{{ optional($log->flock)->name }}</td>
                                 <td>{{ optional($log->shed)->name }}</td>
+
                                 <td class="text-center">{{ $log->age }}</td>
                                 <td class="text-center">{{ $log->day_mortality_count }} / {{ $log->night_mortality_count }}</td>
                                 <td class="text-center">{{ $log->flock->chicken_count }}</td>
                                 <td class="text-center">{{ $log->net_count }}</td>
                                 <td class="text-center">{{ $log->livability }}</td>
-                                <td class="text-center">{{ $log->day_feed_consumed }} / {{ $log->night_feed_consumed }}</td>
+                                <td class="text-center">{{ number_format($log->day_feed_consumed / 1000, 0) }} / {{ number_format($log->night_feed_consumed / 1000, 0) }}</td>
                                 <td class="text-center">{{ $log->day_water_consumed }} / {{ $log->night_water_consumed }}</td>
+                                <td class="text-center">{{ $log->day_medicine }} / {{ $log->night_medicine }}</td>
+
                                 <td class="text-center">{{ $log->weightLog->weighted_chickens_count ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->total_weight ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->avg_weight ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->avg_weight_gain ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->aggregated_total_weight ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->feed_efficiency ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->feed_conversion_ratio ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->adjusted_feed_conversion_ratio ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->fcr_standard_diff ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->coefficient_of_variation ?? '' }}</td>
-                                <td class="text-center">{{ $log->weightLog->production_efficiency_factor ?? '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->total_weight / 1000, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->avg_weight / 1000, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->avg_weight_gain / 1000, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->aggregated_total_weight / 1000, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->feed_efficiency, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->feed_conversion_ratio, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->adjusted_feed_conversion_ratio, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->fcr_standard_diff, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->coefficient_of_variation, 2) : '' }}</td>
+                                <td class="text-center">{{ ($log->weightLog) ? number_format($log->weightLog->production_efficiency_factor, 2) : '' }}</td>
                                 <td class="hide-it">{{ optional($log->user)->name }}</td>
                                 <td class="action-table-data hide-it">
                                     <div class="action-icon d-inline-flex">
