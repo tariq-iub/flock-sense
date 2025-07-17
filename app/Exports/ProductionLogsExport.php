@@ -23,7 +23,7 @@ class ProductionLogsExport implements FromCollection, WithHeadings
         // Load relations if needed and select fields you want to export
         return $this->logs->map(function($log) {
             return [
-                'created_at'  => $log->created_at->format('m-d-Y'),
+                'created_at'  => $log->production_log_date->format('m-d-Y'),
                 'flock'       => optional($log->flock)->name,
                 'shed'        => optional($log->shed)->name,
                 'age'         => $log->age,

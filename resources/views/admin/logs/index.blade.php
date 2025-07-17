@@ -131,7 +131,7 @@
                         @foreach($logs as $log)
                             <tr>
                                 <td>
-                                    {{ $log->created_at->format('d-m-Y') }}
+                                    {{ $log->production_log_date->format('d-m-Y') }}
                                 </td>
                                 <td>{{ optional($log->flock)->name }}</td>
                                 <td>{{ optional($log->shed)->name }}</td>

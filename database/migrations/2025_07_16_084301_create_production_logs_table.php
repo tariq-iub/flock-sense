@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('shed_id')->constrained()->onDelete('restrict');
             $table->foreignId('flock_id')->constrained()->onDelete('restrict');
+            $table->dateTime('production_log_date')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->integer('age')->default(0);
 
             // Count Attributes
