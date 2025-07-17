@@ -58,6 +58,7 @@
     <script src="{{ asset('assets/js/moment.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/plugins/daterangepicker/daterangepicker.js') }}" type="text/javascript"></script>
 
+    <script src="{{ asset('assets/js/jquery.PrintArea.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/js/script.js') }}" type="text/javascript"></script>
 
     @stack('js')

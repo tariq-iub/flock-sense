@@ -22,48 +22,45 @@
                     @foreach($farm->sheds as $index => $shed)
                         <div class="tab-pane text-muted {{ $index == 0 ? 'active show' : '' }}"
                              id="shed-{{ $shed->id }}" role="tabpanel">
-
                             @if($shed->description)
                                 <ul class="mb-3">
                                     <li>{!! nl2br(e($shed->description)) !!}</li>
                                 </ul>
-                                @if($shed->latestFlocks->count() > 0)
-                                    <div class="table-responsive">
-                                        <table class="table table-borderless custom-table">
-                                            <thead class="thead-light">
-                                            <tr>
-                                                <th>Flock</th>
-                                                <th>Breed</th>
-                                                <th class="text-center">Start Date</th>
-                                                <th class="text-center">Age</th>
-                                                <th class="text-center">Start Count</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            @foreach($shed->latestFlocks as $flock)
-                                            <tr>
-                                                <td class="fs-12">{{ $flock->name }}</td>
-                                                <td class="fs-12">{{ $flock->breed->name }}</td>
-                                                <td class="text-center fs-12">{{ $flock->start_date->format('d-m-Y') }}</td>
-                                                <td class="text-center fs-12">
-                                                    @if($flock->end_date)
-                                                        {{ (int)$flock->start_date->diffInDays($flock->end_date) }}
-                                                    @else
-                                                        {{ (int)$flock->start_date->diffInDays(now()) }}
-                                                    @endif
+                            @endif
+                            @if(count($shed->latestFlocks) > 0)
+                                <div class="table-responsive">
+                                    <table class="table table-borderless custom-table">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th>Flock</th>
+                                            <th>Breed</th>
+                                            <th class="text-center">Start Date</th>
+                                            <th class="text-center">Age</th>
+                                            <th class="text-center">Start Count</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($shed->latestFlocks as $flock)
+                                        <tr>
+                                            <td class="fs-12">{{ $flock->name }}</td>
+                                            <td class="fs-12">{{ $flock->breed->name }}</td>
+                                            <td class="text-center fs-12">{{ $flock->start_date->format('d-m-Y') }}</td>
+                                            <td class="text-center fs-12">
+                                                @if($flock->end_date)
+                                                    {{ (int)$flock->start_date->diffInDays($flock->end_date) }}
+                                                @else
+                                                    {{ (int)$flock->start_date->diffInDays(now()) }}
+                                                @endif
 
-                                                </td>
-                                                <td class="text-center fs-12">{{ $flock->chicken_count }}</td>
-                                            </tr>
-                                            @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @else
-                                    <div class="text-danger">No flocks available for this shed.</div>
-                                @endif
+                                            </td>
+                                            <td class="text-center fs-12">{{ $flock->chicken_count }}</td>
+                                        </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             @else
-                                <div class="text-muted">No data for this shed.</div>
+                                <div class="text-danger">No flocks available for this shed.</div>
                             @endif
                         </div>
                     @endforeach

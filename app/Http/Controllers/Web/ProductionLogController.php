@@ -2,29 +2,47 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Exports\ProductionLogsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Chart;
+use App\Models\Farm;
 use App\Models\Flock;
 use App\Models\ProductionLog;
 use App\Models\Shed;
 use App\Models\WeightLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class ProductionLogController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $logs = ProductionLog::with(['shed', 'flock', 'user', 'weightLog'])
-            ->latest()
-            ->paginate(20);
-        $shedList = Shed::orderBy('name')->get();
+        $farms = Farm::with('sheds.flocks')->orderBy('name')->get();
+        $logs = collect();
+        $farmId = null;
+
+        // Only show logs if all three selected
+        if ($request->filled('filter.shed_id') && $request->filled('filter.flock_id')) {
+            $logs = QueryBuilder::for(ProductionLog::class)
+                ->with(['shed', 'flock', 'user', 'weightLog'])
+                ->allowedFilters([
+                    AllowedFilter::exact('shed_id'),
+                    AllowedFilter::exact('flock_id'),
+                ])
+                ->latest()
+                ->get();
+            $farmId = Shed::find($request->filled('filter.shed_id'))->farm->id;
+        }
+
         return view(
             'admin.logs.index',
-            compact('logs', 'shedList')
+            compact('logs', 'farms', 'farmId')
         );
     }
 
@@ -211,5 +229,23 @@ class ProductionLogController extends Controller
         return redirect()
             ->route('productions.index')
             ->with('success', 'Production log deleted.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        // Only allow shed_id and flock_id as filters
+        $query = QueryBuilder::for(ProductionLog::class)
+            ->with(['shed', 'flock', 'user', 'weightLog'])
+            ->allowedFilters([
+                AllowedFilter::exact('shed_id'),
+                AllowedFilter::exact('flock_id'),
+            ])
+            ->latest();
+
+        // If you want to export all filtered records (no pagination)
+        $logs = $query->get();
+
+        return Excel::download(new ProductionLogsExport($logs), 'production-logs.xlsx');
+//        return Excel::download(new ProductionLogsExport, 'production-logs.xlsx');
     }
 }

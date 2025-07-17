@@ -10,6 +10,8 @@ use App\Http\Controllers\Web\FeedController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\RoleController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Flock;
+use App\Models\Shed;
 
 // Welcome page
 Route::get('/', function () {
@@ -63,6 +65,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/roles/{role}/users', [RoleController::class, 'attachedUsers'])->name('roles.users');
 
     Route::get('/farms/{farm}/data', [FarmController::class, 'farmData'])->name('farms.data');
+
+    // Production Log Routes
+    Route::get('log/productions/export/excel', [ProductionLogController::class, 'exportExcel'])->name('productions.export.excel');
+    Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
+        return Shed::where('farm_id', $request->farm_id)
+            ->select('id', 'name', 'capacity', 'type')
+            ->orderBy('name')
+            ->get();
+    });
+    Route::get('/get-flocks', function (\Illuminate\Http\Request $request) {
+        return Flock::where('shed_id', $request->shed_id)
+            ->select('id', 'name', 'start_date', 'end_date')
+            ->orderBy('start_date', 'desc')
+            ->get();
+    });
 
     // Resource routes for clients and charts
     Route::resources([

@@ -16,6 +16,7 @@
         </a>
     </div>
     <!-- /Logo -->
+
     <div class="modern-profile p-3 pb-0">
         <div class="text-center rounded bg-light p-3 mb-4 user-profile">
             <div class="avatar avatar-lg online mb-3">
@@ -71,6 +72,7 @@
             </div>
         </div>
     </div>
+
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
@@ -154,6 +156,12 @@
                         <li><a href="add-product.html"><i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span></a></li>
                         <li><a href="expired-products.html"><i class="ti ti-progress-alert fs-16 me-2"></i><span>System Settings</span></a></li>
                         <li><a href="qrcode.html"><i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span></a></li>
+                        <li class="{{ Route::is('productions.index') ? 'active' : '' }}">
+                            <a href="{{ route('productions.index') }}">
+                                <i class="ti ti-list-details fs-16 me-2"></i>
+                                <span>Production Logs</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
             </ul>

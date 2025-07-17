@@ -12,7 +12,7 @@ class Shed extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['farm_id', 'name', 'capacity', 'type', 'description'];
+    protected $fillable = ['farm_id', 'name', 'capacity', 'type'];
 
     public function farm(): BelongsTo
     {
