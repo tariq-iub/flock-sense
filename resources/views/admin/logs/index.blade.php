@@ -139,7 +139,7 @@
                             <div class="accordion-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <canvas id="productionCombinedChart" height="150"></canvas>
+                                        <canvas id="productionCombinedChart" height="150" class="w-100"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -285,74 +285,119 @@
         document.addEventListener('DOMContentLoaded', function () {
             const ctx = document.getElementById('productionCombinedChart').getContext('2d');
             const chart = new Chart(ctx, {
-                type: 'line',
                 data: {
-                    labels: @json($ages), // Age (days)
+                    labels: @json($ages),
                     datasets: [
+                        // Line datasets (already present)
                         {
                             label: 'Daily Mortality',
                             data: @json($dailyMortality),
-                            borderColor: 'rgba(220,38,38,1)', // Red-600
+                            borderColor: 'rgba(220,38,38,1)',
                             backgroundColor: 'rgba(220,38,38,0.1)',
-                            tension: 0.3,
+                            type: 'line',
                             yAxisID: 'y',
+                            tension: 0.3,
+                            order: 1,
                         },
                         {
                             label: 'Livability (%)',
                             data: @json($livability),
-                            borderColor: 'rgba(34,197,94,1)', // Green-500
+                            borderColor: 'rgba(34,197,94,1)',
                             backgroundColor: 'rgba(34,197,94,0.1)',
-                            tension: 0.3,
+                            type: 'line',
                             yAxisID: 'y1',
+                            tension: 0.3,
+                            order: 1,
                         },
                         {
-                            label: 'Daily Feed Consumption',
+                            label: 'Daily Feed Consumption (Kg)',
                             data: @json($dailyFeed),
-                            borderColor: 'rgba(59,130,246,1)', // Blue-500
+                            borderColor: 'rgba(59,130,246,1)',
                             backgroundColor: 'rgba(59,130,246,0.1)',
-                            tension: 0.3,
+                            type: 'line',
                             yAxisID: 'y2',
+                            tension: 0.3,
+                            order: 1,
+                        },
+
+                        // Bar datasets
+                        {
+                            label: 'Feed Conv. Ratio',
+                            data: @json($feedConversionRatio),
+                            backgroundColor: 'rgba(168,85,247,0.7)', // purple-400
+                            type: 'bar',
+                            yAxisID: 'y3',
+                            order: 2,
+                        },
+                        {
+                            label: 'CV (%)',
+                            data: @json($coefficientOfVariation),
+                            backgroundColor: 'rgba(251,191,36,0.7)', // yellow-400
+                            type: 'bar',
+                            yAxisID: 'y4',
+                            order: 2,
+                        },
+                        {
+                            label: 'Prod. Eff. Factor',
+                            data: @json($productionEfficiencyFactor),
+                            backgroundColor: 'rgba(52,211,153,0.7)', // green-400
+                            type: 'bar',
+                            yAxisID: 'y5',
+                            order: 2,
                         },
                     ]
                 },
                 options: {
                     responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    stacked: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: { position: 'top' },
-                        title: {
-                            display: true,
-                            text: 'Production Parameters by Age'
-                        }
+                        title: { display: true, text: 'Production Parameters by Age' }
                     },
                     scales: {
-                        x: {
-                            title: { display: true, text: 'Age (Days)' }
-                        },
-                        y: {
+                        x: { title: { display: true, text: 'Age (Days)' }},
+                        y: { // For Daily Mortality
                             type: 'linear',
                             display: true,
                             position: 'left',
                             title: { display: true, text: 'Daily Mortality' },
                         },
-                        y1: {
+                        y1: { // For Livability
                             type: 'linear',
                             display: true,
                             position: 'right',
                             grid: { drawOnChartArea: false },
                             title: { display: true, text: 'Livability (%)' },
                         },
-                        y2: {
+                        y2: { // For Daily Feed
+                            type: 'linear',
+                            display: false,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                        },
+                        y3: { // For Feed Conv. Ratio
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { drawOnChartArea: false },
+                            offset: true,
+                            title: { display: true, text: 'FCR' },
+                        },
+                        y4: { // For CV
                             type: 'linear',
                             display: true,
                             position: 'right',
                             grid: { drawOnChartArea: false },
-                            title: { display: true, text: 'Daily Feed Consumption (Kg)' },
                             offset: true,
+                            title: { display: true, text: 'CV (%)' },
+                        },
+                        y5: { // For Prod. Eff. Factor
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            offset: true,
+                            title: { display: true, text: 'Prod. Eff. Factor' },
                         }
                     }
                 }

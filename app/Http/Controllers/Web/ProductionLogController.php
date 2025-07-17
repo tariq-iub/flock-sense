@@ -57,11 +57,19 @@ class ProductionLogController extends Controller
             })->values()->toArray();
             // Livability as before
             $livability = $reverseLogs->pluck('livability')->values()->toArray();
+            // Prepare bar data
+            $feedConversionRatio       = $reverseLogs->map(fn($l) => $l->weightLog->feed_conversion_ratio ?? null)->values()->toArray();
+            $coefficientOfVariation    = $reverseLogs->map(fn($l) => $l->weightLog->coefficient_of_variation ?? null)->values()->toArray();
+            $productionEfficiencyFactor= $reverseLogs->map(fn($l) => $l->weightLog->production_efficiency_factor ?? null)->values()->toArray();
+
         }
 
         return view(
             'admin.logs.index',
-            compact('logs', 'farms', 'farmId', 'ages', 'dailyMortality', 'livability', 'dailyFeed')
+            compact('logs',
+                'farms', 'farmId', 'ages', 'dailyMortality', 'livability', 'dailyFeed',
+                'feedConversionRatio', 'coefficientOfVariation', 'productionEfficiencyFactor'
+            )
         );
     }
 
