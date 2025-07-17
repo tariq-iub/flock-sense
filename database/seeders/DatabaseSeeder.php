@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             FarmSeeder::class,
             ShedSeeder::class,
             FlockSeeder::class,
+            MedicineSeeder::class,
             ProductionSeeder::class,
         ]);
     }

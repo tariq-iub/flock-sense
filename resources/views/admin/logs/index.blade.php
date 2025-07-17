@@ -97,6 +97,10 @@
                 </form>
             </div>
 
+            <div class="card-body">
+                Graphs
+            </div>
+
             <div class="card-body printArea">
                 <div class="table-responsive">
                     <table class="table table-nowrap table-hover mb-0">
