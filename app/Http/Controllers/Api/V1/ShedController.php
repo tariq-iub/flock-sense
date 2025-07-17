@@ -7,16 +7,24 @@ use App\Http\Resources\ShedResource;
 use App\Models\Shed;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Services\DynamoDbService;
 
 class ShedController extends ApiController
 {
+    protected $dynamoDbService;
+
+    public function __construct(DynamoDbService $dynamoDbService)
+    {
+        $this->dynamoDbService = $dynamoDbService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $sheds = QueryBuilder::for(Shed::class)
-            ->where('farm_id', $request->user()->farms()->pluck('farms.id'))
+            ->whereIn('farm_id', $request->user()->farms()->pluck('id'))
             ->with('farm')
             ->withCount(['flocks', 'devices'])
             ->allowedFilters(['id', 'name', 'type', 'farm_id'])
@@ -61,15 +69,29 @@ class ShedController extends ApiController
      */
     public function show(Shed $shed)
     {
-        return ShedResource::make(
-            Shed::with([
-                'farm',
-                'flocks.breed',
-                'devices' => fn($query) => $query->with('appliances'),
-            ])
-                ->withCount(['flocks', 'devices'])
-                ->findOrFail($shed->id)
-        );
+        $shed = Shed::with([
+            'farm',
+            'flocks.breed',
+            'devices.appliances',
+        ])->withCount(['flocks', 'devices'])->findOrFail($shed->id);
+
+        // Fetch latest sensor data for each device
+        $deviceIds = $shed->devices->pluck('id')->all();
+        $sensorData = [];
+        if (!empty($deviceIds)) {
+            $sensorDataArr = $this->dynamoDbService->getSensorData($deviceIds, null, true);
+            foreach ($sensorDataArr as $data) {
+                if (isset($data['device_id'])) {
+                    $sensorData[$data['device_id']] = $data;
+                }
+            }
+        }
+        // Attach sensor data to each device (for resource usage)
+        foreach ($shed->devices as $device) {
+            $device->latest_sensor_data = $sensorData[$device->id] ?? null;
+        }
+
+        return ShedResource::make($shed);
     }
 
     /**
