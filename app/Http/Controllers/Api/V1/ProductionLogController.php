@@ -4,15 +4,25 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\ApiController;
 use App\Models\ProductionLog;
+use App\Models\Shed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductionLogController extends ApiController
 {
     public function index(Request $request)
     {
-        $logs = ProductionLog::with(['shed', 'flock', 'user', 'weightLog'])
-            ->where('flock_id', $request->flock_id)->latest()->get();
+        $logs = QueryBuilder::for(ProductionLog::class)
+            ->with(['shed', 'flock', 'user', 'weightLog'])
+            ->allowedFilters([
+                AllowedFilter::exact('shed_id'),
+                AllowedFilter::exact('flock_id'),
+            ])
+            ->latest()
+            ->get();
+
         return response()->json($logs);
     }
 

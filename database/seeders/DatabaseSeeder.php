@@ -31,7 +31,10 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             BreedSeeder::class,
             FeedSeeder::class,
-            ProductionAndWeightLogSeeder::class,
+            FarmSeeder::class,
+            ShedSeeder::class,
+            FlockSeeder::class,
+            ProductionSeeder::class,
         ]);
     }
 }
