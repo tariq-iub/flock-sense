@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Carbon;
+use App\Http\Resources\UserResource;
 
 
 class AuthController extends ApiController
@@ -52,21 +53,30 @@ class AuthController extends ApiController
     }
 
     /**
-     * Login user and create token
+     * Login user and create token (API for mobile)
      */
-    public function login(Request $request): RedirectResponse
+    public function login(Request $request): JsonResponse
     {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
-
-            return redirect()->route('dashboard');
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'message' => 'Invalid credentials provided.'
+            ], 401);
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials provided.',
-        ])->onlyInput('email');
+        $user = $request->user();
+        $token = $user->createToken('mobile')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'data' => new UserResource($user),
+        ]);
     }
 
     /**
