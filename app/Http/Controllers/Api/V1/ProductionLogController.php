@@ -9,6 +9,7 @@ use App\Models\Flock;
 use App\Models\ProductionLog;
 use App\Models\Shed;
 use App\Models\WeightLog;
+use App\Services\WeightLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
