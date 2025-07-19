@@ -43,7 +43,7 @@
                         <div class="mb-3">
                             <label for="unit" class="form-label">Unit</label>
                             <input type="text" name="unit" id="unit" class="form-control"
-                                   value="{{ old('unit', $chart->unit) }}"required>
+                                   value="{{ old('unit', $chart->unit) }}" required>
                             <div class="invalid-feedback">
                                 Please mention recording unit ( g, Kg etc.).
                             </div>
