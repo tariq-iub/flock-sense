@@ -78,12 +78,6 @@
                     <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
-                            <th class="no-sort">
-                                <label class="checkboxs">
-                                    <input type="checkbox" id="select-all">
-                                    <span class="checkmarks"></span>
-                                </label>
-                            </th>
                             <th class="w-100">Breed</th>
                             <th class="text-center">Category</th>
                             <th class="text-center">Flock Count</th>
@@ -94,12 +88,6 @@
                         <tbody>
                         @foreach($breeds as $breed)
                             <tr>
-                                <td>
-                                    <label class="checkboxs">
-                                        <input type="checkbox" value="{{ $breed->id }}">
-                                        <span class="checkmarks"></span>
-                                    </label>
-                                </td>
                                 <td>
                                     {{ ucfirst($breed->name) }}
                                 </td>
@@ -290,7 +278,7 @@
 
                 $('#statusFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(2).search(selected).draw();
+                    table.column(1).search(selected).draw();
                 });
             }
         });

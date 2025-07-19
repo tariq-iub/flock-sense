@@ -78,12 +78,6 @@
                     <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
-                            <th class="no-sort">
-                                <label class="checkboxs">
-                                    <input type="checkbox" id="select-all">
-                                    <span class="checkmarks"></span>
-                                </label>
-                            </th>
                             <th class="">Feed Title</th>
                             <th class="text-center">Start Day</th>
                             <th class="text-center">End Day</th>
@@ -96,12 +90,6 @@
                         <tbody>
                         @foreach($feeds as $feed)
                             <tr>
-                                <td>
-                                    <label class="checkboxs">
-                                        <input type="checkbox" value="{{ $feed->id }}">
-                                        <span class="checkmarks"></span>
-                                    </label>
-                                </td>
                                 <td>{{ ucfirst($feed->title) }}</td>
                                 <td class="text-center">{{ $feed->start_day }}</td>
                                 <td class="text-center">{{ $feed->end_day }}</td>
@@ -301,7 +289,7 @@
 
                 $('#statusFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(6).search(selected).draw();
+                    table.column(5).search(selected).draw();
                 });
             }
         });
