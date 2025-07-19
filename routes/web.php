@@ -85,14 +85,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     // Charts (Baseline) Data Routes
     Route::prefix('charts')->controller(ChartController::class)->group(function () {
         Route::get('/', 'index')->name('charts.index');
-        Route::post('/', 'store')->name('charts.store');
-        Route::get('/{chart}', 'show')->name('charts.show');
         Route::get('/{chart}/edit', 'edit')->name('charts.edit');
         Route::put('/{chart}', 'update')->name('charts.update');
         Route::delete('/{chart}', 'destroy')->name('charts.destroy');
-        Route::post('/import', [ChartController::class, 'import'])->name('charts.import');
-        Route::get('/data/{chart}', [ChartController::class, 'chartData'])->name('charts.data');
+        Route::post('/import', 'import')->name('charts.import');
+        Route::get('/data/{chart}', 'chartData')->name('charts.data');
         Route::get('/{chart}/toggle', 'toggle')->name('charts.toggle');
+        Route::post('/data/update', 'data_update')->name('charts.data.update');
+
     });
 
     // Roles

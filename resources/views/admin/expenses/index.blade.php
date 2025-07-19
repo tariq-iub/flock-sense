@@ -108,8 +108,12 @@
                                 </td>
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
-                                        <a href="{{ route('expenses.toggle', $expense) }}" class="me-2 d-flex align-items-center p-2 border rounded"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Block Item">
+                                        <a href="{{ route('expenses.toggle', $expense) }}"
+                                           class="me-2 d-flex align-items-center p-2 border rounded"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title=""
+                                           data-bs-original-title="Toggle Status">
                                             <i class="ti ti-shield"></i>
                                         </a>
 

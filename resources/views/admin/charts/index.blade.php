@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Baseline Data')
+@section('title', 'Standards Data')
 
 @section('content')
     <div class="content">
         <div class="page-header">
             <div class="add-item d-flex">
                 <div class="page-title">
-                    <h4 class="fw-bold">Baseline Data</h4>
+                    <h4 class="fw-bold">Standards Data</h4>
                     <h6>Manage daily performance baseline and benchmarking data.</h6>
                 </div>
             </div>
@@ -123,19 +123,36 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <a href="javascript:void(0)" class="btn btn-sm btn-outline-info chart-data" data-chart-id="{{ $chart->id }}"
-                                       data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="View Chart Data">
+                                    <a href="javascript:void(0)"
+                                       class="btn btn-sm btn-outline-info chart-data"
+                                       data-chart-id="{{ $chart->id }}"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title=""
+                                       data-bs-original-title="View Chart Data">
                                        View
                                     </a>
                                 </td>
                                 <td class="action-table-data">
                                     <div class="edit-delete-action">
-                                        <a class="me-2 edit-icon  p-2" href="product-details.html">
-                                            <i data-feather="eye" class="feather-eye"></i>
+                                        <a href="{{ route('charts.toggle', $chart) }}"
+                                           class="me-2 p-2"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title=""
+                                           data-bs-original-title="Toggle Status">
+                                            <i class="ti ti-shield"></i>
                                         </a>
-                                        <a class="me-2 p-2" href="edit-product.html" >
+
+                                        <a href="{{ route('charts.edit', $chart) }}"
+                                           class="me-2 p-2"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title=""
+                                           data-bs-original-title="Edit Standard">
                                             <i data-feather="edit" class="feather-edit"></i>
                                         </a>
+
                                         <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete-modal"
                                            data-chart-id="{{ $chart->id }}" data-chart-name="{{ $chart->chart_name }}" class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>

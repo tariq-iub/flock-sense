@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Imports\ChartDataImport;
 use App\Models\Chart;
+use App\Models\ChartData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,30 +23,6 @@ class ChartController extends Controller
             'admin.charts.index',
             compact('charts', 'sources')
         );
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // No implementation is required
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // No implementation is required
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Chart $chart)
-    {
-        // No implementation is required
     }
 
     /**
@@ -140,5 +117,18 @@ class ChartController extends Controller
         return redirect()->back()->with([
             'success' => "Status of Standard: {$chart->chart_name} has been changed successfully."
         ]);
+    }
+
+    public function data_update(Request $request)
+    {
+        $row = ChartData::find($request->id);
+        if (!$row) {
+            return response()->json(['success' => false, 'message' => 'Row not found'], 404);
+        }
+
+        $row->{$request->field} = $request->value;
+        $row->save();
+
+        return response()->json(['success' => true]);
     }
 }
