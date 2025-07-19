@@ -85,34 +85,39 @@
                             </a>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);" class="{{ Route::is('charts.*') || Route::is('breeding.*') || Route::is('feeds.*') ? 'subdrop active' : '' }}">
+                            <a href="javascript:void(0);"
+                               class="{{ Route::is('charts.*') || Route::is('breeding.*') || Route::is('feeds.*') || Route::is('expenses.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>Super Admin</span><span class="menu-arrow"></span>
                             </a>
                             <ul>
                                 <li>
-                                    <a href="{{ route('charts.index') }}" class="{{ request()->routeIs('charts.index') ? 'active' : '' }}">
-                                        Baseline Data
+                                    <a href="{{ route('charts.index') }}"
+                                       class="{{ request()->routeIs('charts.index') ? 'active' : '' }}">
+                                        Standard Data
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('breeding.index') }}" class="{{ request()->routeIs('breeding.index') ? 'active' : '' }}">
+                                    <a href="{{ route('breeding.index') }}"
+                                       class="{{ request()->routeIs('breeding.index') ? 'active' : '' }}">
                                         Breeds
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('feeds.index') }}" class="{{ request()->routeIs('feeds.index') ? 'active' : '' }}">
+                                    <a href="{{ route('feeds.index') }}"
+                                       class="{{ request()->routeIs('feeds.index') ? 'active' : '' }}">
                                         Feeds
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('expenses.index') }}"
+                                       class="{{ request()->routeIs('expenses.index') ? 'active' : '' }}">
+                                        Expense Heads
                                     </a>
                                 </li>
                                 <li>
                                     <a href="subscription.html">
                                         Packages
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Frontend Management
                                     </a>
                                 </li>
                             </ul>
@@ -136,15 +141,31 @@
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a href="javascript:void(0);">
+                            <a href="javascript:void(0);"
+                               class="{{ Route::is('iot.index') || Route::is('iot.linking') || Route::is('iot.alerts') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-devices fs-16 me-2"></i>
-                                <span>Device Management</span>
+                                <span>IoT Management</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
-                                <li><a href="video-call.html">Devices Inventory</a></li>
-                                <li><a href="audio-call.html">Farm Devices</a></li>
-                                <li><a href="call-history.html">Alerts and Logs</a></li>
+                                <li>
+                                    <a href="{{ route('iot.index') }}"
+                                       class="{{ request()->routeIs('iot.index') ? 'active' : '' }}">
+                                        IoT Inventory
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('iot.linking') }}"
+                                       class="{{ request()->routeIs('iot.linking') ? 'active' : '' }}">
+                                        Farm Devices
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('iot.alerts') }}"
+                                       class="{{ request()->routeIs('iot.alerts') ? 'active' : '' }}">
+                                        IoT Alerts
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>
@@ -152,14 +173,71 @@
                 <li class="submenu-open">
                     <h6 class="submenu-hdr">OPERATIONS</h6>
                     <ul>
+                        <li class="submenu">
+                            <a href="javascript:void(0);"
+                               class="{{ Route::is('productions.*') || Route::is('devices.logs') ? 'subdrop active' : '' }}">
+                                <i class="ti ti-devices fs-16 me-2"></i>
+                                <span>Logs & Analysis</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                <li>
+                                    <a href="{{ route('productions.index') }}"
+                                       class="{{ Route::is('productions.index') ? 'active' : '' }}">
+                                        Production Logs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('iot.logs') }}"
+                                       class="{{ Route::is('iot.logs') ? 'active' : '' }}">
+                                        IoT Logs
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="ti ti-settings-automation fs-16 me-2"></i>
+                                <span>System Settings</span>
+                            </a>
+                        </li>
                         <li><a href="product-list.html"><i data-feather="box"></i><span>Subscriptions</span></a></li>
                         <li><a href="add-product.html"><i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span></a></li>
                         <li><a href="expired-products.html"><i class="ti ti-progress-alert fs-16 me-2"></i><span>System Settings</span></a></li>
                         <li><a href="qrcode.html"><i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span></a></li>
-                        <li class="{{ Route::is('productions.index') ? 'active' : '' }}">
-                            <a href="{{ route('productions.index') }}">
-                                <i class="ti ti-list-details fs-16 me-2"></i>
-                                <span>Production Logs</span>
+                    </ul>
+                </li>
+                <li class="submenu-open">
+                    <h6 class="submenu-hdr">REPORTS</h6>
+                    <ul>
+                        <li>
+                            <a href="{{ route('reports.income') }}"
+                               class="{{ request()->routeIs('reports.income') ? 'active' : '' }}">
+                                Income Report
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('reports.expenses') }}"
+                               class="{{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
+                                Expense Report
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('reports.tax') }}"
+                               class="{{ request()->routeIs('reports.tax') ? 'active' : '' }}">
+                                Tax Report
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('reports.devices.sales') }}"
+                               class="{{ request()->routeIs('reports.devices.sales') ? 'active' : '' }}">
+                                Sales Report
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('reports.annual') }}"
+                               class="{{ request()->routeIs('reports.annual') ? 'active' : '' }}">
+                                Annual Report
                             </a>
                         </li>
                     </ul>

@@ -83,13 +83,7 @@
                     <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
-                            <th class="no-sort">
-                                <label class="checkboxs">
-                                    <input type="checkbox" id="select-all">
-                                    <span class="checkmarks"></span>
-                                </label>
-                            </th>
-                            <th>Chart Name</th>
+                            <th class="w-100">Chart Name</th>
                             <th>Source</th>
                             <th>Description</th>
                             <th class="text-center">Unit</th>
@@ -102,16 +96,8 @@
                         <tbody>
                         @foreach($charts as $chart)
                             <tr>
-                                <td>
-                                    <label class="checkboxs">
-                                        <input type="checkbox" value="{{ $chart->id }}">
-                                        <span class="checkmarks"></span>
-                                    </label>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        {{ $chart->chart_name }}
-                                    </div>
+                                <td class="100">
+                                    {{ $chart->chart_name }}
                                 </td>
                                 <td>{{ $chart->source }}</td>
                                 <td>{{ $chart->description }}</td>
@@ -173,7 +159,7 @@
     <div class="modal fade" id="importChartModal" tabindex="-1" aria-labelledby="importChartModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('import.chart') }}" class="row g-3 needs-validation" novalidate
+                <form action="{{ route('charts.import') }}" class="row g-3 needs-validation" novalidate
                       method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
@@ -332,11 +318,11 @@
 
                 $('#sourceFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(2).search(selected).draw();
+                    table.column(1).search(selected).draw();
                 });
                 $('#statusFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(6).search(selected).draw();
+                    table.column(5).search(selected).draw();
                 });
             }
         });

@@ -19,14 +19,6 @@ class RoleController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // No implementation is required
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -39,22 +31,6 @@ class RoleController extends Controller
         return redirect()
             ->route('roles.index')
             ->with('success', 'Role is created successfully.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Role $role)
-    {
-        // No implementation is required
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Role $role)
-    {
-        // No implementation is required
     }
 
     /**
