@@ -112,9 +112,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::post('/', 'store')->name('iot.store');
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
-        Route::get('/devices/linking', [IotController::class, 'linking'])->name('iot.linking');
-        Route::get('/devices/alerts', [IotController::class, 'alerts'])->name('iot.alerts');
-        Route::get('/iot/devices/logs', [IotController::class, 'logs'])->name('iot.logs');
+        Route::get('/linking', [IotController::class, 'linking'])->name('iot.linking');
+        Route::get('/alerts', [IotController::class, 'alerts'])->name('iot.alerts');
+        Route::get('/logs', [IotController::class, 'logs'])->name('iot.logs');
     });
 
     // Expenses
