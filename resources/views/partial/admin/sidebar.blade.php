@@ -86,26 +86,26 @@
                         </li>
                         <li class="submenu">
                             <a href="javascript:void(0);"
-                               class="{{ Route::is('charts.*') || Route::is('breeding.*') || Route::is('feeds.*') || Route::is('expenses.*') ? 'subdrop active' : '' }}">
+                               class="{{ Route::is('charts.*') || Route::is('breeding.*') || Route::is('feeds.*') || Route::is('expenses.*') || Route::is('pricings.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>Super Admin</span><span class="menu-arrow"></span>
                             </a>
                             <ul>
                                 <li>
                                     <a href="{{ route('charts.index') }}"
-                                       class="{{ request()->routeIs('charts.index') ? 'active' : '' }}">
+                                       class="{{ request()->routeIs('charts.*') ? 'active' : '' }}">
                                         Standard Data
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ route('breeding.index') }}"
-                                       class="{{ request()->routeIs('breeding.index') ? 'active' : '' }}">
+                                       class="{{ request()->routeIs('breeding.*') ? 'active' : '' }}">
                                         Breeds
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{{ route('feeds.index') }}"
-                                       class="{{ request()->routeIs('feeds.index') ? 'active' : '' }}">
+                                       class="{{ request()->routeIs('feeds.*') ? 'active' : '' }}">
                                         Feeds Types
                                     </a>
                                 </li>
@@ -116,8 +116,9 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="subscription.html">
-                                        Packages
+                                    <a href="{{ route('pricings.index') }}"
+                                       class="{{ request()->routeIs('pricings.*') ? 'active' : '' }}">
+                                        Pricing Plans
                                     </a>
                                 </li>
                             </ul>

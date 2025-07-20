@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Breeds')
+
 @section('content')
     <div class="content">
         <div class="page-header">

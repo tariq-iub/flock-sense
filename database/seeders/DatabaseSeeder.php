@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             ProductionLogSeeder::class,
             WeightLogSeeder::class,
             ExpenseSeeder::class,
+            PricingSeeder::class,
         ]);
     }
 }

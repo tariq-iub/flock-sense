@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\IotController;
 use App\Http\Controllers\Web\FarmController;
 use App\Http\Controllers\Web\ExpenseController;
 use App\Http\Controllers\Web\FeedController;
+use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
@@ -80,6 +81,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
         'farms' => FarmController::class,
+        'pricings' => PricingController::class,
     ]);
 
     // Charts (Baseline) Data Routes
