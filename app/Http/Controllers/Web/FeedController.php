@@ -13,13 +13,14 @@ class FeedController extends Controller
      */
     public function index()
     {
-        $feeds = Feed::with('feedProfiles')->get();
-        $breeds = [];
+        $feeds = Feed::with('feedProfiles')
+            ->orderBy('start_day')
+            ->get();
         $categories = ['broiler', 'layer'];
 
         return view(
             'admin.feeds.index',
-            compact('feeds', 'breeds', 'categories')
+            compact('feeds', 'categories')
         );
     }
 
@@ -28,7 +29,7 @@ class FeedController extends Controller
      */
     public function create()
     {
-        //
+        // No implementationis required
     }
 
     /**
@@ -36,7 +37,20 @@ class FeedController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title'         => 'required|string|max:255',
+            'start_day'     => 'required|integer|min:0',
+            'end_day'       => 'nullable|integer|min:0',
+            'feed_form'     => 'required|string|max:150',
+            'particle_size' => 'nullable|string',
+            'category'      => 'required|in:broiler,layer',
+        ]);
+
+        // Create the Feed
+        $feed = Feed::create($validated);
+
+        return redirect()->route('feeds.index')
+            ->with('success', 'Feed has been created successfully.');
     }
 
     /**
@@ -44,7 +58,7 @@ class FeedController extends Controller
      */
     public function show(Feed $feed)
     {
-        //
+        return response()->json($feed);
     }
 
     /**
@@ -52,7 +66,7 @@ class FeedController extends Controller
      */
     public function edit(Feed $feed)
     {
-        //
+        // No implementaion is required
     }
 
     /**
@@ -60,7 +74,20 @@ class FeedController extends Controller
      */
     public function update(Request $request, Feed $feed)
     {
-        //
+         $validated = $request->validate([
+            'title'         => 'required|string|max:255',
+            'start_day'     => 'required|integer|min:0',
+            'end_day'       => 'nullable|integer|min:0',
+            'feed_form'     => 'required|string|max:150',
+            'particle_size' => 'nullable|string',
+            'category'      => 'required|in:broiler,layer',
+        ]);
+
+        // Update the Feed
+        $f = $feed->update($validated);
+
+        return redirect()->route('feeds.index')
+            ->with('success', 'Feed has been updated successfully.');
     }
 
     /**
@@ -68,6 +95,9 @@ class FeedController extends Controller
      */
     public function destroy(Feed $feed)
     {
-        //
+        $title = $feed->title;
+        $feed->delete();
+        return redirect()->route('feeds.index')
+            ->with('success', "Feed: {$title} has been deleted successfully.");
     }
 }

@@ -13,8 +13,12 @@ class BreedController extends Controller
      */
     public function index()
     {
-        $breeds = Breed::withCount('flocks')->get();
+        $breeds = Breed::withCount('flocks')
+            ->orderBy('name')
+            ->get();
+
         $categories = ['broiler', 'layer'];
+
         return view(
             'admin.breeds.index',
             compact('breeds', 'categories')

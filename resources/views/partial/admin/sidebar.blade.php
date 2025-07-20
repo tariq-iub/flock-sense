@@ -106,7 +106,7 @@
                                 <li>
                                     <a href="{{ route('feeds.index') }}"
                                        class="{{ request()->routeIs('feeds.index') ? 'active' : '' }}">
-                                        Feeds
+                                        Feeds Types
                                     </a>
                                 </li>
                                 <li>
