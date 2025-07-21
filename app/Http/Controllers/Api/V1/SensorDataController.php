@@ -25,7 +25,7 @@ class SensorDataController extends ApiController
             'device_serial' => 'required|string',
         ]);
 
-        $device = Device::where('serial_no', $validated['serial_no'])->first();
+        $device = Device::where('serial_no', $validated['device_serial'])->first();
 
         if (!$device) {
             return response()->json(['message' => 'Device not found.'], 404);
