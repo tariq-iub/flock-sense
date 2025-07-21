@@ -35,6 +35,10 @@ class FarmResource extends JsonResource
                 'created_at' => $this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s') : null,
                 'updated_at' => $this->updated_at ? Carbon::parse($this->updated_at)->format('Y-m-d H:i:s') : null,
 
+                $this->mergeWhen($this->relationLoaded('sheds'), [
+                    'sheds' => ShedResource::collection($this->sheds),
+                ]),
+
                 $this->mergeWhen($this->relationLoaded('owner'), [
                     'owner' => [
                         'id' => $this->owner->id,

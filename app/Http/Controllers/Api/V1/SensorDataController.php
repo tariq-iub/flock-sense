@@ -8,6 +8,7 @@ use App\Models\Device;
 use App\Models\Shed;
 use App\Models\ShedDevice;
 use App\Services\DynamoDbService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -21,23 +22,23 @@ class SensorDataController extends ApiController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'serial_no' => 'required|string',
-            'timestamp' => 'required|integer',
+            'device_serial' => 'required|string',
         ]);
 
-        $device = Device::where('serial_no', $validated['serial_no'])->first();
+        $device = Device::where('serial_no', $validated['device_serial'])->first();
 
         if (!$device) {
             return response()->json(['message' => 'Device not found.'], 404);
         }
 
         $validated['device_id'] = $device->id;
-        unset($validated['serial_no']);
+        $validated['timestamp'] = Carbon::now()->timestamp;
+        unset($validated['device_serial']);
 
         // 👇 Merge dynamic sensor fields back into validated array
         $sensorData = array_merge(
             $validated,
-            collect($request->except(['serial_no']))  // All except serial_no
+            collect($request->except(['device_serial']))  // All except serial_no
                 ->reject(fn($value) => is_null($value)) // Optional: skip nulls
                 ->toArray()
         );
