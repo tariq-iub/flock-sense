@@ -12,9 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('shed_devices', function (Blueprint $table) {
-            $table->foreignId('shed_id')->constrained('sheds');
-            $table->foreignId('device_id')->constrained('devices');
-            $table->timestamp('link_date')->useCurrent();
+            $table->id();
+            $table->foreignId('shed_id')->constrained('sheds')->cascadeOnDelete();
+            $table->foreignId('device_id')->constrained('devices')->cascadeOnDelete();
+            $table->boolean('is_active')->default(true);
+            $table->string('location_in_shed')->nullable();
+            $table->datetime('link_date')->useCurrent();
+            $table->timestamps();
         });
     }
 

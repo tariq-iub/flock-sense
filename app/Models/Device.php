@@ -21,4 +21,14 @@ class Device extends Model
     {
         return $this->hasMany(DeviceAppliance::class);
     }
+
+    public function readings() : HasMany
+    {
+        return $this->hasMany(DeviceReading::class);
+    }
+
+    public function events() : HasMany
+    {
+        return $this->hasMany(DeviceEvent::class);
+    }
 }
