@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // Track the user's current plan, trial, etc.
-            $table->unsignedBigInteger('pricing_id')->nullable()->after('id'); // Current selected pricing plan
-            $table->dateTime('trial_ends_at')->nullable()->after('pricing_id');
+            // pricing_id and trial_ends_at already exist in the table
             $table->string('subscription_status')->nullable()->after('trial_ends_at'); // active, cancelled, past_due, trial, expired
             $table->string('stripe_customer_id')->nullable()->after('subscription_status');
             $table->string('stripe_subscription_id')->nullable()->after('stripe_customer_id');
@@ -27,7 +26,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['pricing_id', 'trial_ends_at', 'subscription_status', 'stripe_customer_id', 'stripe_subscription_id']);
+            // Only drop columns that this migration adds, not ones added by Cashier or other migrations
+            $table->dropColumn(['subscription_status', 'stripe_customer_id', 'stripe_subscription_id']);
         });
     }
 };
