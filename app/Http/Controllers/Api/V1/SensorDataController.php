@@ -33,7 +33,7 @@ class SensorDataController extends ApiController
 
         $validated['device_id'] = $device->id;
         $validated['timestamp'] = Carbon::now()->timestamp;
-        unset($validated['serial_no']);
+        unset($validated['device_serial']);
 
         // 👇 Merge dynamic sensor fields back into validated array
         $sensorData = array_merge(
