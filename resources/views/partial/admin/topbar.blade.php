@@ -289,7 +289,7 @@
                         </span>
                         <div>
                             <h6 class="fw-medium">{{ $user->name }}</h6>
-                            <p>{{ $user->getRoleNames()->first() ?? 'User' }}</p>
+                            <p>{{ ucfirst($user->getRoleNames()->first()) ?? 'User' }}</p>
                         </div>
                     </div>
                     <a class="dropdown-item" href="profile.html"><i class="ti ti-user-circle me-2"></i>MyProfile</a>
