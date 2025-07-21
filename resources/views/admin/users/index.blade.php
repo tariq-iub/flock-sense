@@ -97,13 +97,7 @@
                     <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
-                            <th class="no-sort">
-                                <label class="checkboxs">
-                                    <input type="checkbox" id="select-all">
-                                    <span class="checkmarks"></span>
-                                </label>
-                            </th>
-                            <th>User Name</th>
+                            <th class="w-100">User Name</th>
                             <th>Email</th>
                             <th>Contact No</th>
                             <th>Roles</th>
@@ -115,13 +109,7 @@
                         <tbody>
                         @foreach($users as $user)
                             <tr>
-                                <td>
-                                    <label class="checkboxs">
-                                        <input type="checkbox">
-                                        <span class="checkmarks"></span>
-                                    </label>
-                                </td>
-                                <td>
+                                <td class="w-100">
                                     <div class="d-flex align-items-center">
                                         <a href="javascript:void(0);" class="avatar avatar-md me-2">
                                         @php
@@ -380,11 +368,11 @@
 
                 $('#rolesFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(4).search(selected).draw();
+                    table.column(3).search(selected).draw();
                 });
                 $('#statusFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(6).search(selected).draw();
+                    table.column(5).search(selected).draw();
                 });
             }
         });

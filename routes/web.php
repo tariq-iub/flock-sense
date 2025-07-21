@@ -5,9 +5,13 @@ use App\Http\Controllers\Web\BreedController;
 use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\IotController;
 use App\Http\Controllers\Web\FarmController;
+use App\Http\Controllers\Web\ExpenseController;
 use App\Http\Controllers\Web\FeedController;
+use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
+use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Flock;
@@ -56,18 +60,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::post('/dashboard', DashboardController::class)->name('dashboard');
 
-    // Import chart route (POST)
-    Route::post('/import-chart', [ChartController::class, 'import'])->name('import.chart');
-    Route::get('/charts/data/{chart}', [ChartController::class, 'chartData'])->name('charts.data');
-
-    Route::get('/roles/{role}/permissions', [RoleController::class, 'getPermissions'])->name('roles.permissions');
-    Route::post('/roles/permissions', [RoleController::class, 'setPermissions'])->name('roles.set-permissions');
-    Route::get('/roles/{role}/users', [RoleController::class, 'attachedUsers'])->name('roles.users');
-
     Route::get('/farms/{farm}/data', [FarmController::class, 'farmData'])->name('farms.data');
 
-    // Production Log Routes
-    Route::get('log/productions/export/excel', [ProductionLogController::class, 'exportExcel'])->name('productions.export.excel');
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
             ->select('id', 'name', 'capacity', 'type')
@@ -84,11 +78,75 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     // Resource routes for clients and charts
     Route::resources([
         'clients' => ClientController::class,
-        'roles' => RoleController::class,
-        'charts' => ChartController::class,
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
         'farms' => FarmController::class,
-        'log/productions' => ProductionLogController::class,
+        'pricings' => PricingController::class,
     ]);
+
+    // Charts (Baseline) Data Routes
+    Route::prefix('charts')->controller(ChartController::class)->group(function () {
+        Route::get('/', 'index')->name('charts.index');
+        Route::get('/{chart}/edit', 'edit')->name('charts.edit');
+        Route::put('/{chart}', 'update')->name('charts.update');
+        Route::delete('/{chart}', 'destroy')->name('charts.destroy');
+        Route::post('/import', 'import')->name('charts.import');
+        Route::get('/data/{chart}', 'chartData')->name('charts.data');
+        Route::get('/{chart}/toggle', 'toggle')->name('charts.toggle');
+        Route::post('/data/update', 'data_update')->name('charts.data.update');
+
+    });
+
+    // Roles
+    Route::prefix('roles')->controller(RoleController::class)->group(function () {
+        Route::get('/', 'index')->name('roles.index');
+        Route::post('/', 'store')->name('roles.store');
+        Route::put('/{role}', 'update')->name('roles.update');
+        Route::delete('/{role}', 'destroy')->name('roles.destroy');
+        Route::get('/{role}/permissions', [RoleController::class, 'getPermissions'])->name('roles.permissions');
+        Route::post('/permissions', [RoleController::class, 'setPermissions'])->name('roles.set-permissions');
+        Route::get('/{role}/users', [RoleController::class, 'attachedUsers'])->name('roles.users');
+    });
+
+    // IoT
+    Route::prefix('iot')->controller(IotController::class)->group(function () {
+        Route::get('/', 'index')->name('iot.index');
+        Route::post('/', 'store')->name('iot.store');
+        Route::put('/{device}', 'update')->name('iot.update');
+        Route::delete('/{device}', 'destroy')->name('iot.destroy');
+        Route::get('/linking', [IotController::class, 'linking'])->name('iot.linking');
+        Route::get('/alerts', [IotController::class, 'alerts'])->name('iot.alerts');
+        Route::get('/logs', [IotController::class, 'logs'])->name('iot.logs');
+    });
+
+    // Expenses
+    Route::prefix('expenses')->controller(ExpenseController::class)->group(function () {
+        Route::get('/', 'index')->name('expenses.index');
+        Route::post('/', 'store')->name('expenses.store');
+        Route::put('/expenses/{expense}', 'update')->name('expenses.update');
+        Route::delete('/expenses/{expense}', 'delete')->name('expenses.destroy');
+        Route::get('/expenses/{expense}/toggle', 'toggle')->name('expenses.toggle');
+    });
+
+    // Productions Logs
+    Route::prefix('productions')->controller(ProductionLogController::class)->group(function () {
+        Route::get('/', 'index')->name('productions.index');
+        Route::get('/create', 'create')->name('productions.create');
+        Route::post('/', 'store')->name('productions.store');
+        Route::get('/{productionLog}', 'show')->name('productions.show');
+        Route::get('/{productionLog}/edit', 'edit')->name('productions.edit');
+        Route::put('/{productionLog}', 'update')->name('productions.update');
+        Route::delete('/{productionLog}', 'destroy')->name('productions.destroy');
+        Route::get('/export/excel', 'exportExcel')->name('productions.export.excel');
+    });
+
+    // Reports
+    Route::prefix('reports')->controller(ReportsController::class)->group(function () {
+        Route::get('/income', 'income')->name('reports.income');
+        Route::get('/expenses', 'expenses')->name('reports.expenses');
+        Route::get('/tax', 'tax')->name('reports.tax');
+        Route::get('/devices-sold', 'devices_sales')->name('reports.devices.sales');
+        Route::get('/annual', 'annual')->name('reports.annual');
+    });
+
 });

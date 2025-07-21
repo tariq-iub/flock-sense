@@ -22,7 +22,7 @@ class ChartSeeder extends Seeder
             'chart_name' => 'Ross Standard',
             'source' => 'Aviagen',
         ], [
-            'description' => 'Ross 308 Broiler Baseline Chart',
+            'description' => 'Ross 308 Broiler Standard Chart',
             'unit' => 'g',
             'settings' => null,
         ]);

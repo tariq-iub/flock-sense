@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('feed_profiles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('feed_id');
+            $table->foreignId('feed_id')->constrained('feeds')->onDelete('cascade');
             /*
              * Feed Brands:
              * Popular broiler feed brands in some regions include
              * Asia Poultry Feeds, Paragons, Saffron, and Al-Noor.
              */
-            $table->string('brand')->nullable();
+            $table->string('brand');
             /*
              * Fermented Feed:
              * Fermented chicken feed can enhance nutrient absorption and may be particularly

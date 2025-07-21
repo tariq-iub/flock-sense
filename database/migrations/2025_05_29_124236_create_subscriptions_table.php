@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('farm_id')->constrained();
-            $table->foreignId('plan_id')->constrained('subscription_plans');
+            $table->foreignId('package_id')->constrained('subscription_plans');
             $table->datetime('starts_at');
             $table->datetime('ends_at');
             $table->timestamps();

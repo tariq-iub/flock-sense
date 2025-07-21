@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Imports\ChartDataImport;
 use App\Models\Chart;
+use App\Models\ChartData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,30 +23,6 @@ class ChartController extends Controller
             'admin.charts.index',
             compact('charts', 'sources')
         );
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // No implementation is required
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // No implementation is required
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Chart $chart)
-    {
-        // No implementation is required
     }
 
     /**
@@ -70,7 +47,7 @@ class ChartController extends Controller
             'settings' => 'nullable|string',
         ]);
 
-        Chart::update([
+        $chart->update([
             'chart_name' => $validated['chart_name'],
             'source' => $validated['source'],
             'description' => $validated['description'],
@@ -80,7 +57,7 @@ class ChartController extends Controller
 
         return redirect()
             ->route('charts.index')
-            ->with('success', 'Baseline charts updated successfully.');
+            ->with('success', "Standard chart: {$chart->chart_name} data has been updated successfully.");
     }
 
     /**
@@ -88,10 +65,11 @@ class ChartController extends Controller
      */
     public function destroy(Chart $chart)
     {
+        $name = $chart->chart_name;
         $chart->delete();
         return redirect()
             ->route('charts.index')
-            ->with('success', 'Baseline chart deleted successfully.');
+            ->with('success', "Standard chart: {$name} has been deleted successfully.");
     }
 
     public function import(Request $request)
@@ -119,7 +97,7 @@ class ChartController extends Controller
         $file = $request->file('file');
         Excel::import(new ChartDataImport($chart->id), $file);
 
-        return back()->with('success', 'Baseline data imported successfully.');
+        return back()->with('success', 'Standard data imported successfully.');
     }
 
     public function chartData(Chart $chart) : JsonResponse
@@ -130,5 +108,27 @@ class ChartController extends Controller
             'title' => $chart->chart_name . ' - ' . $chart->source,
             'data' => $view,
         ]);
+    }
+
+    public function toggle(Chart $chart)
+    {
+        $chart->is_active = !$chart->is_active;
+        $chart->save();
+        return redirect()->back()->with([
+            'success' => "Status of Standard: {$chart->chart_name} has been changed successfully."
+        ]);
+    }
+
+    public function data_update(Request $request)
+    {
+        $row = ChartData::find($request->id);
+        if (!$row) {
+            return response()->json(['success' => false, 'message' => 'Row not found'], 404);
+        }
+
+        $row->{$request->field} = $request->value;
+        $row->save();
+
+        return response()->json(['success' => true]);
     }
 }

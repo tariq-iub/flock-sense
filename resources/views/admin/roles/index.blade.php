@@ -77,12 +77,6 @@
                     <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
-                            <th class="no-sort">
-                                <label class="checkboxs">
-                                    <input type="checkbox" id="select-all">
-                                    <span class="checkmarks"></span>
-                                </label>
-                            </th>
                             <th class="w-100">Role</th>
                             <th class="text-center">Guard</th>
                             <th class="text-center">Users Attach</th>
@@ -93,13 +87,7 @@
                         <tbody>
                         @foreach($roles as $role)
                             <tr>
-                                <td>
-                                    <label class="checkboxs">
-                                        <input type="checkbox" value="{{ $role->id }}">
-                                        <span class="checkmarks"></span>
-                                    </label>
-                                </td>
-                                <td>
+                                <td class="w-100">
                                     {{ ucfirst($role->name) }}
                                 </td>
                                 <td class="text-center">{{ ucfirst($role->guard_name) }}</td>
@@ -257,7 +245,7 @@
 
                 $('#statusFilter').on('change', function() {
                     var selected = $(this).val();
-                    table.column(6).search(selected).draw();
+                    table.column(5).search(selected).draw();
                 });
             }
         });
