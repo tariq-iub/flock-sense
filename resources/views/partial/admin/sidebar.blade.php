@@ -131,7 +131,7 @@
                             <ul>
                                 <li>
                                     <a href="{{ route('clients.index') }}" class="{{ Route::is('clients.*') ? 'active' : '' }}">
-                                        All Users
+                                        Users List
                                     </a>
                                 </li>
                                 <li>

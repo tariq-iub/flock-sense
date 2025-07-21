@@ -39,7 +39,9 @@
                                 <span><i class="ti ti-search"></i></span>
                             </div>
                             <span class="input-group-text">
-                                <kbd class="d-flex align-items-center"><img src="{{ asset('assets/img/icons/command.svg') }}" alt="img" class="me-1">K</kbd>
+                                <kbd class="d-flex align-items-center">
+                                    <img src="{{ asset('assets/img/icons/command.svg') }}" alt="img" class="me-1">K
+                                </kbd>
                             </span>
                         </div>
                         <div class="dropdown-menu search-dropdown" aria-labelledby="dropdownMenuClickable">
@@ -261,22 +263,33 @@
             <li class="nav-item nav-item-box">
                 <a href="general-settings.html"><i class="ti ti-settings"></i></a>
             </li>
+
+            @php
+                $path = "assets/img/user.jpg";
+                $user = Auth::user();
+                $media = $user->media->first();
+                if($media)
+                {
+                    $path = $media->file_path;
+                }
+            @endphp
+
             <li class="nav-item dropdown has-arrow main-drop profile-nav">
                 <a href="javascript:void(0);" class="nav-link userset" data-bs-toggle="dropdown">
-								<span class="user-info p-0">
-									<span class="user-letter">
-										<img src="{{ asset('assets/img/tariq.jpg') }}" alt="Img" class="img-fluid">
-									</span>
-								</span>
+                    <span class="user-info p-0">
+                        <span class="user-letter">
+                            <img src="{{ asset($path) }}" alt="Img" class="img-fluid">
+                        </span>
+                    </span>
                 </a>
                 <div class="dropdown-menu menu-drop-user">
                     <div class="profileset d-flex align-items-center">
-									<span class="user-img me-2">
-										<img src="{{ asset('assets/img/tariq.jpg') }}" alt="Img">
-									</span>
+                        <span class="user-img me-2">
+                            <img src="{{ asset($path) }}" alt="Img">
+                        </span>
                         <div>
-                            <h6 class="fw-medium">Muhammad Tariq</h6>
-                            <p>Admin</p>
+                            <h6 class="fw-medium">{{ $user->name }}</h6>
+                            <p>{{ $user->getRoleNames()->first() ?? 'User' }}</p>
                         </div>
                     </div>
                     <a class="dropdown-item" href="profile.html"><i class="ti ti-user-circle me-2"></i>MyProfile</a>

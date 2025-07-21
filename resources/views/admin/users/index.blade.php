@@ -156,7 +156,7 @@
                                         <a class="me-2 edit-icon  p-2" href="{{ route('clients.show', $user) }}">
                                             <i data-feather="eye" class="feather-eye"></i>
                                         </a>
-                                        <a class="me-2 p-2" href="{{ route('clients.show', $user) }}" >
+                                        <a class="me-2 p-2" href="javascript:void(0);" onclick="showEditUserModal({{ $user->id }})">
                                             <i data-feather="edit" class="feather-edit"></i>
                                         </a>
                                         @if(Auth::user()->hasRole('admin'))
@@ -188,7 +188,10 @@
                       method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+                        <h5 class="modal-title" id="addUserModalLabel">
+                            <i class="ti ti-user text-primary me-2"></i>
+                            Add User
+                        </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -202,8 +205,8 @@
                                         </span>
                                     </div>
                                     <div class="mt-4 me-3">
-                                        <button type="button" class="btn btn-sm btn-success-light" onclick="$('#profileImageInput').click()">
-                                            Upload Image
+                                        <button type="button" class="btn btn-sm btn-outline-success mt-2" onclick="$('#profileImageInput').click()">
+                                            <i class="ti ti-upload"></i> Upload Image
                                         </button>
                                         <input type="file" id="profileImageInput" name="file" class="d-none" accept="image/*">
                                         <p class="text-center fs-10 mt-2">JPEG, PNG up to 2 MB</p>
@@ -212,10 +215,10 @@
                             </div>
                             <div class="col-lg-9">
                                 <div class="mb-3">
-                                    <label for="chart_name" class="form-label">User Name<span class="text-danger ms-1">*</span></label>
+                                    <label for="name" class="form-label">User Name<span class="text-danger ms-1">*</span></label>
                                     <input type="text" class="form-control" id="name" name="name" required>
                                     <div class="invalid-feedback">
-                                        You have to name baseline data for identification.
+                                        You have to full user name.
                                     </div>
                                 </div>
 
@@ -275,6 +278,88 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-success">Save User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="editUserForm" action="" class="needs-validation" novalidate
+                      method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUserModalLabel">
+                            <i class="ti ti-user-edit text-primary me-2"></i>Edit User
+                        </h5>
+                        <button type="button" id="closeEditModalBtn" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="profile-pic-upload d-flex flex-column align-content-between mb-2">
+                                    <div class="profile-pic position-relative" id="profilePicPreview">
+                                        <img src="" alt="Profile Preview" class="img-fluid d-none" style="width: 100%; height: 100%; object-fit: cover;" id="editProfileImgTag">
+                                        <span id="editProfilePicPlaceholder">
+                                        <i data-feather="plus-circle" class="plus-down-add"></i>Add Image
+                                    </span>
+                                    </div>
+                                    <div class="mt-4 me-3">
+                                        <button type="button" class="btn btn-sm btn-outline-success mt-2" onclick="$('#profileEditImageInput').click()">
+                                            <i class="ti ti-upload"></i> Upload Image
+                                        </button>
+                                        <input type="file" id="profileEditImageInput" name="file" class="d-none" accept="image/*">
+                                        <p class="text-center fs-10 mt-2">JPEG, PNG up to 2 MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-9">
+                                <input type="hidden" id="edit-id" name="id" value="">
+                                <div class="mb-3">
+                                    <label for="edit-name" class="form-label">User Name<span class="text-danger ms-1">*</span></label>
+                                    <input type="text" class="form-control" id="edit-name" name="name" required>
+                                    <div class="invalid-feedback">
+                                        You have to enter complete user name.
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Role<span class="text-danger ms-1">*</span></label>
+                                    <select class="select" id="edit-role" name="role" required>
+                                        @foreach($roles as $role)
+                                            <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Role has been assigned to user.
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email<span class="text-danger ms-1">*</span></label>
+                                    <input type="email" class="form-control" id="edit-email" name="email" required>
+                                    <div class="invalid-feedback">
+                                        Valid email of user must be provided.
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone<span class="text-danger ms-1">*</span></label>
+                                    <input type="tel" class="form-control" id="edit-phone" name="phone" required>
+                                    <div class="invalid-feedback">
+                                        Valid phone no. of user must be provided.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success" id="updateBtn">
+                            <span id="updateBtnText">Update User</span>
+                            <span class="spinner-border spinner-border-sm d-none" id="updateSpinner" role="status" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -377,6 +462,78 @@
             }
         });
     </script>
+
+    <script>
+        document.getElementById('profileEditImageInput').onchange = function(event) {
+            let file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = document.getElementById('editProfileImgTag');
+                    img.src = e.target.result;
+                    img.classList.remove('d-none');
+                    document.getElementById('editProfilePicPlaceholder').classList.add('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // Show and populate edit modal
+        function showEditUserModal(userId) {
+            // Clear previous state
+            document.getElementById('editProfileImgTag').src = '';
+            document.getElementById('editProfileImgTag').classList.add('d-none');
+            document.getElementById('editProfilePicPlaceholder').classList.remove('d-none');
+
+            fetch('/admin/clients/' + userId + '/edit')
+                .then(response => response.json())
+                .then(user => {
+                    // Populate fields
+                    document.getElementById('edit-id').value = user.id;
+                    document.getElementById('edit-name').value = user.name ?? '';
+                    document.getElementById('edit-email').value = user.email ?? '';
+                    document.getElementById('edit-phone').value = user.phone ?? '';
+
+                    // Handle roles array
+                    let roleName = (user.roles && user.roles.length > 0) ? user.roles[0].name : '';
+                    document.getElementById('edit-role').value = roleName;
+
+                    // Profile image preview (handle if media array is empty)
+                    if (user.media && user.media.length > 0 && user.media[0].file_path) {
+                        // Always use the correct absolute path
+                        let imgPath = window.location.origin + '/media/' + user.media[0].file_path.replace(/^media[\/\\]?/, '');
+                        let img = document.getElementById('editProfileImgTag');
+                        img.src = imgPath;
+                        img.classList.remove('d-none');
+                        document.getElementById('editProfilePicPlaceholder').classList.add('d-none');
+                    }
+
+                    // Set form action
+                    document.getElementById('editUserForm').action = '/admin/clients/' + user.id;
+                    $('#editUserModal').modal('show');
+                });
+        }
+
+        // Spinner on submit
+        document.getElementById('editUserForm').addEventListener('submit', function() {
+            document.getElementById('updateBtnText').classList.add('d-none');
+            document.getElementById('updateSpinner').classList.remove('d-none');
+            document.getElementById('updateBtn').setAttribute('disabled', 'disabled');
+        });
+
+        // Reset modal on close
+        document.getElementById('closeEditModalBtn').addEventListener('click', function () {
+            setTimeout(() => {
+                document.getElementById('editUserForm').reset();
+                document.getElementById('updateBtnText').classList.remove('d-none');
+                document.getElementById('updateSpinner').classList.add('d-none');
+                document.getElementById('updateBtn').removeAttribute('disabled');
+                document.getElementById('editProfileImgTag').classList.add('d-none');
+                document.getElementById('editProfilePicPlaceholder').classList.remove('d-none');
+            }, 500);
+        });
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let deleteUserId = null;

@@ -84,7 +84,18 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         'pricings' => PricingController::class,
     ]);
 
-    // Charts (Baseline) Data Routes
+    // Users and Clients
+    Route::prefix('clients')->controller(ClientController::class)->group(function () {
+        Route::get('/', 'index')->name('clients.index');
+        Route::post('/', 'store')->name('clients.store');
+        Route::get('/{user}', 'show')->name('clients.show');
+        Route::get('/{user}/edit', 'edit')->name('clients.edit');
+        Route::put('/{user}', 'update')->name('clients.update');
+        Route::delete('/{user}', 'destroy')->name('clients.destroy');
+//        Route::get('/{chart}/toggle', 'toggle')->name('clients.toggle');
+    });
+
+    // Charts (Standard) Data Routes
     Route::prefix('charts')->controller(ChartController::class)->group(function () {
         Route::get('/', 'index')->name('charts.index');
         Route::get('/{chart}/edit', 'edit')->name('charts.edit');

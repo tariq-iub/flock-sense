@@ -102,7 +102,7 @@
                                     <br>
                                     <small class="text-muted">{{ $plan->description }}</small>
                                 </td>
-                                <td class="text-center fs-12">
+                                <td class="text-center fs-11">
                                     <span class="fw-semibold">{{ number_format($plan->price, 2) }} {{ $plan->currency }}</span>
                                 </td>
                                 <td class="text-center">{{ ucfirst($plan->billing_interval) }}</td>

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -19,6 +20,9 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasApiTokens;
     use HasRoles;
     use HasMedia;
+    use Billable;
+
+    protected $dates = ['trial_ends_at'];
 
     /**
      * The attributes that are mass assignable.
@@ -29,7 +33,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'phone'
+        'phone',
+        'pricing_id',
+        'trial_ends_at',
+        'subscription_status',
+        'stripe_customer_id',
+        'stripe_subscription_id'
     ];
 
     /**
@@ -90,5 +99,31 @@ class User extends Authenticatable implements MustVerifyEmail
     public function settings() : HasOne
     {
         return $this->hasOne(UserSetting::Class);
+    }
+
+    public function pricing()
+    {
+        return $this->belongsTo(Pricing::class);
+    }
+
+    public function paymentLogs()
+    {
+        return $this->hasMany(PaymentLog::class);
+    }
+
+    // Helper: Days left in trial
+    public function trialDaysLeft()
+    {
+        return $this->trial_ends_at ? now()->diffInDays($this->trial_ends_at, false) : 0;
+    }
+
+    public function isOnTrial()
+    {
+        return $this->trial_ends_at && now()->lt($this->trial_ends_at);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->subscriptions()->active()->first();
     }
 }
