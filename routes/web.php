@@ -122,7 +122,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     // IoT
     Route::prefix('iot')->controller(IotController::class)->group(function () {
         Route::get('/', 'index')->name('iot.index');
+        Route::get('/create', 'create')->name('iot.create');
         Route::post('/', 'store')->name('iot.store');
+        Route::get('/{device}', 'show')->name('iot.show');
+        Route::get('/{device}/edit', 'edit')->name('iot.edit');
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
         Route::get('/linking', [IotController::class, 'linking'])->name('iot.linking');

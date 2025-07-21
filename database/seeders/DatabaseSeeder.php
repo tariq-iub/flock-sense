@@ -39,6 +39,8 @@ class DatabaseSeeder extends Seeder
             WeightLogSeeder::class,
             ExpenseSeeder::class,
             PricingSeeder::class,
+            CapabilitySeeder::class,
+            ConnectivitySeeder::class,
         ]);
     }
 }

@@ -143,7 +143,7 @@
                         </li>
                         <li class="submenu">
                             <a href="javascript:void(0);"
-                               class="{{ Route::is('iot.index') || Route::is('iot.linking') || Route::is('iot.alerts') ? 'subdrop active' : '' }}">
+                               class="{{ Route::is('iot.index') || Route::is('iot.create') || Route::is('iot.edit') || Route::is('iot.linking') || Route::is('iot.alerts') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-devices fs-16 me-2"></i>
                                 <span>IoT Management</span>
                                 <span class="menu-arrow"></span>
@@ -151,7 +151,7 @@
                             <ul>
                                 <li>
                                     <a href="{{ route('iot.index') }}"
-                                       class="{{ request()->routeIs('iot.index') ? 'active' : '' }}">
+                                       class="{{ request()->routeIs('iot.index') || request()->routeIs('iot.create') || request()->routeIs('iot.edit') ? 'active' : '' }}">
                                         IoT Inventory
                                     </a>
                                 </li>
