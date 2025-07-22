@@ -24,7 +24,6 @@
                 </a>
             </div>
         </div>
-
         <div class="container-fluid">
             <div class="row mb-3">
                 @if (session('success'))
@@ -57,7 +56,6 @@
                 @endif
             </div>
         </div>
-
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
                 <div class="search-set">
@@ -100,7 +98,7 @@
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
                                         <a href="javascript:void(0)"
-                                           class="me-2 d-flex align-items-center p-2 border rounded edit-breed"
+                                           class="p-2 border rounded me-2 edit-breed"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""

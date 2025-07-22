@@ -59,3 +59,7 @@
     </div>
 
 @endsection
+
+@push('js')
+    <script src="{{ asset('assets/js/forms-pickers.js') }}" type="text/javascript"></script>
+@endpush

@@ -72,7 +72,6 @@
     <script src="{{ asset('assets/plugins/jquery-timepicker/jquery-timepicker.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/plugins/pickr/pickr.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/plugins/%40simonwep/pickr/pickr.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('assets/js/forms-pickers.js') }}" type="text/javascript"></script>
 
     <script src="{{ asset('assets/js/jquery.PrintArea.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/js/script.js') }}" type="text/javascript"></script>

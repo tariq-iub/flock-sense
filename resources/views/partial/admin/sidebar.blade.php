@@ -86,9 +86,14 @@
                         </li>
                         <li class="submenu">
                             <a href="javascript:void(0);"
-                               class="{{ Route::is('charts.*') || Route::is('breeding.*') || Route::is('feeds.*') || Route::is('expenses.*') || Route::is('pricings.*') ? 'subdrop active' : '' }}">
+                               class="{{ Route::is('charts.*') ||
+                                         Route::is('breeding.*') ||
+                                         Route::is('feeds.*') ||
+                                         Route::is('expenses.*') ||
+                                         Route::is('pricings.*') ||
+                                         Route::is('medicines.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
-                                <span>Super Admin</span><span class="menu-arrow"></span>
+                                <span>System Admin</span><span class="menu-arrow"></span>
                             </a>
                             <ul>
                                 <li>
@@ -107,6 +112,12 @@
                                     <a href="{{ route('feeds.index') }}"
                                        class="{{ request()->routeIs('feeds.*') ? 'active' : '' }}">
                                         Feeds Types
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('medicines.index') }}"
+                                       class="{{ request()->routeIs('medicines.*') ? 'active' : '' }}">
+                                        Poultry Medicines
                                     </a>
                                 </li>
                                 <li>
