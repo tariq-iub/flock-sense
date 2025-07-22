@@ -12,16 +12,17 @@ return new class extends Migration {
     {
         Schema::create('device_appliances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('device_id')->constrained(); // Device that owns this appliance
-            $table->string('type'); // e.g., fan, light, exhaust
-            $table->string('name')->nullable(); // Optional: "Fan A", "Light 1"
-            $table->unsignedTinyInteger('channel')->nullable(); // for I/O channel mapping if needed
-            $table->json('config')->nullable(); // optional e.g. {"intensity": "range"}
+            $table->foreignId('device_id')->constrained('devices')->cascadeOnDelete();
+            $table->string('type'); // fan, light, exhaust
+            $table->string('name')->nullable();
+            $table->unsignedTinyInteger('channel')->nullable();
+            $table->json('config')->nullable();
 
-            // Status fields (previously in separate table)
-            $table->boolean('status')->default(false); // basic ON/OFF
-            $table->json('metrics')->nullable(); // optional, e.g., {"speed": 3, "intensity": 50}
-            $table->datetime('status_updated_at')->nullable(); // track last status update
+            // Status and metrics
+            $table->boolean('is_active')->default(false); // Renamed from 'status' for clarity
+            $table->json('metrics')->nullable();
+            $table->string('last_command_source')->nullable(); // e.g., auto, manual, api
+            $table->dateTime('status_updated_at')->nullable();
 
             $table->timestamps();
         });

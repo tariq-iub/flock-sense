@@ -10,6 +10,7 @@
     <title>FlockSense - @yield('title')</title>
 
     <link href="{{ asset('assets/img/favicon.png') }}" type="image/x-icon" rel="shortcut icon">
+
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/animate.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
@@ -18,7 +19,16 @@
     <link href="{{ asset('assets/plugins/fontawesome/css/fontawesome.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/feather.css') }}" rel="stylesheet">
+
+    <!-- Daterangepikcer CSS -->
     <link href="{{ asset('assets/plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet">
+
+    <!-- Form Date PIckers CSS -->
+    <link href="{{ asset('assets/plugins/flatpickr/flatpickr.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/plugins/bootstrap-datepicker/bootstrap-datepicker.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/plugins/jquery-timepicker/jquery-timepicker.css') }}" rel="stylesheet">
+
     <link href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}" rel="stylesheet" >
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
 
@@ -54,9 +64,15 @@
     <script src="{{ asset('assets/plugins/select2/js/select2.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/js/custom-select2.js') }}" type="text/javascript"></script>
 
-    <!-- Daterangepikcer JS -->
+    <!-- Form Date Pickers JS -->
     <script src="{{ asset('assets/js/moment.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/plugins/flatpickr/flatpickr.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/plugins/bootstrap-datepicker/bootstrap-datepicker.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/plugins/daterangepicker/daterangepicker.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/plugins/jquery-timepicker/jquery-timepicker.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/plugins/pickr/pickr.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/plugins/%40simonwep/pickr/pickr.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/forms-pickers.js') }}" type="text/javascript"></script>
 
     <script src="{{ asset('assets/js/jquery.PrintArea.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/js/script.js') }}" type="text/javascript"></script>

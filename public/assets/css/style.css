@@ -11591,9 +11591,9 @@ span.select2-container.select2-container--default.select2-container--open {
 .select2-container--classic .select2-selection--multiple .select2-selection__choice,
 .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-  background-color: #155EEF;
-  border-color: #155EEF;
-  color: #ffffff;
+  background-color: #E0F4F4;
+  border-color: #E0F4F4;
+  color: #334547;
 }
 
 table.dataTable > thead .sorting:after,
@@ -44923,7 +44923,7 @@ svg.feather-14 {
 
 .flatpickr-months,
 .flatpickr-weekdays {
-  background-color: rgba(242, 101, 34, 0.1);
+  background-color: #E0F4F4;
 }
 
 .flatpickr-months .flatpickr-prev-month,

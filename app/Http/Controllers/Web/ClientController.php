@@ -91,17 +91,48 @@ class ClientController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit($id)
     {
-        //
+        $user = User::with(['media', 'settings', 'roles'])
+            ->find($id);
+        return response()->json($user);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        //
+        $user = User::with('media')->find($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'role' => 'required|string|exists:roles,name',
+            'file' => 'nullable|mimes:jpeg,jpg,png|max:2000',
+        ]);
+
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+        ]);
+
+        $user->syncRoles($validated['role']);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            if($user->media != null && $user->media->first()){
+                $user->deleteMedia($user->media->first()->id);
+            }
+            $user->addMedia($file);
+        }
+
+        return redirect()
+            ->route('clients.index')
+            ->with('success', 'User has been updated successfully.');
+
     }
 
     /**

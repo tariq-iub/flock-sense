@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shed_devices', function (Blueprint $table) {
+        Schema::create('capabilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shed_id')->constrained('sheds')->cascadeOnDelete();
-            $table->foreignId('device_id')->constrained('devices')->cascadeOnDelete();
+            $table->string('name');
             $table->boolean('is_active')->default(true);
-            $table->string('location_in_shed')->nullable();
-            $table->datetime('link_date')->useCurrent();
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shed_devices');
+        Schema::dropIfExists('capabilities');
     }
 };

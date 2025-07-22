@@ -84,7 +84,18 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         'pricings' => PricingController::class,
     ]);
 
-    // Charts (Baseline) Data Routes
+    // Users and Clients
+    Route::prefix('clients')->controller(ClientController::class)->group(function () {
+        Route::get('/', 'index')->name('clients.index');
+        Route::post('/', 'store')->name('clients.store');
+        Route::get('/{user}', 'show')->name('clients.show');
+        Route::get('/{user}/edit', 'edit')->name('clients.edit');
+        Route::put('/{user}', 'update')->name('clients.update');
+        Route::delete('/{user}', 'destroy')->name('clients.destroy');
+//        Route::get('/{chart}/toggle', 'toggle')->name('clients.toggle');
+    });
+
+    // Charts (Standard) Data Routes
     Route::prefix('charts')->controller(ChartController::class)->group(function () {
         Route::get('/', 'index')->name('charts.index');
         Route::get('/{chart}/edit', 'edit')->name('charts.edit');
@@ -111,7 +122,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     // IoT
     Route::prefix('iot')->controller(IotController::class)->group(function () {
         Route::get('/', 'index')->name('iot.index');
+        Route::get('/create', 'create')->name('iot.create');
         Route::post('/', 'store')->name('iot.store');
+        Route::get('/{device}', 'show')->name('iot.show');
+        Route::get('/{device}/edit', 'edit')->name('iot.edit');
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
         Route::get('/linking', [IotController::class, 'linking'])->name('iot.linking');
