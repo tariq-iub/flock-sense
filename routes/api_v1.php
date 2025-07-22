@@ -32,7 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'flocks' => FlockController::class,
         'settings' => UserSettingsController::class,
         'production' => ProductionLogController::class,
-        'medicine' => MedicineController::class,
+        'medicines' => MedicineController::class,
     ]);
 
     // Farm managers
