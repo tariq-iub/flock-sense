@@ -44,6 +44,7 @@ class ShedResource extends JsonResource
                         return $device->latest_sensor_data ? new SensorDataResource((object)$device->latest_sensor_data) : null;
                     })->filter()->values();
                 }),
+
                 'appliances' => $this->whenLoaded('devices', function () {
                     return $this->devices->flatMap(function ($device) {
                         return $device->appliances ?? [];
@@ -65,6 +66,7 @@ class ShedResource extends JsonResource
                             ];
                         });
                     }),
+
                     'devices' => $this->whenLoaded('devices', function () {
                         return $this->devices->map(function ($device) {
                             return [
