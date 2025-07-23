@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\BreedController;
 use App\Http\Controllers\Api\V1\DeviceApplianceController;
 use App\Http\Controllers\Api\V1\FlockController;
+use App\Http\Controllers\Api\V1\MedicineController;
 use App\Http\Controllers\Api\V1\ProductionLogController;
 use App\Http\Controllers\Api\V1\SensorDataController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
@@ -31,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'flocks' => FlockController::class,
         'settings' => UserSettingsController::class,
         'production' => ProductionLogController::class,
+        'medicines' => MedicineController::class,
     ]);
 
     // Farm managers
@@ -39,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('farms/{farm}/managers/{user}', [FarmManagerController::class, 'show']);
     Route::put('farms/{farm}/managers/{user}', [FarmManagerController::class, 'update']);
     Route::delete('farms/{farm}/managers/{user}', [FarmManagerController::class, 'destroy']);
+
     // Farm staff
     Route::get('farms/{farm}/staff', [FarmStaffController::class, 'index']);
     Route::post('farms/{farm}/staff', [FarmStaffController::class, 'store']);

@@ -12,6 +12,7 @@ class WeightLog extends Model
 
     protected $fillable = [
         'production_log_id',
+        'flock_id',
         'weighted_chickens_count',
         'total_weight',
         'avg_weight',
