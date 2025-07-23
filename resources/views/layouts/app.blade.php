@@ -30,6 +30,7 @@
     <link href="{{ asset('assets/plugins/jquery-timepicker/jquery-timepicker.css') }}" rel="stylesheet">
 
     <link href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}" rel="stylesheet" >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
 
     @stack('css')

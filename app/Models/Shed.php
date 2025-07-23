@@ -12,7 +12,7 @@ class Shed extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['farm_id', 'name', 'capacity', 'type'];
+    protected $fillable = ['farm_id', 'name', 'capacity', 'type', 'description'];
 
     public function farm(): BelongsTo
     {
@@ -35,4 +35,19 @@ class Shed extends Model
             ->withPivot('link_date');
     }
 
+    /**
+     * Relationship: Shed has many linked shed devices.
+     */
+    public function shedDevices()
+    {
+        return $this->hasMany(ShedDevice::class);
+    }
+
+    /**
+     * Shortcut: Get all currently active linked devices for this shed.
+     */
+    public function activeDevices()
+    {
+        return $this->shedDevices()->where('is_active', true)->with('device');
+    }
 }

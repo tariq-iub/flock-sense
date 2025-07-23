@@ -91,7 +91,7 @@
                                 <td>{{ $device->manufacturer }}</td>
                                 <td>{{ $device->firmware_version }}</td>
                                 <td>{{ $device->connectivity_type }}</td>
-                                <td>{{ implode(', ', json_decode($device->capabilities, true)) }}</td>
+                                <td>{{ implode(', ', array_map('ucwords', json_decode($device->capabilities, true))) }}</td>
                                 <td class="text-center">
                                     @if($device->battery_operated)
                                         <span class='badge bg-outline-info'>Yes</span>

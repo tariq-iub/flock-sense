@@ -22,6 +22,7 @@ class Device extends Model
         'capabilities' => 'array',
         'battery_operated' => 'boolean',
     ];
+
     public function sheds(): BelongsToMany
     {
         return $this->belongsToMany(Shed::class, 'shed_devices')
@@ -41,5 +42,19 @@ class Device extends Model
     public function events() : HasMany
     {
         return $this->hasMany(DeviceEvent::class);
+    }
+
+    public function shedDevices() : HasMany
+    {
+        return $this->hasMany(ShedDevice::class);
+    }
+
+    public function currentShed()
+    {
+        return $this->shedDevices()
+            ->where('is_active', true)
+            ->with('shed.farm')
+            ->latest()
+            ->first();
     }
 }

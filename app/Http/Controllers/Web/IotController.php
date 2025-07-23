@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Capability;
 use App\Models\Connectivity;
 use App\Models\Device;
+use App\Models\Shed;
+use App\Models\ShedDevice;
+use App\Models\DeviceEvent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class IotController extends Controller
 {
@@ -134,18 +138,105 @@ class IotController extends Controller
             ->with('success', 'Device has been deleted successfully.');
     }
 
-    public function linking()
+    public function farmDevices()
     {
+        $devices = Device::all();
+        $sheds = Shed::with('farm')->get();
+        $availableDevices = Device::whereDoesntHave('shedDevices', fn($q) => $q->where('is_active', true))->get();
+        $linkedDevices = Device::whereHas('shedDevices', fn($q) => $q->where('is_active', true))->get();
 
+        return view(
+            'admin.devices.farm_devices',
+            compact('devices', 'sheds', 'availableDevices', 'linkedDevices')
+        );
+    }
+
+    /**
+     * Link a device to a shed.
+     */
+    public function link(Request $request)
+    {
+        $request->validate([
+            'shed_id' => 'required|exists:sheds,id',
+            'device_id' => 'required|exists:devices,id',
+            'location_in_shed' => 'nullable|string|max:255'
+        ]);
+
+        DB::transaction(function () use ($request) {
+            $shedDevice = ShedDevice::create([
+                'shed_id' => $request->shed_id,
+                'device_id' => $request->device_id,
+                'location_in_shed' => $request->location_in_shed,
+                'is_active' => true,
+            ]);
+
+            DeviceEvent::create([
+                'device_id' => $request->device_id,
+                'event_type' => 'linked',
+                'severity' => 'info',
+                'details' => json_encode([
+                    'shed_id' => $request->shed_id,
+                    'location' => $request->location_in_shed,
+                ]),
+                'occurred_at' => now(),
+            ]);
+
+            return redirect()->back()
+                ->with('success', "Device has been linked with Shed: {$shedDevice->shed->name} successfully.");
+        });
+
+        return redirect()->back()
+            ->with('error', 'Transaction error: Shed device or event cannot be saved.');
+    }
+
+    /**
+     * Delink (deactivate) a device from a shed.
+     */
+    public function delink(Request $request)
+    {
+        $request->validate([
+            'shed_id' => 'required|exists:sheds,id',
+            'device_id' => 'required|exists:devices,id',
+        ]);
+
+        DB::transaction(function () use ($request) {
+            $shedDevice = ShedDevice::where('shed_id', $request->shed_id)
+                ->with('shed')
+                ->where('device_id', $request->device_id)
+                ->where('is_active', true)
+                ->latest()
+                ->first();
+
+            if ($shedDevice) {
+                $shedDevice->update(['is_active' => false]);
+
+                DeviceEvent::create([
+                    'device_id' => $request->device_id,
+                    'event_type' => 'delinked',
+                    'severity' => 'info',
+                    'details' => json_encode([
+                        'shed_id' => $request->shed_id,
+                        'previous_location' => $shedDevice->location_in_shed,
+                    ]),
+                    'occurred_at' => now(),
+                ]);
+            }
+
+            return redirect()->back()
+                ->with('success', "Device has been delinked from Shed: {$shedDevice->shed->name} successfully.");
+        });
+
+        return redirect()->back()
+            ->with('error', 'Transaction error: Shed device or event cannot be saved.');
     }
 
     public function alerts()
     {
-
+        //
     }
 
     public function logs()
     {
-
+        //
     }
 }

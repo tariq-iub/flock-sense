@@ -62,6 +62,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::post('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::get('/farms/{farm}/data', [FarmController::class, 'farmData'])->name('farms.data');
+    Route::get('/farm-devices', [IotController::class, 'farmDevices'])->name('farm.devices');
+    Route::post('/farm-devices/link', [IotController::class, 'link'])->name('farm.devices.link');
+    Route::post('/farm-devices/delink', [IotController::class, 'delink'])->name('farm.devices.delink');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -129,9 +132,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{device}/edit', 'edit')->name('iot.edit');
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
-        Route::get('/linking', [IotController::class, 'linking'])->name('iot.linking');
-        Route::get('/alerts', [IotController::class, 'alerts'])->name('iot.alerts');
-        Route::get('/logs', [IotController::class, 'logs'])->name('iot.logs');
+        Route::get('/alerts', 'alerts')->name('iot.alerts');
+        Route::get('/logs', 'logs')->name('iot.logs');
     });
 
     // Expenses

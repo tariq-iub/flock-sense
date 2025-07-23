@@ -19,12 +19,14 @@ return new class extends Migration {
             $table->json('config')->nullable();
 
             // Status and metrics
-            $table->boolean('is_active')->default(false); // Renamed from 'status' for clarity
+            $table->boolean('is_active')->default(true); // Renamed from 'status' for clarity
             $table->json('metrics')->nullable();
             $table->string('last_command_source')->nullable(); // e.g., auto, manual, api
             $table->dateTime('status_updated_at')->nullable();
 
             $table->timestamps();
+
+            $table->unique(['device_id', 'type'], 'device_appliances_unique_device_type'); // Ensure key is unique per device
         });
     }
 

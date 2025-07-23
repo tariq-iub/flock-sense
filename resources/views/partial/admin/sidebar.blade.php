@@ -154,7 +154,11 @@
                         </li>
                         <li class="submenu">
                             <a href="javascript:void(0);"
-                               class="{{ Route::is('iot.index') || Route::is('iot.create') || Route::is('iot.edit') || Route::is('iot.linking') || Route::is('iot.alerts') ? 'subdrop active' : '' }}">
+                               class="{{ Route::is('iot.index') ||
+                                         Route::is('iot.create') ||
+                                         Route::is('iot.edit') ||
+                                         Route::is('farm.devices') ||
+                                         Route::is('iot.alerts') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-devices fs-16 me-2"></i>
                                 <span>IoT Management</span>
                                 <span class="menu-arrow"></span>
@@ -167,8 +171,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('iot.linking') }}"
-                                       class="{{ request()->routeIs('iot.linking') ? 'active' : '' }}">
+                                    <a href="{{ route('farm.devices') }}"
+                                       class="{{ request()->routeIs('farm.devices') ? 'active' : '' }}">
                                         Farm Devices
                                     </a>
                                 </li>
@@ -215,7 +219,6 @@
                         </li>
                         <li><a href="product-list.html"><i data-feather="box"></i><span>Subscriptions</span></a></li>
                         <li><a href="add-product.html"><i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span></a></li>
-                        <li><a href="expired-products.html"><i class="ti ti-progress-alert fs-16 me-2"></i><span>System Settings</span></a></li>
                         <li><a href="qrcode.html"><i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span></a></li>
                     </ul>
                 </li>

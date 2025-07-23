@@ -13,12 +13,16 @@ class CapabilitySeeder extends Seeder
      */
     public function run(): void
     {
-        $data = ['temperature', 'humidity', 'nh3', 'co2', 'electricity'];
+        $data = [
+            ['name' => 'temperature', 'icon' => 'bi bi-thermometer-half', 'is_active' => true],
+            ['name' => 'humidity', 'icon' => 'bi bi-droplet-half', 'is_active' => true],
+            ['name' => 'nh3', 'icon' => 'bi bi-radioactive', 'is_active' => true],
+            ['name' => 'co2', 'icon' => 'bi bi-activity', 'is_active' => true],
+            ['name' => 'electricity', 'icon' => 'bi bi-lightning-charge', 'is_active' => true]
+        ];
+
         foreach ($data as $d) {
-            Capability::firstOrCreate([
-                'name' => $d,
-                'is_active' => true,
-            ]);
+            Capability::firstOrCreate($d);
         }
     }
 }

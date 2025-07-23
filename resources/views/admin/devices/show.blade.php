@@ -2,10 +2,6 @@
 
 @section('title', $device->serial_no)
 
-@push('css')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-@endpush
-
 @section('content')
     <div class="content">
         <div class="page-header">
@@ -111,7 +107,7 @@
                             </span>
                         @endif
                     </div>
-                    <div class="col-5 text-end text-mute">Signal : </div>
+                    <div class="col-5 text-end text-muted">Signal : </div>
                     <div class="col-7">
                     <span data-bs-toggle="tooltip" title="Signal Strength">
                         <i class="bi bi-bar-chart-steps text-primary"></i>
@@ -133,7 +129,7 @@
 
                 {{-- Timeline and status --}}
                 <div class="row g-3 align-items-center">
-                    <div class="col-5 text-end text-muted small">Last Heartbeat : </div>
+                    <div class="col-5 text-end text-muted">Last Heartbeat : </div>
                     <div class="col-7">
                         <span data-bs-toggle="tooltip" title="{{ $device->last_heartbeat }}">
                             <i class="bi bi-clock-history text-info"></i>
