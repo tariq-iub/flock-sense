@@ -14,15 +14,16 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('device_id')->constrained('devices')->cascadeOnDelete();
             $table->string('type'); // fan, light, exhaust
+            $table->string('key')->nullable();
             $table->string('name')->nullable();
             $table->unsignedTinyInteger('channel')->nullable();
             $table->json('config')->nullable();
 
             // Status and metrics
-            $table->boolean('is_active')->default(true); // Renamed from 'status' for clarity
-            $table->json('metrics')->nullable();
-            $table->string('last_command_source')->nullable(); // e.g., auto, manual, api
+            $table->boolean('status')->default(false);
             $table->dateTime('status_updated_at')->nullable();
+            $table->string('last_command_source')->nullable(); // e.g., auto, manual, api
+            $table->json('metrics')->nullable();
 
             $table->timestamps();
 

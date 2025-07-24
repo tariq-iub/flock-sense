@@ -81,7 +81,8 @@ class DeviceApplianceController extends ApiController
     public function destroy(DeviceAppliance $deviceAppliance)
     {
         $deviceAppliance->delete();
-        return response()->json(['message' => 'Appliance deleted successfully']);
+        return response()
+            ->json(['message' => 'Appliance deleted successfully']);
     }
 
     /**
@@ -90,7 +91,9 @@ class DeviceApplianceController extends ApiController
     public function fetchByShed($shedId)
     {
         $shed = Shed::findOrFail($shedId);
-        $appliances = DeviceAppliance::whereIn('device_id', $shed->devices()->pluck('devices.id'))->get();
+        $appliances = DeviceAppliance::whereIn('device_id', $shed->devices()
+            ->pluck('devices.id'))
+            ->get();
         return DeviceApplianceResource::collection($appliances);
     }
 
@@ -129,13 +132,14 @@ class DeviceApplianceController extends ApiController
         ]);
 
         // Get device by serial number
-        $device = Device::where('serial_no', $validated['device_serial'])->firstOrFail();
-        
+        $device = Device::where('serial_no', $validated['device_serial'])
+            ->firstOrFail();
+
         // Find appliance by device ID and key
         $appliance = DeviceAppliance::where('device_id', $device->id)
             ->where('key', $validated['appliance_key'])
             ->first();
-        
+
         if (!$appliance) {
             // Create new appliance with default type based on key
             $type = $this->getApplianceTypeFromKey($validated['appliance_key']);
@@ -171,7 +175,7 @@ class DeviceApplianceController extends ApiController
 
         // Get device by serial number
         $device = Device::where('serial_no', $validated['device_serial'])->firstOrFail();
-        
+
         $updatedAppliances = [];
 
         foreach ($validated['appliances'] as $key => $status) {
@@ -179,7 +183,7 @@ class DeviceApplianceController extends ApiController
             $appliance = DeviceAppliance::where('device_id', $device->id)
                 ->where('key', $key)
                 ->first();
-            
+
             if (!$appliance) {
                 // Create new appliance with default type based on key
                 $type = $this->getApplianceTypeFromKey($key);
@@ -195,7 +199,7 @@ class DeviceApplianceController extends ApiController
                 // Update existing appliance
                 $appliance->updateStatus($status);
             }
-            
+
             $updatedAppliances[] = $appliance;
         }
 
@@ -211,7 +215,7 @@ class DeviceApplianceController extends ApiController
     private function getApplianceTypeFromKey(string $key): string
     {
         $firstChar = strtolower(substr($key, 0, 1));
-        
+
         return match($firstChar) {
             'f' => 'fan',
             'b' => 'brooder',
