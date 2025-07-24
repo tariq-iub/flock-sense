@@ -69,6 +69,7 @@
                         <tr>
                             <th class="w-100">Device</th>
                             <th>Capabilities</th>
+                            <th>Appliances</th>
                             <th>Linked Shed</th>
                             <th class="no-sort"></th>
                         </tr>
@@ -88,6 +89,16 @@
                                         {{ ucfirst($cap->name) }}
                                     </span>
                                     @endforeach
+                                </td>
+                                <td class="text-center">
+                                    <a href="javascript:void(0);"
+                                       class="btn btn-sm btn-outline-info view-appliance"
+                                       title="View Device Appliances"
+                                       data-device-id="{{ $device->id }}"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#appliancesModal">
+                                        View
+                                    </a>
                                 </td>
                                 <td>
                                     @php
@@ -217,6 +228,30 @@
         </div>
     </div>
 
+    <!-- Appliances Modal -->
+    <div class="modal fade" id="appliancesModal" tabindex="-1" aria-labelledby="appliancesModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appliancesModalLabel">
+                        Device Appliances
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body" id="applianceModalContent">
+                    <div class="text-center text-muted">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <div class="mt-2">Loading appliance data...</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -250,6 +285,19 @@
                     table.column(1).search(selected).draw();
                 });
             }
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.view-appliance', function () {
+            let deviceId = $(this).data('device-id');
+            $('#applianceModalContent').html('<div class="text-center"><div class="spinner-border text-success"></div></div>');
+
+            $.get(`/admin/iot/devices/${deviceId}/appliances`, function (data) {
+                $('#applianceModalContent').html(data.html);
+            }).fail(function () {
+                $('#applianceModalContent').html('<div class="alert alert-danger">Failed to load appliances.</div>');
+            });
         });
     </script>
 @endpush

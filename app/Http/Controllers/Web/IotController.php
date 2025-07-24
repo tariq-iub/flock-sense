@@ -240,4 +240,13 @@ class IotController extends Controller
         return redirect()->back()
             ->with('error', 'Transaction error: Shed device or event cannot be saved.');
     }
+
+    public function fetchAppliances($deviceId)
+    {
+        $device = Device::with('appliances')->findOrFail($deviceId);
+
+        $html = view('admin.devices.partials.appliance-info', compact('device'))->render();
+
+        return response()->json(['html' => $html]);
+    }
 }

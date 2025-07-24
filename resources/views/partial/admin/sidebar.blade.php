@@ -170,6 +170,7 @@
                                          Route::is('iot.create') ||
                                          Route::is('iot.edit') ||
                                          Route::is('farm.devices') ||
+                                         Route::is('devices.map') ||
                                          Route::is('iot.alerts') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-devices fs-16 me-2"></i>
                                 <span>IoT Management</span>
@@ -188,6 +189,12 @@
                                     <a href="{{ route('farm.devices') }}"
                                        class="{{ request()->routeIs('farm.devices') ? 'active' : '' }}">
                                         Farm Devices
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('devices.map') }}"
+                                       class="{{ request()->routeIs('devices.map') ? 'active' : '' }}">
+                                        Devices Map
                                     </a>
                                 </li>
                                 <li>

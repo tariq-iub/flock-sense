@@ -51,7 +51,7 @@
                 @endif
             </div>
         </div>
-        @include('admin.devices.form', [
+        @include('admin.devices.partials.form', [
                 'device' => $device,
                 'capabilities' => $capabilities,
                 'connectivities' => $connectivities

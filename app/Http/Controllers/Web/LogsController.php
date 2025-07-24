@@ -52,14 +52,13 @@ class LogsController extends Controller
         $farmId = null;
 
         $dynamoService = new DynamoDbService();
-
         $logs = $dynamoService->getSensorData(
                 [1],
                 (int)now()->subDay(7)->timestamp
         );
 
         return view(
-            'admin.devices.logs',
+            'admin.logs.iot-logs',
             compact('logs', 'capabilityMap', 'farms', 'farmId')
         );
     }

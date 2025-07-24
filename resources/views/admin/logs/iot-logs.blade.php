@@ -124,8 +124,11 @@
                     </li>
                     <li class="me-2">
                         <a href="javascript:void(0);" id="print" class="btn btn-outline-success"
-                           data-bs-toggle="tooltip" data-bs-placement="top"
-                           aria-label="Print" data-bs-original-title="Print">
+                           data-bs-toggle="tooltip"
+                           data-bs-placement="top"
+                           aria-label="Print"
+                           title=""
+                           data-bs-original-title="Print">
                             <i class="ti ti-printer fs-16"></i>
                         </a>
                     </li>
@@ -160,8 +163,8 @@
                             <th class="text-center">Log Time</th>
                             <th class="text-center">Temperature (°C)</th>
                             <th class="text-center">Humidity (%)</th>
-                            <th class="text-center">NH3 (ppm)</th>
-                            <th class="text-center">CO2 (ppm)</th>
+                            <th class="text-center">NH<sub>3</sub> (ppm)</th>
+                            <th class="text-center">CO<sub>2</sub> (ppm)</th>
                             <th class="text-center">Electricity (kWh)</th>
                         </tr>
                         </thead>

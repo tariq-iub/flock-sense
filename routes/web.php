@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\FarmController;
 use App\Http\Controllers\Web\ExpenseController;
 use App\Http\Controllers\Web\FeedController;
 use App\Http\Controllers\Web\LogsController;
+use App\Http\Controllers\Web\MapController;
 use App\Http\Controllers\Web\MedicineController;
 use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
@@ -69,6 +70,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
     Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');
     Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
+    Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -151,6 +153,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{device}/edit', 'edit')->name('iot.edit');
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
+        Route::get('/devices/{device}/appliances', 'fetchAppliances');
     });
 
     // Expenses
