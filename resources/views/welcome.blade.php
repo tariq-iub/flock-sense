@@ -1,13 +1,14 @@
 @extends('layouts.front')
 @section('title', 'Smart Farm Management')
+
 @push('css')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link href="{{ asset('assets/css/landing.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
-
-    <section class="alt-section section-padding">
+    <section class="alt-section section-padding" data-aos="zoom-in">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -66,7 +67,7 @@
             </div>
         </div>
     </section>
-    <section id="models" class="alt-section section-padding">
+    <section id="models" class="alt-section section-padding" data-aos="fade-up">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -118,7 +119,7 @@
             </div>
         </div>
     </section>
-    <section id="features" class="alt-section section-padding">
+    <section id="features" class="alt-section section-padding" data-aos="flip-left">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -174,7 +175,7 @@
             </div>
         </div>
     </section>
-    <section id="services" class="alt-section section-padding">
+    <section id="services" class="alt-section section-padding" data-aos="flip-right">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -237,7 +238,7 @@
             </div>
         </div>
     </section>
-    <section id="trusted" class="trusted-section position-relative py-5">
+    <section id="trusted" class="trusted-section position-relative py-5" data-aos="fade-down">
         <div class="container position-relative z-2">
             <div class="row align-items-center">
                 <div class="col-lg-7">
@@ -291,6 +292,47 @@
             </div>
         </div>
     </section>
-
+    <section id="contact" class="alt-section section-padding" data-aos="fade-up">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="{{ asset('assets/img/contact.jpg') }}" class="img-fluid rounded-3" alt="Contact Image">
+                </div>
+                <div class="col-md-6">
+                    <h2 class="fw-bold mb-4">Contact Us</h2>
+                    <form>
+                        <input type="text" class="form-control mb-3" placeholder="Your Name">
+                        <input type="email" class="form-control mb-3" placeholder="Your Email">
+                        <textarea class="form-control mb-3" rows="4" placeholder="Your Message"></textarea>
+                        <button class="btn btn-success">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 @endsection
 
+@push('js')
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-in-out',
+        });
+    </script>
+
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+            s1.async=true;
+            s1.src='https://embed.tawk.to/6881cf98416fc119149cee83/1j0th5uc0';
+            s1.charset='UTF-8';
+            s1.setAttribute('crossorigin','*');
+            s0.parentNode.insertBefore(s1,s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
+@endpush

@@ -132,6 +132,18 @@
                                         Pricing Plans
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="#"
+                                       class="">
+                                        Farms & Sheds
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                       class="">
+                                        Flock Management
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         <li class="submenu">

@@ -16,18 +16,23 @@
     @stack('css')
 </head>
 <body>
-<div class="container py-3">
-    <header class="d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center logo">
-            <img src="{{ asset('assets/img/logo.png') }}" alt="Logo">
-        </div>
-        <nav>
-            <a href="/" class="me-3 fw-semibold text-decoration-none text-dark">Home</a>
-            <a href="#models" class="me-3 fw-semibold text-decoration-none text-dark">Models</a>
-            <a href="#features" class="me-3 fw-semibold text-decoration-none text-dark">Features</a>
-            <a href="#services" class="me-3 fw-semibold text-decoration-none text-dark">Services</a>
-            <a href="#contact" class="me-3 fw-semibold text-decoration-none text-dark">Contact Us</a>
-            <a href="/login" class="login-btn">Login</a>
-        </nav>
-    </header>
+<div class="navbar sticky-top-nav">
+    <div class="container py-3">
+        <header class="w-100 d-flex justify-content-between align-items-center">
+            <div class="logo">
+                <img src="{{ asset('assets/img/logo.png') }}" alt="Logo">
+            </div>
+            <div class="nav">
+                <a href="/" class="pt-1 me-3 fw-semibold text-decoration-none text-dark">Home</a>
+                <a href="#models" class="pt-1 me-3 fw-semibold text-decoration-none text-dark">Models</a>
+                <a href="#features" class="pt-1 me-3 fw-semibold text-decoration-none text-dark">Features</a>
+                <a href="#services" class="pt-1 me-3 fw-semibold text-decoration-none text-dark">Services</a>
+                <a href="#contact" class="pt-1 me-3 fw-semibold text-decoration-none text-dark">Contact Us</a>
+                <a href="/login" class="btn btn-success">
+                    <i class="bi bi-unlock me-2"></i>Login
+                </a>
+            </div>
+        </header>
+    </div>
 </div>
+

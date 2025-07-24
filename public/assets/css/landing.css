@@ -8,6 +8,14 @@ body {
     color: #334547;
 }
 
+.sticky-top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1020; /* higher than other elements */
+    background-color: #fff; /* or your nav bg */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
 p, h1, h2, h3, h4, h5, h6 {
     /* Inherit from body, redundant but fine for specificity if you want */
     color: inherit;
@@ -111,15 +119,20 @@ p, h1, h2, h3, h4, h5, h6 {
 
 /* Footer */
 .footer {
-    background-color: #DCFFAD;
-    color: #334547;
+    background-color: #334547;
+    color: #DCFFAD;
+}
+
+.footer a, p {
+    --bs-text-opacity: 1;
+    color: rgba(255, 255, 255, .5) !important;
 }
 
 /* Scroll to top button */
 .scroll-to-top {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 140px;
+    right: 40px;
     background-color: #79c37d;
     color: #fff;
     border: none;
