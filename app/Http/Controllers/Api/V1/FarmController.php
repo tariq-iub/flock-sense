@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\ApiController;
 use App\Http\Resources\FarmResource;
 use App\Models\Farm;
+use App\Services\DynamoDbService;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -20,8 +21,20 @@ class FarmController extends ApiController
             ->allowedFilters(['id', 'name'])
             ->allowedIncludes(['sheds'])
             ->allowedSorts(['id', 'name'])
+            ->with(['sheds.devices.appliances'])
             ->withCount('sheds')
             ->get();
+
+        $dynamo = app(DynamoDbService::class);
+
+        foreach ($farms as $farm) {
+            foreach ($farm->sheds as $shed) {
+                foreach ($shed->devices as $device) {
+                    $data = $dynamo->getSensorData([$device->id], null, true); // correct argument order
+                    $device->latest_sensor_data = !empty($data) ? (object)$data[0] : null;
+                }
+            }
+        }
 
         return FarmResource::collection($farms);
     }
