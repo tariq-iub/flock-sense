@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('manufacturer')->nullable();
             $table->string('firmware_version')->nullable();
             $table->string('connectivity_type')->default('WiFi');
-            $table->text('capabilities'); // JSON: ['temperature','humidity','nh3','co2','electricity']
             $table->boolean('is_online')->default(false);
             $table->datetime('last_heartbeat')->nullable();
             $table->boolean('battery_operated')->default(false);

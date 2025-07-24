@@ -69,7 +69,7 @@
                         <tr>
                             <th class="w-100">Device</th>
                             <th>Capabilities</th>
-                            <th>Link Shed</th>
+                            <th>Linked Shed</th>
                             <th class="no-sort"></th>
                         </tr>
                         </thead>
@@ -82,14 +82,19 @@
                                     <small class="text-muted">{{ $device->model_number . ' (Firmware: ' . $device->firmware_version . ')' }}</small>
                                 </td>
                                 <td>
-                                    {{ implode(', ', array_map('ucwords', json_decode($device->capabilities, true))) }}
+                                    @foreach($device->capabilities as $cap)
+                                        <span class="badge bg-gradient text-dark border">
+                                        <i class="{{ $cap->icon }}"></i>
+                                        {{ ucfirst($cap->name) }}
+                                    </span>
+                                    @endforeach
                                 </td>
                                 <td>
                                     @php
                                     $currentShed = $device->currentShed();
                                     @endphp
                                     @if($currentShed)
-                                        <span class="fw-bold">{{ $currentShed->shed->name }}</span>
+                                        <span class="text-info fw-bold">{{ $currentShed->shed->name }}</span>
                                         <br>
                                         <small class="text-muted">{{ $currentShed->shed->farm->name }}</small>
                                     @else
@@ -100,7 +105,7 @@
                                     <div class="action-icon d-inline-flex">
                                         @if($currentShed)
                                         <a href="javascript:void(0);"
-                                           class="p-2 border rounded me-2"
+                                           class="p-2 border rounded me-2" style="background-color: #FFEDE9 !important; color: #FF0000 !important;"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
@@ -110,7 +115,7 @@
                                         </a>
                                         @else
                                         <a href="javascript:void(0);"
-                                           class="p-2 border rounded me-2"
+                                           class="p-2 border rounded me-2" style="background-color: #CBEFD4 !important; color: #3EB780 !important;"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
@@ -204,8 +209,8 @@
                         </div>
                     </div>
                     <div class="modal-footer mt-3">
+                        <button type="submit" class="btn btn-danger me-2">Delink Device</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">Delink Device</button>
                     </div>
                 </form>
             </div>

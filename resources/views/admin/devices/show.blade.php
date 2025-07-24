@@ -39,6 +39,14 @@
             <div class="card-body bg-light">
                 {{-- Basic Info --}}
                 <div class="row g-3 align-items-center mb-2">
+                    <div class="col-5 text-end text-muted">Serial Number : </div>
+                    <div class="col-7">
+                        <span class="fw-semibold">
+                            <i class="bi bi-upc me-1"></i>
+                            {{ $device->serial_no ?? '-' }}
+                        </span>
+                    </div>
+
                     <div class="col-5 text-end text-muted">Model : </div>
                     <div class="col-7 fw-bold">{{ $device->model_number ?? '-' }}</div>
 
@@ -69,16 +77,10 @@
                     </div>
                     <div class="col-5 text-end text-muted">Capabilities : </div>
                     <div class="col-7 d-flex flex-wrap gap-1">
-                        @foreach(json_decode($device->capabilities, true) as $cap)
-                            <span class="badge bg-gradient text-dark border" data-bs-toggle="tooltip" title="Monitors {{ ucfirst($cap) }}">
-                                @switch($cap)
-                                    @case('temperature') <i class="bi bi-thermometer-half"></i> @break
-                                    @case('humidity') <i class="bi bi-droplet-half"></i> @break
-                                    @case('nh3') <i class="bi bi-flask"></i> @break
-                                    @case('co2') <i class="bi bi-cloud-haze2"></i> @break
-                                    @case('electricity') <i class="bi bi-lightning-charge"></i> @break
-                                @endswitch
-                                {{ ucfirst($cap) }}
+                        @foreach($device->capabilities as $cap)
+                            <span class="badge bg-gradient text-dark border" data-bs-toggle="tooltip" title="Monitors {{ ucfirst($cap->name) }}">
+                                <i class="{{ $cap->icon }}"></i>
+                                {{ ucfirst($cap->name) }}
                             </span>
                         @endforeach
                     </div>

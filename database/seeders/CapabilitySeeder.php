@@ -14,11 +14,11 @@ class CapabilitySeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['name' => 'temperature', 'icon' => 'bi bi-thermometer-half', 'is_active' => true],
-            ['name' => 'humidity', 'icon' => 'bi bi-droplet-half', 'is_active' => true],
-            ['name' => 'nh3', 'icon' => 'bi bi-radioactive', 'is_active' => true],
-            ['name' => 'co2', 'icon' => 'bi bi-activity', 'is_active' => true],
-            ['name' => 'electricity', 'icon' => 'bi bi-lightning-charge', 'is_active' => true]
+            ['name' => 'Temperature', 'icon' => 'bi bi-thermometer-half', 'is_active' => true],
+            ['name' => 'Humidity', 'icon' => 'bi bi-droplet-half', 'is_active' => true],
+            ['name' => 'NH3', 'icon' => 'bi bi-radioactive', 'is_active' => true],
+            ['name' => 'CO2', 'icon' => 'bi bi-activity', 'is_active' => true],
+            ['name' => 'Electricity', 'icon' => 'bi bi-lightning-charge', 'is_active' => true]
         ];
 
         foreach ($data as $d) {

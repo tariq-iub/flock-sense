@@ -68,14 +68,14 @@
             <div class="col-md-6">
                 <label class="form-label">
                     <i class="bi bi-list-task"></i> Capabilities <span class="text-danger">*</span>
-                    <span class="text-muted" data-bs-toggle="tooltip" title="Hold Ctrl (Cmd on Mac) for multi-select">?</span>
+                    <span class="text-muted" data-bs-toggle="tooltip" title="May select multiple capabilities">?</span>
                 </label>
                 @php
-                    $selected = old('capabilities', isset($device) ? json_decode($device->capabilities, true) : []);
+                    $selected = old('capabilities', isset($device) ? $device->capabilities->pluck('id')->toArray() : []);
                 @endphp
                 <select name="capabilities[]" class="select2 w-100" multiple required>
                     @foreach($capabilities as $cap)
-                        <option value="{{ $cap->name }}" {{ in_array($cap->name, $selected ?? []) ? 'selected' : '' }}>
+                        <option value="{{ $cap->id }}" {{ in_array($cap->id, $selected ?? []) ? 'selected' : '' }}>
                             {{ ucfirst($cap->name) }}
                         </option>
                     @endforeach

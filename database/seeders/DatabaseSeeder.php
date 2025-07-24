@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
             PricingSeeder::class,
             CapabilitySeeder::class,
             ConnectivitySeeder::class,
+            DeviceSeeder::class,
         ]);
     }
 }

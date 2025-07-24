@@ -91,13 +91,19 @@
                                 <td>{{ $device->manufacturer }}</td>
                                 <td>{{ $device->firmware_version }}</td>
                                 <td>{{ $device->connectivity_type }}</td>
-                                <td>{{ implode(', ', array_map('ucwords', json_decode($device->capabilities, true))) }}</td>
+                                <td>
+                                    @foreach($device->capabilities as $cap)
+                                        <span class="badge bg-soft-info text-dark border">
+                                            <i class="{{ $cap->icon }}"></i>
+                                            {{ ucfirst($cap->name) }}
+                                        </span>
+                                    @endforeach
+                                </td>
                                 <td class="text-center">
-                                    @if($device->battery_operated)
-                                        <span class='badge bg-outline-info'>Yes</span>
-                                    @else
-                                        <span class='badge bg-outline-info'>No</span>
-                                    @endif
+                                    <span class="badge bg-secondary-subtle text-dark me-1">
+                                        <i class="bi {{ $device->battery_operated ? 'bi-battery-charging' : 'bi-plug' }}"></i>
+                                        {{ $device->battery_operated ? 'Battery' : 'Wired' }}
+                                    </span>
                                 </td>
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">

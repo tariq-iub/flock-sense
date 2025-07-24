@@ -9,6 +9,7 @@ use App\Models\Device;
 use App\Models\Shed;
 use App\Models\ShedDevice;
 use App\Models\DeviceEvent;
+use App\Services\DeviceEventService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +20,8 @@ class IotController extends Controller
      */
     public function index()
     {
-        $devices = Device::orderBy('created_at', 'desc')
+        $devices = Device::with('capabilities')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view(
@@ -57,12 +59,20 @@ class IotController extends Controller
             'manufacturer' => 'nullable|string',
             'firmware_version' => 'nullable|string',
             'connectivity_type' => 'required|string',
-            'capabilities' => 'required|array',
             'battery_operated' => 'boolean',
+            'capabilities' => 'array',
         ]);
 
-        $validated['capabilities'] = json_encode($validated['capabilities']);
-        Device::create($validated);
+        $device = Device::create([
+            'serial_no' => $validated['serial_no'],
+            'model_number' => $validated['model_number'],
+            'manufacturer' => $validated['manufacturer'],
+            'firmware_version' => $validated['firmware_version'],
+            'connectivity_type' => $validated['connectivity_type'],
+            'battery_operated' => $validated['battery_operated']
+        ]);
+
+        $device->capabilities()->syncWithoutDetaching($validated['capabilities']);
 
         return redirect()->route('iot.index')
             ->with('success', 'Device has been added successfully.');
@@ -75,7 +85,7 @@ class IotController extends Controller
     {
         $capabilities = Capability::all();
         $connectivities = Connectivity::all();
-        $device->load(['appliances', 'readings', 'events']);
+        $device->load(['capabilities', 'appliances', 'readings', 'events']);
 
         return view(
             'admin.devices.show',
@@ -163,23 +173,24 @@ class IotController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            $shedDevice = ShedDevice::create([
+            $shedDevice = ShedDevice::updateOrCreate([
                 'shed_id' => $request->shed_id,
                 'device_id' => $request->device_id,
+            ], [
                 'location_in_shed' => $request->location_in_shed,
                 'is_active' => true,
             ]);
 
-            DeviceEvent::create([
-                'device_id' => $request->device_id,
-                'event_type' => 'linked',
-                'severity' => 'info',
-                'details' => json_encode([
-                    'shed_id' => $request->shed_id,
+            app(DeviceEventService::class)->logEvent(
+                $request->device_id,
+                'linked',
+                [
+                    'shed_id'  => $request->shed_id,
                     'location' => $request->location_in_shed,
-                ]),
-                'occurred_at' => now(),
-            ]);
+                ],
+                'info',
+                now()
+            );
 
             return redirect()->back()
                 ->with('success', "Device has been linked with Shed: {$shedDevice->shed->name} successfully.");
@@ -210,16 +221,16 @@ class IotController extends Controller
             if ($shedDevice) {
                 $shedDevice->update(['is_active' => false]);
 
-                DeviceEvent::create([
-                    'device_id' => $request->device_id,
-                    'event_type' => 'delinked',
-                    'severity' => 'info',
-                    'details' => json_encode([
-                        'shed_id' => $request->shed_id,
-                        'previous_location' => $shedDevice->location_in_shed,
-                    ]),
-                    'occurred_at' => now(),
-                ]);
+                app(DeviceEventService::class)->logEvent(
+                    $request->device_id,
+                    'delinked',
+                    [
+                        'shed_id'  => $request->shed_id,
+                        'location' => $request->location_in_shed,
+                    ],
+                    'info',
+                    now()
+                );
             }
 
             return redirect()->back()
@@ -228,15 +239,5 @@ class IotController extends Controller
 
         return redirect()->back()
             ->with('error', 'Transaction error: Shed device or event cannot be saved.');
-    }
-
-    public function alerts()
-    {
-        //
-    }
-
-    public function logs()
-    {
-        //
     }
 }

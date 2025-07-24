@@ -166,7 +166,9 @@
                             <ul>
                                 <li>
                                     <a href="{{ route('iot.index') }}"
-                                       class="{{ request()->routeIs('iot.index') || request()->routeIs('iot.create') || request()->routeIs('iot.edit') ? 'active' : '' }}">
+                                       class="{{ request()->routeIs('iot.index') ||
+                                                 request()->routeIs('iot.create') ||
+                                                 request()->routeIs('iot.edit') ? 'active' : '' }}">
                                         IoT Inventory
                                     </a>
                                 </li>
