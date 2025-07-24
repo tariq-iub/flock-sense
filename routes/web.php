@@ -87,7 +87,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::resources([
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
-        'medicines' => MedicineController::class,
         'farms' => FarmController::class,
         'pricings' => PricingController::class,
     ]);
@@ -101,6 +100,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::put('/{user}', 'update')->name('clients.update');
         Route::delete('/{user}', 'destroy')->name('clients.destroy');
 //        Route::get('/{chart}/toggle', 'toggle')->name('clients.toggle');
+    });
+
+    // Medicines
+    Route::prefix('medicines')->controller(MedicineController::class)->group(function () {
+        Route::get('/', 'index')->name('admin.medicines.index');
+        Route::post('/', 'store')->name('admin.medicines.store');
+        Route::put('/{user}', 'update')->name('admin.medicines.update');
+        Route::delete('/{user}', 'destroy')->name('admin.medicines.destroy');
     });
 
     // Charts (Standard) Data Routes

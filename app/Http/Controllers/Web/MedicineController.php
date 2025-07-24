@@ -46,7 +46,7 @@ class MedicineController extends Controller
             'description' => $request->description,
         ]);
 
-        return redirect()->route('medicines.index')
+        return redirect()->route('admin.medicines.index')
             ->with('success', 'Medicine has been added successfully.');
     }
 
@@ -83,7 +83,7 @@ class MedicineController extends Controller
             'description' => $request->description,
         ]);
 
-        return redirect()->route('medicines.index')
+        return redirect()->route('admin.medicines.index')
             ->with('success', 'Medicine has been updated successfully.');
     }
 
@@ -93,7 +93,7 @@ class MedicineController extends Controller
     public function destroy(Medicine $medicine)
     {
         $medicine->delete();
-        return redirect()->route('medicines.index')
+        return redirect()->route('admin.medicines.index')
             ->with('success', 'Medicine has been deleted successfully.');
     }
 }

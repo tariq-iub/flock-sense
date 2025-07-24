@@ -114,7 +114,7 @@
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
                                         <form id="delete-form-{{ $medicine->id }}"
-                                                     action="{{ route('medicines.destroy', $medicine) }}"
+                                                     action="{{ route('admin.medicines.destroy', $medicine) }}"
                                                      method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
@@ -134,7 +134,7 @@
     <div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedicineModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('medicines.store') }}" class="needs-validation" novalidate method="POST">
+                <form action="{{ route('admin.medicines.store') }}" class="needs-validation" novalidate method="POST">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="addMedicineModalLabel">Add Medicine</h5>
