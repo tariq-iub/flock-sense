@@ -76,10 +76,18 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
             ->orderBy('name')
             ->get();
     });
+
     Route::get('/get-flocks', function (\Illuminate\Http\Request $request) {
         return Flock::where('shed_id', $request->shed_id)
             ->select('id', 'name', 'start_date', 'end_date')
             ->orderBy('start_date', 'desc')
+            ->get();
+    });
+
+    Route::get('/get-devices', function (\Illuminate\Http\Request $request) {
+        $shed = Shed::findOrFail($request->shed_id);
+        return $shed->devices()
+            ->wherePivot('is_active', true)
             ->get();
     });
 

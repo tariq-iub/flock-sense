@@ -13,11 +13,12 @@
             </div>
             <ul class="table-top-head">
                 <li>
-                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="Collapse" id="collapse-header"><i class="ti ti-chevron-up"></i></a>
+                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="Collapse" id="collapse-header">
+                        <i class="ti ti-chevron-up"></i>
+                    </a>
                 </li>
             </ul>
         </div>
-
         <div class="container-fluid">
             <div class="row mb-3">
                 @if (session('success'))
@@ -50,115 +51,130 @@
                 @endif
             </div>
         </div>
-
         <div class="card">
+            <div class="card-body pb-1">
+                <form id="filterForm" method="GET" action="{{ route('iot.logs') }}" class="row g-2 mb-3">
+                    <div class="row align-items-end">
+                        <div class="col-lg-10">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Farm</label>
+                                        <select id="farmSelect" class="select2">
+                                            <option value="">Select Farm</option>
+                                            @foreach($farms as $farm)
+                                                <option value="{{ $farm->id }}" {{ (isset($farmId) && $farmId == $farm->id) ? 'selected' : '' }}>
+                                                    {{ $farm->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Shed</label>
+                                        <select name="filter[shed_id]" id="shedSelect" class="select2" disabled>
+                                            <option value="">Select Shed</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Device</label>
+                                        <select name="filter[device_id]" id="deviceSelect" class="select2" disabled>
+                                            <option value="">Select Device</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Select Date Range</label>
+                                    <div class="input-icon-start position-relative mb-3">
+                                        <span class="input-icon-addon fs-16 text-gray-9">
+                                            <i class="ti ti-calendar"></i>
+                                        </span>
+                                        <input type="text" class="form-control date-range bookingrange" placeholder="Search Logs">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="mb-3">
+                                <button class="btn btn-success w-100" type="submit" id="showLogsBtn" disabled>
+                                    Get Device Logs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card no-search">
             <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                <div class="search-set">
-                    <div class="search-input">
-                        <span class="btn-searchset"><i class="ti ti-search fs-14 feather-search"></i></span>
+                <div>
+                    <h4>Device Readings</h4>
+                </div>
+                <ul class="table-top-head">
+                    <li class="me-2">
+                        <a href="javascript:void(0);" class="btn btn-outline-success" id="excelExportBtn"
+                           data-bs-toggle="tooltip" data-bs-placement="top"
+                           aria-label="Excel" data-bs-original-title="Excel">
+                            <i class="ti ti-file-excel fs-16"></i>
+                        </a>
+                    </li>
+                    <li class="me-2">
+                        <a href="javascript:void(0);" id="print" class="btn btn-outline-success"
+                           data-bs-toggle="tooltip" data-bs-placement="top"
+                           aria-label="Print" data-bs-original-title="Print">
+                            <i class="ti ti-printer fs-16"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="accordion accordion-flush" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                Graph Trends
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample" style="">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <canvas id="productionCombinedChart" height="150" class="w-100"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex table-dropdown my-xl-auto right-content align-items-center row-gap-3">
-                    <select id="sourceFilter" class="form-select me-2">
-                        <option value="">All Sources</option>
-                        @foreach([] as $source)
-                            <option value="{{ $source }}">{{ $source }}</option>
-                        @endforeach
-                    </select>
 
-                    <select id="statusFilter" class="form-select">
-                        <option value="">All Statuses</option>
-                        <option value="Active">Active</option>
-                        <option value="Blocked">Blocked</option>
-                    </select>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table datatable-custom">
+                <div class="table-responsive printArea">
+                    <table class="table table-nowrap table-hover mb-0">
                         <thead class="thead-light">
                         <tr>
-                            <th class="w-100">Chart Name</th>
-                            <th>Source</th>
-                            <th>Description</th>
-                            <th class="text-center">Unit</th>
-                            <th class="text-center">Settings</th>
-                            <th class="text-center">Active</th>
-                            <th class="text-center">Data</th>
-                            <th class="no-sort"></th>
+                            <th class="text-center">Device Id</th>
+                            <th class="text-center">Log Time</th>
+                            <th class="text-center">Temperature (°C)</th>
+                            <th class="text-center">Humidity (%)</th>
+                            <th class="text-center">NH3 (ppm)</th>
+                            <th class="text-center">CO2 (ppm)</th>
+                            <th class="text-center">Electricity (kWh)</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach([] as $chart)
-                            <tr>
-                                <td class="100">
-                                    {{ $chart->chart_name }}
-                                </td>
-                                <td>{{ $chart->source }}</td>
-                                <td>{{ $chart->description }}</td>
-                                <td class="text-center">
-                                    {{ $chart->unit }}
-                                </td>
-                                <td class="text-center">
-                                    @if($chart->settings == null)
-                                        ...
-                                    @else
-                                        View
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    @if($chart->is_active)
-                                    <span class="p-1 pe-2 rounded-1 text-success bg-success-transparent fs-10">
-                                        <i class="ti ti-check me-1 fs-11"></i> Active
-                                    </span>
-                                    @else
-                                        <span class="p-1 pe-2 rounded-1 text-danger bg-danger-transparent fs-10">
-                                        <i class="ti ti-ban me-1 fs-11"></i> Blocked
-                                    </span>
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0)"
-                                       class="btn btn-sm btn-outline-info chart-data"
-                                       data-chart-id="{{ $chart->id }}"
-                                       data-bs-toggle="tooltip"
-                                       data-bs-placement="top"
-                                       title=""
-                                       data-bs-original-title="View Chart Data">
-                                       View
-                                    </a>
-                                </td>
-                                <td class="action-table-data">
-                                    <div class="edit-delete-action">
-                                        <a href="{{ route('charts.toggle', $chart) }}"
-                                           class="me-2 p-2"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-placement="top"
-                                           title=""
-                                           data-bs-original-title="Toggle Status">
-                                            <i class="ti ti-shield"></i>
-                                        </a>
-
-                                        <a href="{{ route('charts.edit', $chart) }}"
-                                           class="me-2 p-2"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-placement="top"
-                                           title=""
-                                           data-bs-original-title="Edit Standard">
-                                            <i data-feather="edit" class="feather-edit"></i>
-                                        </a>
-
-                                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete-modal"
-                                           data-chart-id="{{ $chart->id }}" data-chart-name="{{ $chart->chart_name }}" class="p-2 open-delete-modal">
-                                            <i data-feather="trash-2" class="feather-trash-2"></i>
-                                        </a>
-                                        <form action="{{ route('charts.destroy', $chart) }}" method="POST" id="delete{{ $chart->id }}">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
+                        @foreach($logs as $row)
+                        <tr>
+                            <td class="text-center">{{ $row['device_id'] }}</td>
+                            <td class="text-center">{{  \Carbon\Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i:s') }}</td>
+                            <td class="text-center">{{ $row['temperature'] ?? '' }}</td>
+                            <td class="text-center">{{ $row['humidity'] ?? '' }}</td>
+                            <td class="text-center">{{ $row['ammonia'] ?? '' }}</td>
+                            <td class="text-center">{{ $row['carbon_dioxide'] ?? '' }}</td>
+                            <td class="text-center">{{ $row['electricity'] ?? '' }}</td>
+                        </tr>
                         @endforeach
                         </tbody>
                     </table>
@@ -167,196 +183,99 @@
         </div>
     </div>
 
-    <!-- Import Chart Modal -->
-    <div class="modal fade" id="importChartModal" tabindex="-1" aria-labelledby="importChartModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('charts.import') }}" class="row g-3 needs-validation" novalidate
-                      method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="importChartModalLabel">Import Data</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="chart_name" class="form-label">Chart Name <span class="text-danger">*</span></label>
-                            <input type="text" name="chart_name" id="chart_name" class="form-control" required>
-                            <div class="invalid-feedback">
-                                You have to name baseline data for identification.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="source" class="form-label">Source <span class="text-danger">*</span></label>
-                            <input type="text" name="source" id="source" class="form-control" required>
-                            <div class="invalid-feedback">
-                                Please mention the source for baseline data.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea name="description" id="description" class="form-control"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="unit" class="form-label">Unit</label>
-                            <input type="text" name="unit" id="unit" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="settings" class="form-label">Settings</label>
-                            <textarea class="form-control" name="settings" id="settings" placeholder="Settings in JSON Format"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="data" class="form-label">Select Excel File <span class="text-danger">*</span></label>
-                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx,.xls" required>
-                            <div class="invalid-feedback">
-                                Select the file containing data for baseline validation.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Import</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chart Data Modal -->
-    <div class="modal fade" id="chartDataModal" tabindex="-1" aria-labelledby="chartDataModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="chartDataModalLabel">Chart Data</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="chart-details-loading" class="text-center py-5">
-                        <div class="spinner-border text-success"></div>
-                    </div>
-                    <div id="chart-details-content" style="display:none;">
-                        <!-- Chart data table will be injected here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chart Delete Modal -->
-    <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="page-wrapper-new p-0">
-                    <div class="p-5 px-3 text-center">
-                    <span class="rounded-circle d-inline-flex p-2 bg-danger-transparent mb-2">
-                        <i class="ti ti-trash fs-24 text-danger"></i>
-                    </span>
-                        <h4 class="fs-20 fw-bold mb-2 mt-1">Delete Chart</h4>
-                        <p class="mb-0 fs-16" id="delete-modal-message">
-                            Are you sure you want to delete this chart and its data?
-                        </p>
-                        <div class="modal-footer-btn mt-3 d-flex justify-content-center">
-                            <button type="button" class="btn btn-secondary fs-13 fw-medium p-2 px-3 me-2" data-bs-dismiss="modal">
-                                Cancel
-                            </button>
-                            <button type="button" class="btn btn-danger fs-13 fw-medium p-2 px-3" id="confirm-delete-btn">
-                                Yes Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 @endsection
 
 @push('js')
+    <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}" type="text/javascript"></script>
+
     <script>
         $(function() {
-            $('.chart-data').on('click', function() {
-                var chartId = $(this).data('chart-id');
-                $('#chart-details-loading').show();
-                $('#chart-details-content').hide();
-                $('#viewChartModalLabel').text('Loading...');
-
-                // Open the modal
-                var modal = new bootstrap.Modal(document.getElementById('chartDataModal'));
-                modal.show();
-
-                // Fetch chart data from API
-                $.ajax({
-                    url: '/admin/charts/data/' + chartId,
-                    type: 'GET',
-                    success: function(chart) {
-                        $('#chartDataModalLabel').text(chart.title);
-                        $('#chart-details-content').html(chart.data);
-                        $('#chart-details-loading').hide();
-                        $('#chart-details-content').show();
-                    },
-                    error: function() {
-                        $('#chartDataModalLabel').text('Chart Data Not Found');
-                        $('#chart-details-loading').hide();
-                        $('#chart-details-content').html('<div class="alert alert-danger">Failed to load chart data.</div>').show();
-                    }
-                });
-            });
-
-            // Datatable
-            if($('.datatable-custom').length > 0) {
-                var table = $('.datatable-custom').DataTable({
-                    "bFilter": true,
-                    "sDom": 'fBtlpi',
-                    "ordering": true,
-                    "language": {
-                        search: ' ',
-                        sLengthMenu: '_MENU_',
-                        searchPlaceholder: "Search",
-                        sLengthMenu: 'Rows Per Page _MENU_ Entries',
-                        info: "_START_ - _END_ of _TOTAL_ items",
-                        paginate: {
-                            next: ' <i class=" fa fa-angle-right"></i>',
-                            previous: '<i class="fa fa-angle-left"></i> '
-                        },
-                    },
-                    initComplete: (settings, json)=> {
-                        $('.dataTables_filter').appendTo('#tableSearch');
-                        $('.dataTables_filter').appendTo('.search-input');
-                    },
-                });
-
-                $('#sourceFilter').on('change', function() {
-                    var selected = $(this).val();
-                    table.column(1).search(selected).draw();
-                });
-                $('#statusFilter').on('change', function() {
-                    var selected = $(this).val();
-                    table.column(5).search(selected).draw();
-                });
-            }
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let deleteChartId = null;
-
-            document.querySelectorAll('.open-delete-modal').forEach(function(el) {
-                el.addEventListener('click', function() {
-                    deleteChartId = this.getAttribute('data-chart-id');
-                    const chartName = this.getAttribute('data-chart-name');
-                    document.getElementById('delete-modal-message').textContent =
-                        `Are you sure you want to delete "${chartName}" and its data?`;
-                });
-            });
-
-            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
-                if (deleteChartId) {
-                    document.getElementById('delete' + deleteChartId).submit();
+            // When farm changes, load sheds
+            $('#farmSelect').on('change', function() {
+                var farmId = $(this).val();
+                $('#shedSelect').prop('disabled', true).html('<option value="">Select Shed</option>');
+                $('#deviceSelect').prop('disabled', true).html('<option value="">Select Device</option>');
+                $('#showLogsBtn').prop('disabled', true);
+                if (farmId) {
+                    $.get('/admin/get-sheds', {farm_id: farmId}, function(sheds) {
+                        $('#shedSelect').prop('disabled', false);
+                        $.each(sheds, function(i, shed) {
+                            $('#shedSelect').append('<option value="' + shed.id + '">' + shed.name + '</option>');
+                        });
+                    });
                 }
+            });
+
+            // When shed changes, load devices
+            $('#shedSelect').on('change', function() {
+                var shedId = $(this).val();
+                $('#deviceSelect').prop('disabled', true).html('<option value="">Select Device</option>');
+                $('#showLogsBtn').prop('disabled', true);
+                if (shedId) {
+                    $.get('/admin/get-devices', {shed_id: shedId}, function(devices) {
+                        $('#deviceSelect').prop('disabled', false);
+                        $.each(devices, function(i, device) {
+                            $('#deviceSelect').append('<option value="' + device.id + '">' + device.serial_no + '</option>');
+                        });
+                    });
+                }
+            });
+
+            // Enable submit when all selects are chosen
+            $('#deviceSelect').on('change', function() {
+                $('#showLogsBtn').prop('disabled', !$(this).val());
+            });
+
+            // Pre-select (when returning after submit)
+            @if(isset($farmId) && $farmId)
+            $.get('/admin/get-sheds', {farm_id: '{{ $farmId }}'}, function(sheds) {
+                $('#shedSelect').prop('disabled', false);
+                $.each(sheds, function(i, shed) {
+                    var selected = (shed.id == '{{ request('filter.shed_id') }}') ? 'selected' : '';
+                    $('#shedSelect').append('<option value="' + shed.id + '" ' + selected + '>' + shed.name + '</option>');
+                });
+
+                @if(request('filter.shed_id'))
+                $.get('/admin/get-devices', {shed_id: '{{ request('filter.shed_id') }}'}, function(devices) {
+                    $('#deviceSelect').prop('disabled', false);
+                    $.each(devices, function(i, device) {
+                        var selected = (device.id == '{{ request('filter.device_id') }}') ? 'selected' : '';
+                        $('#deviceSelect').append('<option value="' + device.id + '" ' + selected + '>' + device.serial_no + '</option>');
+                    });
+                    $('#showLogsBtn').prop('disabled', '{{ $farmId ? false : true }}');
+                });
+                @endif
+            });
+            @endif
+
+            $('#excelExportBtn').on('click', function (e) {
+                e.preventDefault();
+                // Gather filter query
+                var params = [];
+                var shedId = $('#shedSelect').val();
+                var deviceId = $('#deviceSelect').val();
+                if (shedId) params.push('filter[shed_id]=' + encodeURIComponent(shedId));
+                if (deviceId) params.push('filter[device_id]=' + encodeURIComponent(deviceId));
+                var url = "{{ route('productions.export.excel') }}";
+                if (params.length) url += '?' + params.join('&');
+                window.location = url;
+            });
+
+            $("#print").on('click', function () {
+                var mode = 'iframe'; //popup
+                var close = mode == "popup";
+                var title = 'Device Reading Logs';
+                var head = '';
+                var options = {
+                    mode: mode,
+                    popClose: close,
+                    popTitle: title,
+                    extraHead: head
+                };
+
+                $('.hide-it').hide();
+                $("div.printArea").printArea(options);
+                $('.hide-it').show();
             });
         });
     </script>
