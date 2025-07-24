@@ -205,7 +205,8 @@
                     <ul>
                         <li class="submenu">
                             <a href="javascript:void(0);"
-                               class="{{ Route::is('productions.*') || Route::is('devices.logs') ? 'subdrop active' : '' }}">
+                               class="{{ Route::is('productions.*') ||
+                                         Route::is('iot.logs') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-devices fs-16 me-2"></i>
                                 <span>Logs & Analysis</span>
                                 <span class="menu-arrow"></span>

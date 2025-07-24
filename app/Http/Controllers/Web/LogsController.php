@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Models\Farm;
 use App\Services\DeviceEventService;
+use App\Services\DynamoDbService;
 use Illuminate\Http\Request;
 
 class LogsController extends Controller
@@ -32,8 +34,20 @@ class LogsController extends Controller
         return response()->json(['html' => $html]);
     }
 
-    public function deviceLogs()
+    public function deviceLogs(Request $request)
     {
-        //
+        $farms = Farm::with('sheds.flocks')->orderBy('name')->get();
+        $logs = collect();
+        $farmId = null;
+
+        $dynamoService = new DynamoDbService();
+
+        $logs = $dynamoService->getSensorData(
+                [1],
+                (int)now()->subDay(7)->timestamp
+        );
+
+        return $logs;
+        return view('admin.devices.logs');
     }
 }
