@@ -92,7 +92,8 @@
                                         <span class="input-icon-addon fs-16 text-gray-9">
                                             <i class="ti ti-calendar"></i>
                                         </span>
-                                        <input type="text" class="form-control date-range bookingrange" placeholder="Search Logs">
+                                        <input type="text" class="form-control date-range bookingrange"
+                                               name="date_range" placeholder="Search Logs">
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +169,7 @@
                         @foreach($logs as $row)
                         <tr>
                             <td class="text-center">{{ $row['device_id'] }}</td>
-                            <td class="text-center">{{  \Carbon\Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i:s') }}</td>
+                            <td class="text-center">{{  \Carbon\Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i:s A') }}</td>
                             <td class="text-center">{{ $row['temperature'] ?? '' }}</td>
                             <td class="text-center">{{ $row['humidity'] ?? '' }}</td>
                             <td class="text-center">{{ $row['ammonia'] ?? '' }}</td>
