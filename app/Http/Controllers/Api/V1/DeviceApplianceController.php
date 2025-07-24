@@ -107,7 +107,6 @@ class DeviceApplianceController extends ApiController
         return DeviceApplianceResource::collection($appliances);
     }
 
-
     /**
      * Fetch only IDs of appliances by device serial
      */
