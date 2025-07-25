@@ -26,13 +26,19 @@
                                             Firmware: {{ $device->firmware_version }}
                                         </small>
                                     </div>
+
                                     <div>
-                                        <span class="text-info">{{ $device->currentShed()?->shed->name }}</span>
-                                        <br>
-                                        <small class="text-body-secondary">
-                                            Link {{ $device->currentShed()?->link_date->diffForHumans() }}<br>
-                                            {{ $device->currentShed()?->shed->farm->name }}
-                                        </small>
+                                        @if($device->currentShed())
+                                            <span class="text-info">{{ $device->currentShed()->shed->name }}</span>
+                                            <br>
+                                            <small class="text-body-secondary">
+                                                Link {{ $device->currentShed()->link_date->diffForHumans() }}<br>
+                                                {{ $device->currentShed()->shed->farm->name }}
+                                            </small>
+                                        @else
+                                            <span class="badge bg-soft-danger">Not Linked</span>
+                                        @endif
+
                                     </div>
 
                                 </a>
