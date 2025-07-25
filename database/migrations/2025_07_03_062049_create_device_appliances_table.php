@@ -27,7 +27,7 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->unique(['device_id', 'type'], 'device_appliances_unique_device_type'); // Ensure key is unique per device
+            $table->unique(['device_id', 'key'], 'device_appliances_unique_device_key'); // Ensure key is unique per device
         });
     }
 
