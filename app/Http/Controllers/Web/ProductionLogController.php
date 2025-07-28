@@ -163,7 +163,6 @@ class ProductionLogController extends Controller
             ->with('success', 'Production log created.');
     }
 
-
     /**
      * Display the specified resource.
      */

@@ -51,9 +51,20 @@ class DynamoDbService
         ]);
     }
 
-    public function getSensorData(array $deviceIds, ?int $fromTimestamp, bool $latest = false): array
+    public function getSensorData(
+        array $deviceIds,
+        ?int $fromTimestamp,
+        ?int $toTimestamp = null,
+        bool $latest = false,
+        bool $ascOrder = true
+    ): array
     {
         $results = [];
+
+        if(empty($deviceIds) || $fromTimestamp == null)
+        {
+            return $results;
+        }
 
         foreach ($deviceIds as $deviceId) {
             if ($latest) {
@@ -66,7 +77,21 @@ class DynamoDbService
                     'ScanIndexForward' => false,
                     'Limit' => 1,
                 ];
-            } else {
+            }
+            elseif($toTimestamp != null) {
+                $query = [
+                    'TableName' => $this->table,
+                    'KeyConditionExpression' => 'device_id = :device_id AND #ts BETWEEN :from_ts AND :to_ts',
+                    'ExpressionAttributeNames' => ['#ts' => 'timestamp'],
+                    'ExpressionAttributeValues' => [
+                        ':device_id' => ['N' => (string)$deviceId],
+                        ':from_ts' => ['N' => (string)$fromTimestamp],
+                        ':to_ts' => ['N' => (string)$toTimestamp],
+                    ],
+                    'ScanIndexForward' => $ascOrder,
+                ];
+            }
+            else {
                 $query = [
                     'TableName' => $this->table,
                     'KeyConditionExpression' => 'device_id = :device_id AND #ts >= :from_ts',
@@ -75,7 +100,7 @@ class DynamoDbService
                         ':device_id' => ['N' => (string)$deviceId],
                         ':from_ts' => ['N' => (string)$fromTimestamp],
                     ],
-                    'ScanIndexForward' => true,
+                    'ScanIndexForward' => $ascOrder,
                 ];
             }
 

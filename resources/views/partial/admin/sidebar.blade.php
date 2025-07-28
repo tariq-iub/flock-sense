@@ -250,30 +250,35 @@
                         <li>
                             <a href="{{ route('reports.income') }}"
                                class="{{ request()->routeIs('reports.income') ? 'active' : '' }}">
+                                <i class="ti ti-chart-ppf fs-16 me-2"></i>
                                 Income Report
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('reports.expenses') }}"
                                class="{{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
+                                <i class="ti ti-file-vector fs-16 me-2"></i>
                                 Expense Report
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('reports.tax') }}"
                                class="{{ request()->routeIs('reports.tax') ? 'active' : '' }}">
+                                <i class="ti ti-chart-dots-2 fs-16 me-2"></i>
                                 Tax Report
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('reports.devices.sales') }}"
                                class="{{ request()->routeIs('reports.devices.sales') ? 'active' : '' }}">
+                                <i class="ti ti-chart-bar fs-16 me-2"></i>
                                 Sales Report
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('reports.annual') }}"
                                class="{{ request()->routeIs('reports.annual') ? 'active' : '' }}">
+                                <i class="ti ti-report-search fs-16 me-2"></i>
                                 Annual Report
                             </a>
                         </li>

@@ -70,6 +70,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
     Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');
     Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
+    Route::get('/iot/export/excel', [LogsController::class, 'exportExcel'])->name('iot.export.excel');
     Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {

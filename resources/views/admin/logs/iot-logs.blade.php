@@ -60,7 +60,7 @@
                                 <div class="col-md-3">
                                     <div class="mb-3">
                                         <label class="form-label">Select Farm</label>
-                                        <select id="farmSelect" class="select2">
+                                        <select id="farmSelect" name="filter[farm_id]" class="select2">
                                             <option value="">Select Farm</option>
                                             @foreach($farms as $farm)
                                                 <option value="{{ $farm->id }}" {{ (isset($farmId) && $farmId == $farm->id) ? 'selected' : '' }}>
@@ -93,7 +93,7 @@
                                             <i class="ti ti-calendar"></i>
                                         </span>
                                         <input type="text" class="form-control date-range bookingrange"
-                                               name="date_range" placeholder="Search Logs">
+                                               id="date_range" name="filter[date_range]" placeholder="Search Logs">
                                     </div>
                                 </div>
                             </div>
@@ -140,14 +140,14 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="flush-headingOne">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                                Graph Trends
+                                IoT Device Metrics
                             </button>
                         </h2>
                         <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample" style="">
                             <div class="accordion-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <canvas id="productionCombinedChart" height="150" class="w-100"></canvas>
+                                        <canvas id="iotChart" height="150" class="w-100"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -191,6 +191,75 @@
 
 @push('js')
     <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}" type="text/javascript"></script>
+    <script>
+        const chartData = @json($chart);
+
+        const ctx = document.getElementById('iotChart').getContext('2d');
+        const iotChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: chartData.datasets,
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                stacked: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { boxWidth: 20 }
+                    },
+                    tooltip: {
+                        mode: 'nearest',
+                        intersect: false,
+                    },
+                    title: {
+                        display: true,
+                        text: 'IoT Device Environment Logs'
+                    },
+                    zoom: { // Optional: Add zoom plugin if installed
+                        pan: { enabled: true, mode: 'x' },
+                        zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Temp / Humidity' },
+                    },
+                    y2: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Ammonia / CO₂' },
+                        grid: { drawOnChartArea: false },
+                    },
+                    y3: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Electricity' },
+                        grid: { drawOnChartArea: false },
+                        offset: true,
+                    },
+                    x: {
+                        title: { display: true, text: 'Date/Time' },
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 15
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 
     <script>
         $(function() {
@@ -256,11 +325,11 @@
                 e.preventDefault();
                 // Gather filter query
                 var params = [];
-                var shedId = $('#shedSelect').val();
                 var deviceId = $('#deviceSelect').val();
-                if (shedId) params.push('filter[shed_id]=' + encodeURIComponent(shedId));
+                var dateRange = $('#date_range').val();
                 if (deviceId) params.push('filter[device_id]=' + encodeURIComponent(deviceId));
-                var url = "{{ route('productions.export.excel') }}";
+                if (dateRange) params.push('filter[date_range]=' + encodeURIComponent(dateRange));
+                var url = "{{ route('iot.export.excel') }}";
                 if (params.length) url += '?' + params.join('&');
                 window.location = url;
             });
