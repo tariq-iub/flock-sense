@@ -159,7 +159,7 @@
                     <table class="table table-nowrap table-hover mb-0">
                         <thead class="thead-light">
                         <tr>
-                            <th class="text-center">Device Id</th>
+                            <th class="text-center">Device</th>
                             <th class="text-center">Log Time</th>
                             <th class="text-center">Temperature (°C)</th>
                             <th class="text-center">Humidity (%)</th>
@@ -169,9 +169,17 @@
                         </tr>
                         </thead>
                         <tbody>
+                        @php
+                            $serial_no = $device->serial_no ?? '';
+                            $shed_name = $device?->currentShed()->shed->name ?? '';
+                        @endphp
                         @foreach($logs as $row)
                         <tr>
-                            <td class="text-center">{{ $row['device_id'] }}</td>
+                            <td>
+                                <span class="fw-bold">{{  $serial_no }}</span>
+                                <br>
+                                <small class="text-muted">{{ $shed_name }}</small>
+                            </td>
                             <td class="text-center">{{  \Carbon\Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i:s A') }}</td>
                             <td class="text-center">{{ $row['temperature'] ?? '' }}</td>
                             <td class="text-center">{{ $row['humidity'] ?? '' }}</td>

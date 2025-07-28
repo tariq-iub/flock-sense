@@ -55,6 +55,7 @@ class LogsController extends Controller
         $farms = Farm::with('sheds.flocks')->orderBy('name')->get();
         $logs = collect();
         $farmId = null;
+        $device = null;
         $date_range = null;
         $chart = [];
 
@@ -63,6 +64,7 @@ class LogsController extends Controller
             $farmId = $request->input('filter.farm_id');
             $date_range = $request->input('filter.date_range');
             $device_id = $request->input('filter.device_id');
+            $device = Device::find($device_id);
             list($logs, $days) = $this->logData($device_id, $date_range);
 
             if ($days <= 7) {
@@ -147,6 +149,7 @@ class LogsController extends Controller
                 'capabilityMap',
                 'farms',
                 'farmId',
+                'device',
                 'date_range',
                 'chart'
             )
