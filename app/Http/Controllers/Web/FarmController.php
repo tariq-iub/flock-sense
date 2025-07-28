@@ -13,7 +13,8 @@ class FarmController extends Controller
      */
     public function index()
     {
-        //
+        $farms = Farm::with('owner', 'managers', 'sheds')->get();
+        return view('admin.farms.index', compact('farms'));
     }
 
     /**
@@ -21,7 +22,7 @@ class FarmController extends Controller
      */
     public function create()
     {
-        //
+        // No implementation is required
     }
 
     /**
@@ -37,7 +38,7 @@ class FarmController extends Controller
      */
     public function show(Farm $farm)
     {
-        //
+        // No implementation is required
     }
 
     /**
@@ -45,7 +46,7 @@ class FarmController extends Controller
      */
     public function edit(Farm $farm)
     {
-        //
+        // No implementation is required
     }
 
     /**

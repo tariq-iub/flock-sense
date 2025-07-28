@@ -91,6 +91,7 @@
                                          Route::is('feeds.*') ||
                                          Route::is('expenses.*') ||
                                          Route::is('pricings.*') ||
+                                         Route::is('admin.farms.*') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>System Admin</span><span class="menu-arrow"></span>
@@ -133,9 +134,15 @@
                                     </a>
                                 </li>
                                 <li>
+                                    <a href="{{ route('admin.farms.index') }}"
+                                       class="{{ request()->routeIs('admin.farms.*') ? 'active' : '' }}">
+                                        Farms
+                                    </a>
+                                </li>
+                                <li>
                                     <a href="#"
                                        class="">
-                                        Farms & Sheds
+                                        Sheds
                                     </a>
                                 </li>
                                 <li>

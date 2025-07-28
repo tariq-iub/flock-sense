@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Breeds')
+@section('title', 'Farms')
 
 @section('content')
     <div class="content">
         <div class="page-header">
             <div class="add-item d-flex">
                 <div class="page-title">
-                    <h4 class="fw-bold">Chicken Breeds</h4>
-                    <h6>Manage data for chicken breeds.</h6>
+                    <h4 class="fw-bold">Farms</h4>
+                    <h6>Manage poultry farms information.</h6>
                 </div>
             </div>
             <ul class="table-top-head">
@@ -19,8 +19,8 @@
                 </li>
             </ul>
             <div class="page-btn">
-                <a href="javascript:void(0)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBreedModal">
-                    <i class="ti ti-circle-plus me-1"></i>Add Breed
+                <a href="javascript:void(0)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFarmModal">
+                    <i class="ti ti-circle-plus me-1"></i>Add Farm
                 </a>
             </div>
         </div>
@@ -65,8 +65,8 @@
                 </div>
                 <div class="d-flex my-xl-auto right-content align-items-center row-gap-3">
                     <select id="statusFilter" class="form-select">
-                        <option value="">All Categories</option>
-                        @foreach($categories as $row)
+                        <option value="">All Owners</option>
+                        @foreach([] as $row)
                             <option value="{{ $row }}">{{ ucfirst($row) }}</option>
                         @endforeach
                     </select>
@@ -77,34 +77,48 @@
                     <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
-                            <th class="w-100">Breed</th>
-                            <th class="text-center">Category</th>
-                            <th class="text-center">Flock Count</th>
-                            <th class="text-center">Create Date</th>
+                            <th class="w-100">Farm</th>
+                            <th>Owner</th>
+                            <th>Manager</th>
+                            <th>Sheds</th>
+                            <th>Address</th>
+                            <th class="text-center">Latitude</th>
+                            <th class="text-center">Longitude</th>
                             <th class="no-sort"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($breeds as $breed)
+                        @foreach($farms as $farm)
                             <tr>
+                                <td>{{ ucwords($farm->name) }}</td>
+                                <td>{{ ucwords($farm->owner->name) }}</td>
                                 <td>
-                                    {{ ucfirst($breed->name) }}
+                                    @if($farm->managers->count() > 0)
+                                        {{ ucwords($farm->managers->first()->name) }}
+                                    @else
+                                        <span class="text-danger fs-10">No Manager Added</span>
+                                    @endif
                                 </td>
-                                <td class="text-center">{{ ucfirst($breed->category) }}</td>
-                                <td class="text-center">{{ $breed->flocks_count }}</td>
-                                <td class="text-center">
-                                   {{ $breed->created_at->format('d-m-Y') }}
+                                <td>
+                                    @forelse($farm->sheds as $shed)
+                                        <span class="p-1 pe-2 rounded-1 text-primary bg-info-transparent fs-10">{{ $shed->name }}</span>
+                                    @empty
+                                        <span class='text-danger fs-10'>No Shed Attached</span>
+                                    @endforelse
                                 </td>
+                                <td>{{ ucfirst($farm->address) }}</td>
+                                <td class="text-center">{{ round($farm->latitude, 4) }}</td>
+                                <td class="text-center">{{ round($farm->longitude, 4) }}</td>
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
                                         <a href="javascript:void(0)"
-                                           class="p-2 border rounded me-2 edit-breed"
+                                           class="p-2 border rounded me-2 edit-farm"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Edit Breed"
-                                           data-breed-id="{{ $breed->id }}"
-                                           data-breed-name="{{ $breed->name }}">
+                                           data-bs-original-title="Edit Farm"
+                                           data-farm-id="{{ $farm->id }}"
+                                           data-farm-name="{{ $farm->name }}">
                                             <i class="ti ti-edit"></i>
                                         </a>
 
@@ -112,13 +126,13 @@
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Delete Breed"
-                                           data-breed-id="{{ $breed->id }}"
-                                           data-breed-name="{{ $breed->name }}"
+                                           data-bs-original-title="Delete Farm"
+                                           data-farm-id="{{ $farm->id }}"
+                                           data-farm-name="{{ $farm->name }}"
                                            class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
-                                        <form action="{{ route('breeding.destroy', $breed->id) }}" method="POST" id="delete{{ $breed->id }}">
+                                        <form action="{{ route('admin.farms.destroy', $farm->id) }}" method="POST" id="delete{{ $farm->id }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -133,35 +147,35 @@
         </div>
     </div>
 
-    <!-- Add Breed Modal -->
-    <div class="modal fade" id="addBreedModal" tabindex="-1" aria-labelledby="addBreedModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <!-- Add Farm Modal -->
+    <div class="modal fade" id="addFarmModal" tabindex="-1" aria-labelledby="addFarmModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('breeding.store') }}" class="needs-validation" novalidate method="POST">
+                <form action="{{ route('admin.farms.store') }}" class="needs-validation" novalidate method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addBreedModalLabel">Add Breed</h5>
+                        <h5 class="modal-title" id="addFarmModalLabel">Add Farm</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Breed Name<span class="text-danger ms-1">*</span></label>
+                                    <label for="name" class="form-label">Farm Name<span class="text-danger ms-1">*</span></label>
                                     <input type="text" class="form-control" id="name" name="name" required>
                                     <div class="invalid-feedback">
-                                        Breed name is required.
+                                        Farm name is required.
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Category<span class="text-danger ms-1">*</span></label>
                                     <select class="select2" id="category" name="category" required>
-                                        @foreach($categories as $row)
+                                        @foreach([] as $row)
                                             <option value="{{ $row }}">{{ ucfirst($row) }}</option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
-                                        Bareed category is required.
+                                        Breed name is required.
                                     </div>
                                 </div>
                             </div>
@@ -169,44 +183,44 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Save Breed</button>
+                        <button type="submit" class="btn btn-success">Save Farm</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Edit Breed Modal -->
-    <div class="modal fade" id="editBreedModal" tabindex="-1" aria-labelledby="editBreedModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <!-- Edit Farm Modal -->
+    <div class="modal fade" id="editFarmModal" tabindex="-1" aria-labelledby="editFarmModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="editBreedForm" action="" class="needs-validation" novalidate method="POST">
+                <form id="editFarmForm" action="" class="needs-validation" novalidate method="POST">
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editBreedModalLabel">Edit Breed</h5>
+                        <h5 class="modal-title" id="editFarmModalLabel">Edit Farm</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <input type="hidden" id="edit-breed-id" name="id" value="">
+                                <input type="hidden" id="edit-farm-id" name="id" value="">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Breed Name<span class="text-danger ms-1">*</span></label>
+                                    <label for="name" class="form-label">Farm Name<span class="text-danger ms-1">*</span></label>
                                     <input type="text" class="form-control" id="edit-name" name="name" required>
                                     <div class="invalid-feedback">
-                                        Breed name is required.
+                                        Farm name is required.
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Category<span class="text-danger ms-1">*</span></label>
                                     <select class="select2" id="edit-category" name="category" required>
-                                        @foreach($categories as $row)
+                                        @foreach([] as $row)
                                             <option value="{{ $row }}">{{ ucfirst($row) }}</option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
-                                        Breed category is required.
+                                        Farm owner is required to be selected.
                                     </div>
                                 </div>
                             </div>
@@ -214,7 +228,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Update Breed</button>
+                        <button type="submit" class="btn btn-success">Update Farm</button>
                     </div>
                 </form>
             </div>
@@ -230,9 +244,9 @@
                     <span class="rounded-circle d-inline-flex p-2 bg-danger-transparent mb-2">
                         <i class="ti ti-trash fs-24 text-danger"></i>
                     </span>
-                        <h4 class="fs-20 fw-bold mb-2 mt-1">Delete Breed</h4>
+                        <h4 class="fs-20 fw-bold mb-2 mt-1">Delete Farm</h4>
                         <p class="mb-0 fs-16" id="delete-modal-message">
-                            Are you sure you want to delete this breed data?
+                            Are you sure you want to delete this farm data?
                         </p>
                         <div class="modal-footer-btn mt-3 d-flex justify-content-center">
                             <button type="button" class="btn btn-secondary fs-13 fw-medium p-2 px-3 me-2" data-bs-dismiss="modal">
@@ -284,22 +298,22 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.edit-breed').forEach(function(button) {
+            document.querySelectorAll('.edit-farm').forEach(function(button) {
                 button.addEventListener('click', function() {
-                    var breedId = this.getAttribute('data-breed-id');
-                    var breedName = this.getAttribute('data-breed-name');
+                    var farmId = this.getAttribute('data-farm-id');
+                    var farmName = this.getAttribute('data-farm-name');
 
-                    var form = document.getElementById('editBreedForm');
-                    form.action = '/admin/breeding/' + breedId;
+                    var form = document.getElementById('editFarmForm');
+                    form.action = '/admin/farms/' + farmId;
 
                     // Set hidden and visible values
-                    document.getElementById('edit-breed-id').value = breedId;
-                    document.getElementById('edit-name').value = breedName;
+                    document.getElementById('edit-farm-id').value = farmId;
+                    document.getElementById('edit-name').value = farmName;
 
-                    document.getElementById('editBreedModalLabel').textContent = "Edit Breed - " + breedName;
+                    document.getElementById('editFarmModalLabel').textContent = "Edit Farm - " + farmName;
 
                     // Show the modal
-                    var modal = new bootstrap.Modal(document.getElementById('editBreedModal'));
+                    var modal = new bootstrap.Modal(document.getElementById('editFarmModal'));
                     modal.show();
                 });
             });
@@ -311,10 +325,10 @@
 
             document.querySelectorAll('.open-delete-modal').forEach(function(el) {
                 el.addEventListener('click', function() {
-                    deleteId = this.getAttribute('data-breed-id');
-                    const breedName = this.getAttribute('data-breed-name');
+                    deleteId = this.getAttribute('data-farm-id');
+                    const farmName = this.getAttribute('data-farm-name');
                     document.getElementById('delete-modal-message').textContent =
-                        `Are you sure you want to delete "${breedName}" data?`;
+                        `Are you sure you want to delete "${farmName}" data?`;
 
                     var modal = new bootstrap.Modal(document.getElementById('delete-modal'));
                     modal.show();
