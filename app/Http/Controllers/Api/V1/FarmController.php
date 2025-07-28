@@ -109,4 +109,80 @@ class FarmController extends ApiController
             'message' => 'Farm deleted successfully.',
         ]);
     }
+
+    public function createFarmWithShedAndFlock(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string'],
+            'address' => ['required', 'string'],
+            'owner_id' => ['required', 'exists:users,id'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+
+            'shed' => ['required', 'array'],
+            'shed.name' => ['required', 'string', 'max:255'],
+            'shed.capacity' => ['required', 'integer', 'min:1'],
+            'shed.type' => ['required', 'in:default,brooder,layer,broiler,hatchery'],
+            'shed.description' => ['nullable', 'string'],
+            'shed.device_id' => ['nullable', 'exists:devices,id'],
+
+            'flock' => ['required', 'array'],
+            'flock.name' => ['required', 'string', 'max:255'],
+            'flock.breed_id' => ['required', 'exists:breeds,id'],
+            'flock.start_date' => ['required', 'date'],
+            'flock.end_date' => ['nullable', 'date'],
+            'flock.chicken_count' => ['required', 'integer', 'min:1'],
+        ]);
+
+        \DB::beginTransaction();
+        try {
+            // Step 1: Create the Farm
+            $farm = Farm::create([
+                'name' => $validated['name'],
+                'address' => $validated['address'],
+                'owner_id' => $validated['owner_id'],
+                'latitude' => $validated['latitude'] ?? null,
+                'longitude' => $validated['longitude'] ?? null,
+            ]);
+
+            // Step 2: Create the Shed
+            $shedData = $validated['shed'];
+            $shed = $farm->sheds()->create([
+                'name' => $shedData['name'],
+                'capacity' => $shedData['capacity'],
+                'type' => $shedData['type'],
+                'description' => $shedData['description'] ?? null,
+            ]);
+
+            // Attach device if provided
+            if (isset($shedData['device_id'])) {
+                $shed->devices()->attach($shedData['device_id'], [
+                    'link_date' => now()
+                ]);
+            }
+
+            // Step 3: Create the Flock
+            $flockData = $validated['flock'];
+            $flock = $shed->flocks()->create([
+                'name' => $flockData['name'],
+                'breed_id' => $flockData['breed_id'],
+                'start_date' => $flockData['start_date'],
+                'end_date' => $flockData['end_date'] ?? null,
+                'chicken_count' => $flockData['chicken_count'],
+            ]);
+
+            \DB::commit();
+
+            return response()->json([
+                'message' => 'Farm, Shed, and Flock created successfully.',
+                'farm' => FarmResource::make($farm),
+            ], 201);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return response()->json([
+                'message' => 'An error occurred while creating resources.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

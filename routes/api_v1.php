@@ -35,6 +35,8 @@ Route::middleware('auth:sanctum')->group(function () {
         'medicines' => MedicineController::class,
     ]);
 
+    Route::post('farms/create', [FarmController::class, 'createFarmWithShedAndFlock']);
+
     // Farm managers
     Route::get('farms/{farm}/managers', [FarmManagerController::class, 'index']);
     Route::post('farms/{farm}/managers', [FarmManagerController::class, 'store']);
