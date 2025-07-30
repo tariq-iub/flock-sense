@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Shed extends Model
 {
@@ -24,6 +25,11 @@ class Shed extends Model
         return $this->hasMany(Flock::class);
     }
 
+    public function latestFlock() : HasOne
+    {
+        return $this->hasOne(Flock::class)->orderByDesc('created_at')->limit(1);
+    }
+
     public function latestFlocks() : HasMany
     {
         return $this->hasMany(Flock::class)->orderByDesc('created_at')->limit(5);
@@ -35,19 +41,30 @@ class Shed extends Model
             ->withPivot('link_date');
     }
 
-    /**
-     * Relationship: Shed has many linked shed devices.
-     */
     public function shedDevices()
     {
         return $this->hasMany(ShedDevice::class);
     }
 
-    /**
-     * Shortcut: Get all currently active linked devices for this shed.
-     */
     public function activeDevices()
     {
         return $this->shedDevices()->where('is_active', true)->with('device');
+    }
+
+    public function productionLogs(): HasMany
+    {
+        return $this->hasMany(ProductionLog::class);
+    }
+
+    public function latestFlockProductionLogs(): HasMany
+    {
+        return $this->hasMany(ProductionLog::class)
+            ->whereIn('flock_id', function ($query) {
+                $query->select('id')
+                    ->from('flocks')
+                    ->whereColumn('shed_id', 'sheds.id') // Ensure it's for the current shed
+                    ->orderByDesc('created_at')
+                    ->limit(1);
+            });
     }
 }

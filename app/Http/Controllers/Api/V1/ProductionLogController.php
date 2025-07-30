@@ -143,4 +143,15 @@ class ProductionLogController extends ApiController
         $productionLog->delete();
         return response()->json(null, 204);
     }
+
+    public function dailyReportHeaders($shedId)
+    {
+        if($shedId) {
+            return response()
+                ->json(Shed::with('latestFlockProductionLogs')->find($shedId));
+        }
+        else {
+            return response()->json([]);
+        }
+    }
 }
