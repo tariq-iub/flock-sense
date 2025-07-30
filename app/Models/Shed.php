@@ -27,7 +27,7 @@ class Shed extends Model
 
     public function latestFlock() : HasOne
     {
-        return $this->hasOne(Flock::class)->orderByDesc('created_at')->limit(1);
+        return $this->hasOne(Flock::class)->latestOfMany();
     }
 
     public function latestFlocks() : HasMany
@@ -54,17 +54,5 @@ class Shed extends Model
     public function productionLogs(): HasMany
     {
         return $this->hasMany(ProductionLog::class);
-    }
-
-    public function latestFlockProductionLogs(): HasMany
-    {
-        return $this->hasMany(ProductionLog::class)
-            ->whereIn('flock_id', function ($query) {
-                $query->select('id')
-                    ->from('flocks')
-                    ->whereColumn('shed_id', 'sheds.id') // Ensure it's for the current shed
-                    ->orderByDesc('created_at')
-                    ->limit(1);
-            });
     }
 }

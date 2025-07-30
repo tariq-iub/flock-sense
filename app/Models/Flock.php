@@ -35,6 +35,11 @@ class Flock extends Model
         return $this->belongsTo(Breed::class);
     }
 
+    public function productionLogs(): HasMany
+    {
+        return $this->hasMany(ProductionLog::class);
+    }
+
     public function weightLog() : HasMany
     {
         return $this->hasMany(WeightLog::class);

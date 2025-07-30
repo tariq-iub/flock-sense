@@ -77,3 +77,7 @@ Route::post('device-appliances/update-all-statuses', [DeviceApplianceController:
 // Legacy routes
 Route::get('device-appliances/statuses', [DeviceApplianceController::class, 'getAllStatuses']);
 Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'getStatus']);
+
+// Daily reports
+Route::get('production/report/headers/{id}', [ProductionLogController::class, 'dailyReportHeaders'])->name('productions.report.headers');
+Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
