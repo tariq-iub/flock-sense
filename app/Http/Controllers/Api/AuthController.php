@@ -338,4 +338,25 @@ class AuthController extends ApiController
 
         return response()->json(['message' => 'Password reset successful.']);
     }
+
+    /**
+     * Validate session token
+     */
+    public function validateSession(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if ($user) {
+            return response()->json([
+                'status' => 1,
+                'message' => 'Session is valid.',
+                'data' => new UserResource($user),
+            ]);
+        }
+
+        return response()->json([
+            'status' => 0,
+            'message' => 'Session expired. Please login again.',
+        ], 401);
+    }
 }
