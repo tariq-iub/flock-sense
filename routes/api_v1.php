@@ -81,3 +81,10 @@ Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceControl
 // Daily reports
 Route::get('production/report/headers/{id}', [ProductionLogController::class, 'dailyReportHeaders'])->name('productions.report.headers');
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
+
+Route::fallback(function () {
+    return response()->json([
+        'status' => 0,
+        'message' => 'API endpoint not found.',
+    ], 404);
+});
