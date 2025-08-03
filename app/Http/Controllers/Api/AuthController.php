@@ -348,14 +348,14 @@ class AuthController extends ApiController
 
         if ($user) {
             return response()->json([
-                'status' => 1,
+                'valid' => 1,
                 'message' => 'Session is valid.',
                 'data' => new UserResource($user),
             ]);
         }
 
         return response()->json([
-            'status' => 0,
+            'valid' => 0,
             'message' => 'Session expired. Please login again.',
         ], 401);
     }
