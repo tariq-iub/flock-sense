@@ -64,7 +64,7 @@ class SensorDataController extends ApiController
         }
 
         $fromTimestamp = $this->getTimeRange($validated['range']);
-        $results = $this->dynamoDbService->getSensorData($deviceIds, $fromTimestamp, $validated['range'] === 'latest');
+        $results = $this->dynamoDbService->getSensorData($deviceIds, null, null, true);
 
         return response()->json(['data' => SensorDataResource::collection($results)], 200);
     }
