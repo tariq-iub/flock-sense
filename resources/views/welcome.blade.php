@@ -15,9 +15,9 @@
                     <h1 class="display-3 fw-bold">
                         <span style="color:#60776F">Smart</span> Farm Management
                     </h1>
-                    <p class="fs-4 mb-4">
+                    <div class="fs-4 mb-4">
                         A Solution designed for Modern Poultry Farming
-                    </p>
+                    </div>
                     <div class="input-group mb-4">
                         <input type="text" class="form-control form-control-lg rounded-start-pill" placeholder="What's on your mind?">
                         <button class="btn btn-success rounded-end-pill">Message</button>
@@ -28,7 +28,7 @@
                         <img src="https://randomuser.me/api/portraits/men/31.jpg">
                         <img src="https://randomuser.me/api/portraits/men/41.jpg">
                         <div style="margin-left: 2.5rem;">
-                            <p class="fs-3">Join our Community<br>We’re waiting for you</p>
+                            <div class="fs-3">Join our Community<br>We’re waiting for you</div>
                             <div class="community-icons fs-2">
                                 <a href="#" class="text-muted text-decoration-none me-2"><i class="fab fa-linkedin"></i></a>
                                 <a href="#" class="text-muted text-decoration-none me-2"><i class="fab fa-x"></i></a>
