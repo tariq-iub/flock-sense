@@ -30,7 +30,7 @@ class FarmController extends ApiController
         foreach ($farms as $farm) {
             foreach ($farm->sheds as $shed) {
                 foreach ($shed->devices as $device) {
-                    $data = $dynamo->getSensorData([$device->id], null, true); // correct argument order
+                    $data = $dynamo->getSensorData([$device->id], null, null, true); // correct argument order
                     $device->latest_sensor_data = !empty($data) ? (object)$data[0] : null;
                 }
             }
@@ -69,12 +69,30 @@ class FarmController extends ApiController
 
         $farm->load(array_filter([
             in_array('owner', $includes) ? 'owner' : null,
-            in_array('sheds', $includes) ? 'sheds' : null,
+            in_array('sheds', $includes) ? 'sheds.devices.appliances' : null,
             in_array('managers', $includes) ? 'managers' : null,
             in_array('staff', $includes) ? 'staff' : null,
         ]))->loadCount('sheds');
 
+        $dynamo = app(DynamoDbService::class);
+        foreach ($farm->sheds as $shed) {
+            foreach ($shed->devices as $device) {
+                $data = $dynamo->getSensorData([$device->id], null, null, true);
+                $device->latest_sensor_data = !empty($data) ? (object)$data[0] : null;
+            }
+        }
+
+
+//        $farm->load(array_filter([
+//            in_array('owner', $includes) ? 'owner' : null,
+//            in_array('sheds', $includes) ? 'sheds' : null,
+//            in_array('managers', $includes) ? 'managers' : null,
+//            in_array('staff', $includes) ? 'staff' : null,
+//        ]))->loadCount('sheds');
+//
         return FarmResource::make($farm);
+
+
     }
 
     /**
