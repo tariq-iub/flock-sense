@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\ApiController;
 use App\Http\Resources\FarmResource;
 use App\Models\Farm;
+use App\Models\ProductionLog;
 use App\Services\DynamoDbService;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -21,7 +22,7 @@ class FarmController extends ApiController
             ->allowedFilters(['id', 'name'])
             ->allowedIncludes(['sheds'])
             ->allowedSorts(['id', 'name'])
-            ->with(['sheds.devices.appliances'])
+            ->with(['sheds.devices.appliances', 'sheds.flocks'])
             ->withCount('sheds')
             ->get();
 
@@ -34,6 +35,37 @@ class FarmController extends ApiController
                     $device->latest_sensor_data = !empty($data) ? (object)$data[0] : null;
                 }
             }
+        }
+
+        // Iterate over each farm, shed, and flock to calculate live birds
+        foreach ($farms as $farm) {
+            $totalLiveBirdCount = 0; // Initialize total live bird count for the farm
+
+            foreach ($farm->sheds as $shed) {
+                foreach ($shed->flocks as $flock) {
+                    // Get the initial bird count from the flock
+                    $initialBirdCount = $flock->chicken_count;
+
+                    // Get the mortality data for this flock (daily and nightly)
+                    $mortalityData = ProductionLog::where('flock_id', $flock->id)
+                            ->whereBetween('production_log_date', [$flock->start_date, now()])
+                            ->sum('day_mortality_count') + ProductionLog::where('flock_id', $flock->id)
+                            ->whereBetween('production_log_date', [$flock->start_date, now()])
+                            ->sum('night_mortality_count');
+
+                    // Calculate the live bird count for this flock
+                    $liveBirdCount = $initialBirdCount - $mortalityData;
+
+                    // Add the live bird count of this flock to the total for the farm
+                    $totalLiveBirdCount += $liveBirdCount;
+
+                    // Add live bird count to the flock for reference in the API response
+                    $flock->live_bird_count = $liveBirdCount;
+                }
+            }
+
+            // Add total live bird count to the farm object
+            $farm->total_live_bird_count = $totalLiveBirdCount;
         }
 
         return FarmResource::collection($farms);

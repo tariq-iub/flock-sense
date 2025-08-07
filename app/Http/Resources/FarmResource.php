@@ -16,26 +16,37 @@ class FarmResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+
     public function toArray(Request $request): array
     {
         return [
             'type' => 'farm',
             'id' => $this->id,
-
             'attributes' => [
                 'name' => $this->name,
                 'address' => $this->address,
+
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
 
                 'sheds_count' => $this->sheds_count,
                 'flocks_count' => $this->flocks_count,
                 'birds_count' => $this->birds_count,
+                'total_live_bird_count' => $this->total_live_bird_count, // Include total live bird count here
 
                 'created_at' => $this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s') : null,
                 'updated_at' => $this->updated_at ? Carbon::parse($this->updated_at)->format('Y-m-d H:i:s') : null,
 
                 'sheds' => ShedResource::collection($this->sheds),
+
+                'live_bird_counts' => $this->sheds->map(function ($shed) {
+                    return $shed->flocks->map(function ($flock) {
+                        return [
+                            'flock_id' => $flock->id,
+                            'live_bird_count' => $flock->live_bird_count,  // Include live bird count for individual flocks
+                        ];
+                    });
+                }),
 
                 $this->mergeWhen($this->relationLoaded('owner'), [
                     'owner' => [
