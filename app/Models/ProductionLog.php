@@ -25,6 +25,8 @@ class ProductionLog extends Model
         'day_water_consumed',
         'night_water_consumed',
         'avg_water_consumed',
+        'day_medicine',
+        'night_medicine',
         'is_vaccinated',
         'user_id',
     ];
