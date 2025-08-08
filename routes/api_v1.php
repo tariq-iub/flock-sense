@@ -1,5 +1,6 @@
 <?php
 
+use Aaqib\GeoPakistan\Pakistan;
 use App\Http\Controllers\Api\V1\BreedController;
 use App\Http\Controllers\Api\V1\DeviceApplianceController;
 use App\Http\Controllers\Api\V1\FlockController;
@@ -81,6 +82,27 @@ Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceControl
 // Daily reports
 Route::get('production/report/headers/{id}', [ProductionLogController::class, 'dailyReportHeaders'])->name('productions.report.headers');
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
+
+// Address Credentials
+Route::get('provinces', function() {
+    return \Aaqib\GeoPakistan\Models\Province::select('id', 'name')
+        ->orderBy('name')
+        ->get();
+})->name('provinces');
+
+Route::get('districts/{provinceId}', function($provinceId) {
+    return \Aaqib\GeoPakistan\Models\District::select('id', 'name')
+        ->where('province_id', $provinceId)
+        ->orderBy('name')
+        ->get();
+})->name('districts');
+
+Route::get('cities/{districtId}', function($districtId) {
+    return \Aaqib\GeoPakistan\Models\Tehsil::select('id', 'name')
+        ->where('district_id', $districtId)
+        ->orderBy('name')
+        ->get();
+})->name('cities');
 
 Route::fallback(function () {
     return response()->json([

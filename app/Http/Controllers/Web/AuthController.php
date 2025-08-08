@@ -5,21 +5,19 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\PasswordResetRequest;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Carbon;
-
 
 class AuthController extends Controller
 {
@@ -46,7 +44,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User registered successfully. Please check your email for verification.',
-            'user' => $user
+            'user' => $user,
         ], 201);
     }
 
@@ -60,12 +58,37 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->route('dashboard');
+            $user = Auth::user();
+            if ($user->password_reset_required) {
+                return redirect()->route('required.reset', compact('user'));
+            } else {
+                return redirect()->route('dashboard');
+            }
         }
 
         return back()->withErrors([
             'email' => 'Invalid credentials provided.',
         ])->onlyInput('email');
+    }
+
+    public function forceReset(Request $request, User $user): RedirectResponse
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return back()
+                ->withErrors(['current_password' => 'Current password is incorrect.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+            'password_reset_required' => 0,
+        ]);
+
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -99,7 +122,7 @@ class AuthController extends Controller
     public function forgotPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|email|exists:users,email',
         ]);
 
         $status = Password::sendResetLink(
@@ -126,7 +149,7 @@ class AuthController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password)
+                    'password' => Hash::make($password),
                 ])->setRememberToken(Str::random(60));
 
                 $user->save();
@@ -193,7 +216,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'OTP sent to your email.']);
     }
 
-
     public function verifyResetOtp(Request $request): JsonResponse
     {
         $request->validate([
@@ -203,7 +225,7 @@ class AuthController extends Controller
 
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
 
-        if (!$record || $record->token !== $request->otp) {
+        if (! $record || $record->token !== $request->otp) {
             return response()->json(['error' => 'Invalid OTP.'], 400);
         }
 
@@ -216,7 +238,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'OTP verified.']);
     }
 
-
     public function resetPasswordWithOtp(Request $request): JsonResponse
     {
         $request->validate([
@@ -227,7 +248,7 @@ class AuthController extends Controller
 
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
 
-        if (!$record || $record->token !== $request->otp) {
+        if (! $record || $record->token !== $request->otp) {
             return response()->json(['error' => 'Invalid OTP.'], 400);
         }
 
@@ -284,7 +305,7 @@ class AuthController extends Controller
 
         $reset = PasswordResetRequest::where('email', $request->email)->first();
 
-        if (!$reset) {
+        if (! $reset) {
             return response()->json(['error' => 'No reset request found.'], 404);
         }
 
@@ -292,8 +313,9 @@ class AuthController extends Controller
             return response()->json(['error' => 'OTP expired.'], 400);
         }
 
-        if (!Hash::check($request->otp, $reset->otp)) {
+        if (! Hash::check($request->otp, $reset->otp)) {
             $reset->increment('attempts');
+
             return response()->json(['error' => 'Invalid OTP.'], 400);
         }
 
@@ -314,7 +336,7 @@ class AuthController extends Controller
 
         $reset = PasswordResetRequest::where('email', $request->email)->first();
 
-        if (!$reset || !$reset->is_verified) {
+        if (! $reset || ! $reset->is_verified) {
             return response()->json(['error' => 'OTP not verified.'], 400);
         }
 
@@ -325,7 +347,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
         $user->update([
             'password' => Hash::make($request->password),
-            'remember_token' => Str::random(60)
+            'remember_token' => Str::random(60),
         ]);
 
         $reset->update(['reset_at' => now()]);

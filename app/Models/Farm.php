@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Aaqib\GeoPakistan\Models\District;
+use Aaqib\GeoPakistan\Models\Province;
+use Aaqib\GeoPakistan\Models\Tehsil;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +14,16 @@ class Farm extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'address', 'owner_id', 'latitude', 'longitude'];
+    protected $fillable = [
+        'name',
+        'province_id',
+        'district_id',
+        'city_id',
+        'address',
+        'owner_id',
+        'latitude',
+        'longitude',
+    ];
 
     public function owner(): BelongsTo
     {
@@ -49,5 +61,20 @@ class Farm extends Model
         return $this->sheds->sum(function ($shed) {
             return $shed->flocks->sum('chicken_count');
         });
+    }
+
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(Tehsil::class, 'city_id');
     }
 }

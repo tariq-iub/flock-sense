@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Web;
 
+use Aaqib\GeoPakistan\Models\Province;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class ClientController extends Controller
 {
@@ -17,6 +19,7 @@ class ClientController extends Controller
     {
         $users = User::with(['media', 'farms'])->get();
         $roles = Role::all();
+
         return view(
             'admin.users.index',
             compact('users', 'roles')
@@ -50,6 +53,7 @@ class ClientController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'phone' => $validated['phone'],
+            'password_reset_required' => true,
         ]);
 
         $user->assignRole($validated['role']);
@@ -72,10 +76,10 @@ class ClientController extends Controller
         $user = User::with([
             'farms.sheds.flocks',
             'settings',
-            'farms' => fn($query) => $query->withCount('sheds'),
+            'farms' => fn ($query) => $query->withCount('sheds'),
         ])->withCount('farms')
             ->findOrFail($userId);
-        if($user->settings == null){
+        if ($user->settings == null) {
             $user->settings = $user->settings()->create([
                 'security_level' => 'medium',
                 'backup_frequency' => 'daily',
@@ -85,7 +89,15 @@ class ClientController extends Controller
                 'notifications_sms' => false,
             ]);
         }
-        return view('admin.users.show', compact('user'));
+
+        $provinces = Province::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'admin.users.show',
+            compact('user', 'provinces')
+        );
     }
 
     /**
@@ -95,6 +107,7 @@ class ClientController extends Controller
     {
         $user = User::with(['media', 'settings', 'roles'])
             ->find($id);
+
         return response()->json($user);
     }
 
@@ -123,7 +136,7 @@ class ClientController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            if($user->media != null && $user->media->first()){
+            if ($user->media != null && $user->media->first()) {
                 $user->deleteMedia($user->media->first()->id);
             }
             $user->addMedia($file);
@@ -142,10 +155,34 @@ class ClientController extends Controller
     {
         $user = User::with('media')->findOrFail($userId);
         $media = $user->media->first();
-        if($media) $user->deleteMedia($media->id);
+        if ($media) {
+            $user->deleteMedia($media->id);
+        }
         $user->delete();
+
         return redirect()
             ->route('clients.index')
             ->with('success', 'User is deleted successfully.');
+    }
+
+    public function updatePassword(Request $request, User $user)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return back()
+                ->withErrors(['current_password' => 'Current password is incorrect.']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+            'password_reset_required' => 1,
+        ]);
+
+        return back()
+            ->with('success', 'Password has been updated successfully.');
     }
 }

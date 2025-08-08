@@ -92,6 +92,7 @@
                                          Route::is('expenses.*') ||
                                          Route::is('pricings.*') ||
                                          Route::is('admin.farms.*') ||
+                                         Route::is('daily.reports') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>System Admin</span><span class="menu-arrow"></span>
@@ -149,6 +150,12 @@
                                     <a href="#"
                                        class="">
                                         Flock Management
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('daily.reports') }}"
+                                       class="{{ request()->routeIs('daily.reports') ? 'active' : '' }}">
+                                        Daily Reports
                                     </a>
                                 </li>
                             </ul>

@@ -4,6 +4,7 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\BreedController;
 use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
+use App\Http\Controllers\Web\DailyReportsController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\IotController;
 use App\Http\Controllers\Web\FarmController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Models\Flock;
 use App\Models\Shed;
@@ -30,6 +32,13 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+// Force Reset Password
+Route::get('/required-reset/{user}', function ($user) {
+    return view('auth.force-reset-password', compact('user'));
+})->name('required.reset');
+
+Route::put('/force-reset/{user}', [AuthController::class, 'forceReset'])->name('force.reset');
 
 Route::get('/forget-password', function () {
     return view('auth.forget');
@@ -72,6 +81,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
     Route::get('/iot/export/excel', [LogsController::class, 'exportExcel'])->name('iot.export.excel');
     Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
+    Route::get('/daily-reports', DailyReportsController::class)->name('daily.reports');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -94,6 +104,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
             ->get();
     });
 
+
     // Resource routes for clients and charts
     Route::resources([
         'breeding' => BreedController::class,
@@ -109,13 +120,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{user}/edit', 'edit')->name('clients.edit');
         Route::put('/{user}', 'update')->name('clients.update');
         Route::delete('/{user}', 'destroy')->name('clients.destroy');
-//        Route::get('/{chart}/toggle', 'toggle')->name('clients.toggle');
+        Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
     });
 
     // Farms
     Route::prefix('farms')->controller(FarmController::class)->group(function () {
         Route::get('/', 'index')->name('admin.farms.index');
         Route::post('/', 'store')->name('admin.farms.store');
+        Route::get('/{farm}', 'show')->name('admin.farms.show');
         Route::put('/{farm}', 'update')->name('admin.farms.update');
         Route::delete('/{farm}', 'destroy')->name('admin.farms.destroy');
     });

@@ -9,18 +9,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Laravel\Cashier\Billable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-    use HasApiTokens;
-    use HasRoles;
-    use HasMedia;
     use Billable;
+    use HasApiTokens;
+
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory;
+
+    use HasMedia;
+    use HasRoles;
+    use Notifiable;
 
     protected $dates = ['trial_ends_at'];
 
@@ -34,11 +37,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'phone',
+        'password_reset_required',
         'pricing_id',
         'trial_ends_at',
         'subscription_status',
         'stripe_customer_id',
-        'stripe_subscription_id'
+        'stripe_subscription_id',
     ];
 
     /**
@@ -61,33 +65,41 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_reset_required' => 'boolean',
         ];
     }
 
-    public function farms() : HasMany
+    public function farms(): HasMany
     {
         return $this->hasMany(Farm::class, 'owner_id');
     }
 
     public function managedFarms()
     {
-        return $this->belongsToMany(Farm::class, 'farm_managers', 'manager_id', 'farm_id')->withPivot('link_date');
+        return $this->belongsToMany(Farm::class, 'farm_managers', 'manager_id', 'farm_id')
+            ->withPivot('link_date');
     }
 
     public function staffFarms()
     {
-        return $this->belongsToMany(Farm::class, 'farm_staff', 'worker_id', 'farm_id')->withPivot('link_date');
+        return $this->belongsToMany(Farm::class, 'farm_staff', 'worker_id', 'farm_id')
+            ->withPivot('link_date');
     }
 
     public function getShedsCountAttribute()
     {
-        if (!$this->relationLoaded('farms')) return 0;
+        if (! $this->relationLoaded('farms')) {
+            return 0;
+        }
+
         return $this->farms->sum('sheds_count');
     }
 
     public function getBirdsCountAttribute()
     {
-        if (!$this->relationLoaded('farms')) return 0;
+        if (! $this->relationLoaded('farms')) {
+            return 0;
+        }
 
         return $this->farms->sum(function ($farm) {
             return $farm->sheds->sum(function ($shed) {
@@ -96,9 +108,9 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-    public function settings() : HasOne
+    public function settings(): HasOne
     {
-        return $this->hasOne(UserSetting::Class);
+        return $this->hasOne(UserSetting::class);
     }
 
     public function pricing()
