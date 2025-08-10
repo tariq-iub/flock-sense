@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -53,7 +54,7 @@ class UserController extends ApiController
     {
         // For multipart form data, try different approaches to get the data
         $isMultipart = str_contains($request->header('Content-Type', ''), 'multipart/form-data');
-        
+
         try {
             $validated = $request->validate([
                 'name' => ['nullable', 'string', 'max:255'],
@@ -73,36 +74,36 @@ class UserController extends ApiController
         if (empty($validated)) {
             $manualData = [];
             $requestData = $request->all();
-            
+
             // For multipart form data, try different methods
             if ($isMultipart) {
                 // Try input() method
                 $inputData = $request->input();
-                
+
                 if (!empty($inputData)) {
                     $requestData = $inputData;
                 } else {
                     // Manual parsing of multipart form data
                     $rawContent = $request->getContent();
-                    
+
                     // Parse multipart form data manually
                     $boundary = null;
                     if (preg_match('/boundary=([^;]+)/', $request->header('Content-Type'), $matches)) {
                         $boundary = $matches[1];
                     }
-                    
+
                     if ($boundary) {
                         $parts = explode("--$boundary", $rawContent);
                         foreach ($parts as $part) {
                             if (preg_match('/Content-Disposition: form-data; name="([^"]+)"/', $part, $nameMatches)) {
                                 $fieldName = $nameMatches[1];
-                                
+
                                 // Skip file fields - they should be handled by Laravel's file handling
                                 if (str_contains($part, 'filename=')) {
                                     Log::info("Skipping file field: $fieldName");
                                     continue;
                                 }
-                                
+
                                 // Extract the value (everything after the double newline)
                                 $valueStart = strpos($part, "\r\n\r\n");
                                 if ($valueStart !== false) {
@@ -117,7 +118,7 @@ class UserController extends ApiController
                     }
                 }
             }
-            
+
             // Extract only the fields we want to update
             if (isset($requestData['name'])) {
                 $manualData['name'] = $requestData['name'];
@@ -131,7 +132,7 @@ class UserController extends ApiController
             if (isset($requestData['password'])) {
                 $manualData['password'] = $requestData['password'];
             }
-            
+
             if (!empty($manualData)) {
                 $validated = $manualData;
             }
@@ -156,12 +157,12 @@ class UserController extends ApiController
         } elseif ($isMultipart && $request->file('avatar')) {
             $avatarFile = $request->file('avatar');
         }
-        
+
         // For multipart form data, also check if we manually parsed a file
         if ($isMultipart && !$avatarFile && isset($manualData['avatar'])) {
             // Try to get the file from the request files
             $allFiles = $request->allFiles();
-            
+
             if (isset($allFiles['avatar'])) {
                 $avatarFile = $allFiles['avatar'];
             } else {
@@ -169,32 +170,32 @@ class UserController extends ApiController
                 $avatarFile = $request->file('avatar');
             }
         }
-        
+
         // If still no file, try manual extraction from multipart data
         if ($isMultipart && !$avatarFile) {
             $rawContent = $request->getContent();
             $boundary = null;
-            
+
             if (preg_match('/boundary=([^;]+)/', $request->header('Content-Type'), $matches)) {
                 $boundary = $matches[1];
             }
-            
+
             if ($boundary) {
                 $parts = explode("--$boundary", $rawContent);
                 foreach ($parts as $part) {
                     if (preg_match('/Content-Disposition: form-data; name="avatar"; filename="([^"]+)"/', $part, $matches)) {
                         $filename = $matches[1];
                         $fileStart = strpos($part, "\r\n\r\n");
-                        
+
                         if ($fileStart !== false) {
                             $fileContent = substr($part, $fileStart + 4);
                             $fileContent = trim($fileContent);
-                            
+
                             if (!empty($fileContent)) {
                                 // Create a temporary file
                                 $tempPath = tempnam(sys_get_temp_dir(), 'avatar_');
                                 file_put_contents($tempPath, $fileContent);
-                                
+
                                 // Create a file object
                                 $avatarFile = new \Illuminate\Http\UploadedFile(
                                     $tempPath,
@@ -210,15 +211,37 @@ class UserController extends ApiController
                 }
             }
         }
-        
+
+//        if ($avatarFile) {
+//            // Delete existing avatar if any
+//            $existingAvatar = $user->media()->first();
+//            if ($existingAvatar) {
+//                $user->deleteMedia($existingAvatar->id);
+//            }
+//
+//            $user->addMedia($avatarFile, 'avatars');
+//        }
+
         if ($avatarFile) {
-            // Delete existing avatar if any
+            $filename = time() . '_' . $avatarFile->getClientOriginalName();
+            $path = $avatarFile->storeAs('avatars', $filename, 'public'); // Save to public disk
             $existingAvatar = $user->media()->first();
+
             if ($existingAvatar) {
-                $user->deleteMedia($existingAvatar->id);
+                Storage::disk('public')->delete($existingAvatar->file_path); // Delete old file
+                $existingAvatar->delete();
             }
-            
-            $user->addMedia($avatarFile, 'avatars');
+
+            $user->media()->create([
+                'model_type' => get_class($user),
+                'model_id' => $user->id,
+                'file_name' => $filename,
+                'file_path' => $path, // e.g., avatars/1754822530_media.jpg
+                'size' => $avatarFile->getSize(),
+                'order_column' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
         // Remove avatar from validated data since we handle it separately
