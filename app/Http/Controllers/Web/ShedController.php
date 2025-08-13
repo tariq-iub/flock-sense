@@ -65,7 +65,7 @@ class ShedController extends Controller
         Shed::create($validated);
 
         return redirect()
-            ->route('admin.sheds.index')
+            ->back()
             ->with('success', 'Shed has been created successfully.');
     }
 
@@ -115,5 +115,27 @@ class ShedController extends Controller
         return redirect()
             ->route('admin.sheds.index')
             ->with('success', 'Shed has been deleted successfully.');
+    }
+
+    public function shedData($shedId)
+    {
+        $shed = Shed::with('farm.owner', 'latestFlock', 'latestFlocks.breed')
+            ->find($shedId);
+        $farm = $shed->farm;
+
+        $types = [
+            'default',
+            'brooder',
+            'layer',
+            'broiler',
+            'hatchery',
+        ];
+
+        $view = view(
+            'admin.sheds.shed_card',
+            compact('shed', 'farm', 'types')
+        )->render();
+
+        return response()->json(['html' => $view]);
     }
 }

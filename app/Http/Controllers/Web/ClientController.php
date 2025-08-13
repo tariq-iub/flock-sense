@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Web;
 
-use Aaqib\GeoPakistan\Models\Province;
+use App\Models\Province;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -79,6 +78,7 @@ class ClientController extends Controller
             'farms' => fn ($query) => $query->withCount('sheds'),
         ])->withCount('farms')
             ->findOrFail($userId);
+
         if ($user->settings == null) {
             $user->settings = $user->settings()->create([
                 'security_level' => 'medium',

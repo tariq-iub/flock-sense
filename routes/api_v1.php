@@ -1,25 +1,23 @@
 <?php
 
-use Aaqib\GeoPakistan\Pakistan;
 use App\Http\Controllers\Api\V1\BreedController;
 use App\Http\Controllers\Api\V1\DeviceApplianceController;
+use App\Http\Controllers\Api\V1\DeviceController;
+use App\Http\Controllers\Api\V1\FarmController;
+use App\Http\Controllers\Api\V1\FarmManagerController;
+use App\Http\Controllers\Api\V1\FarmStaffController;
 use App\Http\Controllers\Api\V1\FlockController;
 use App\Http\Controllers\Api\V1\MedicineController;
 use App\Http\Controllers\Api\V1\ProductionLogController;
 use App\Http\Controllers\Api\V1\SensorDataController;
+use App\Http\Controllers\Api\V1\ShedController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\SubscriptionPlanController;
 use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V1\FarmController;
-use App\Http\Controllers\Api\V1\ShedController;
-use App\Http\Controllers\Api\V1\DeviceController;
-use App\Http\Controllers\Api\V1\FarmManagerController;
-use App\Http\Controllers\Api\V1\FarmStaffController;
 use App\Http\Controllers\Api\V1\UserSettingsController;
 use App\Models\District;
 use App\Models\Province;
 use App\Models\Tehsil;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Other routes
@@ -87,20 +85,20 @@ Route::get('production/report/headers/{id}', [ProductionLogController::class, 'd
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
 
 // Address Credentials
-Route::get('provinces', function() {
+Route::get('provinces', function () {
     return Province::select('id', 'name')
         ->orderBy('name')
         ->get();
 })->name('provinces');
 
-Route::get('districts/{provinceId}', function($provinceId) {
+Route::get('districts/{provinceId}', function ($provinceId) {
     return District::select('id', 'name')
         ->where('province_id', $provinceId)
         ->orderBy('name')
         ->get();
 })->name('districts');
 
-Route::get('cities/{districtId}', function($districtId) {
+Route::get('cities/{districtId}', function ($districtId) {
     return Tehsil::select('id', 'name')
         ->where('district_id', $districtId)
         ->orderBy('name')

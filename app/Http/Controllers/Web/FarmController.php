@@ -117,10 +117,21 @@ class FarmController extends Controller
 
     public function farmData($farmId)
     {
-        $farm = Farm::with('sheds.latestFlocks.breed')
+        $farm = Farm::with('owner', 'sheds.latestFlocks.breed')
             ->find($farmId);
 
-        $view = view('admin.farms.farm_card', compact('farm'))->render();
+        $types = [
+            'default',
+            'brooder',
+            'layer',
+            'broiler',
+            'hatchery',
+        ];
+
+        $view = view(
+            'admin.farms.farm_card',
+            compact('farm', 'types')
+        )->render();
 
         return response()->json(['html' => $view]);
     }

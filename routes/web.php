@@ -79,10 +79,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::post('/dashboard', DashboardController::class)->name('dashboard');
 
-    Route::get('/farms/{farm}/data', [FarmController::class, 'farmData'])->name('farms.data');
-    Route::get('/farm-devices', [IotController::class, 'farmDevices'])->name('farm.devices');
-    Route::post('/farm-devices/link', [IotController::class, 'link'])->name('farm.devices.link');
-    Route::post('/farm-devices/delink', [IotController::class, 'delink'])->name('farm.devices.delink');
     Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
     Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');
     Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
@@ -137,6 +133,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{farm}', 'show')->name('admin.farms.show');
         Route::put('/{farm}', 'update')->name('admin.farms.update');
         Route::delete('/{farm}', 'destroy')->name('admin.farms.destroy');
+        Route::get('/farms/{farm}/data', 'farmData')->name('farms.data');
     });
 
     // Sheds
@@ -146,6 +143,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{shed}', 'show')->name('admin.sheds.show');
         Route::put('/{shed}', 'update')->name('admin.sheds.update');
         Route::delete('/{shed}', 'destroy')->name('admin.sheds.destroy');
+        Route::get('/{shed}/data', 'shedData')->name('sheds.data');
     });
 
     // Flocks
@@ -199,6 +197,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
         Route::get('/devices/{device}/appliances', 'fetchAppliances');
+        Route::get('/farm-devices', 'farmDevices')->name('farm.devices');
+        Route::post('/farm-devices/link', 'link')->name('farm.devices.link');
+        Route::post('/farm-devices/delink', 'delink')->name('farm.devices.delink');
     });
 
     // Expenses

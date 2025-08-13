@@ -19,12 +19,7 @@
                 </li>
             </ul>
             <div class="page-btn">
-                <a href="javascript:void(0)"
-                   class="btn btn-primary"
-                   data-bs-toggle="modal"
-                   data-bs-target="#addFlockModal">
-                    <i class="ti ti-circle-plus me-1"></i>Add Flock
-                </a>
+
             </div>
         </div>
         <div class="container-fluid">
@@ -62,14 +57,15 @@
         <div class="row">
             <div class="col-xl-4">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <div class="card-title">All Sheds</div>
+                        <input id="shedSearch" type="text" class="form-control form-control-sm w-50" placeholder="Search Shed">
                     </div>
                     <div class="card-body">
                         <div class="list-group" id="shedList">
                             @foreach($sheds as $shed)
                                 <a href="javascript:void(0)"
-                                   class="list-group-item list-group-item-action d-flex w-100 justify-content-between device-item"
+                                   class="list-group-item list-group-item-action d-flex w-100 justify-content-between shed-item"
                                    data-shed-id="{{ $shed->id }}">
                                     <div>
                                         <h5 class="text-info fs-14 mb-1">
@@ -95,81 +91,13 @@
                                 </a>
                             @endforeach
                         </div>
+                        <div id="noResults" class="text-danger small px-3 py-2 d-none">No sheds found.</div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-xl-8" id="flockDetailContainer">
+            <div class="col-xl-8" id="flockDetailsContainer">
 
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Shed Modal -->
-    <div class="modal fade" id="addFlockModal" tabindex="-1" aria-labelledby="addFlockModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('admin.flocks.store') }}" method="POST"
-                      class="needs-validation" novalidate>
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addFlockModalLabel">Add Shed</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="row">
-                            {{-- Shed Name --}}
-                            <div class="col-lg-6 mb-3">
-                                <label for="name" class="form-label">Shed Name<span class="text-danger ms-1">*</span></label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                                <div class="invalid-feedback">Shed name is required.</div>
-                            </div>
-
-                            {{-- Farm --}}
-                            <div class="col-lg-6 mb-3">
-                                <label for="farm_id" class="form-label">Farm<span class="text-danger ms-1">*</span></label>
-                                <select class="form-select basic-select" id="farm_id" name="farm_id" required>
-                                    <option value="">Select Farm</option>
-                                    @foreach([] as $farm)
-                                        <option value="{{ $farm->id }}">{{ $farm->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback">Farm is required.</div>
-                            </div>
-
-                            {{-- Capacity --}}
-                            <div class="col-lg-6 mb-3">
-                                <label for="capacity" class="form-label">Capacity<span class="text-danger ms-1">*</span></label>
-                                <input type="number" id="capacity" name="capacity" class="form-control" required>
-                                <div class="invalid-feedback">Shed capacity is required to enter.</div>
-                            </div>
-
-                            {{-- Type --}}
-                            <div class="col-lg-6 mb-3">
-                                <label for="type" class="form-label">Shed Type<span class="text-danger ms-1">*</span></label>
-                                <select class="form-select basic-select" id="type" name="type" required>
-                                    <option value="">Select Type</option>
-                                    @foreach([] as $t)
-                                        <option value="{{ $t }}">{{ ucfirst($t) }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="invalid-feedback">Shed type is required.</div>
-                            </div>
-
-                            {{-- Description --}}
-                            <div class="col-lg-12 mb-3">
-                                <label for="description" class="form-label">Other Details<span class="text-danger ms-1">*</span></label>
-                                <textarea class="form-control" id="description" name="description" rows="2"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success me-2">Save Shed</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -272,6 +200,66 @@
 @endsection
 
 @push('js')
+
+@endpush
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('shedSearch');
+            const items = Array.from(document.querySelectorAll('#shedList .list-group-item'));
+            const noResults = document.getElementById('noResults');
+
+            function filter() {
+                const q = input.value.trim().toLowerCase();
+                let visible = 0;
+
+                items.forEach(el => {
+                    const text = el.textContent.replace(/\s+/g, ' ').toLowerCase();
+                    // Match all tokens (supports multi-word queries like "ali farm-1")
+                    const match = q.split(/\s+/).every(token => text.includes(token));
+                    const hide = q && !match;
+                    el.classList.toggle('d-none', hide);
+                    if (!hide) visible++;
+                });
+
+                if (noResults) noResults.classList.toggle('d-none', visible > 0);
+            }
+
+            // Simple debounce
+            let t;
+            input.addEventListener('input', () => {
+                clearTimeout(t);
+                t = setTimeout(filter, 150);
+            });
+
+            // Initial state
+            filter();
+        });
+    </script>
+    <script>
+        $(function(){
+            $('#shedList').on('click', '.shed-item', function() {
+                var shedId = $(this).data('shed-id');
+
+                // Optionally, show a loading spinner
+                $('#flockDetailsContainer').html('<div class="text-center py-5"><div class="spinner-border text-success"></div></div>');
+
+                $.get('/admin/sheds/' + shedId + '/data', function(data) {
+                    $('#flockDetailsContainer').html(data.html);
+
+                    // If you use Bootstrap's JS tabs, initialize them
+                    var triggerTabList = [].slice.call(document.querySelectorAll('#flockDetailsContainer .nav-link'));
+                    triggerTabList.forEach(function (triggerEl) {
+                        var tabTrigger = new bootstrap.Tab(triggerEl);
+                    });
+                }).fail(function() {
+                    $('#flockDetailsContainer').html('<div class="alert alert-danger"><i class="feather-alert-triangle flex-shrink-0 me-2"></i>Failed to load shed flocks details.</div>');
+                });
+            });
+        });
+    </script>
+
     <script>
         $(function() {
             // Datatable
