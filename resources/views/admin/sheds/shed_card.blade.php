@@ -51,7 +51,7 @@
                             <td class="text-center fs-12">{{ $flock->chicken_count }}</td>
                             <td class="action-table-data">
                                 <div class="action-icon d-inline-flex float-end">
-                                    <a href="javascript:void(0)"
+                                    <a href="javascript:void(0);"
                                        class="p-2 border rounded me-2 edit-flock"
                                        title="Edit Flock"
                                        data-flock-id="{{ $flock->id }}"
@@ -61,9 +61,9 @@
 
                                     <a href="javascript:void(0);"
                                        title="Delete Flock"
-                                       data-farm-id="{{ $flock->id }}"
-                                       data-farm-name="{{ $flock->name }}"
-                                       class="p-2 open-delete-modal">
+                                       data-flock-id="{{ $flock->id }}"
+                                       data-flock-name="{{ $flock->name }}"
+                                       class="p-2 open-delete-modal" onclick="OpenModal(this)">
                                         <i data-feather="trash-2" class="feather-trash-2"></i>
                                     </a>
                                     <form action="{{ route('admin.flocks.destroy', $flock->id) }}" method="POST" id="delete{{ $flock->id }}">
@@ -83,65 +83,74 @@
     </div>
 </div>
 
-<!-- Add Shed Modal -->
-<div class="modal fade" id="addFlockModal" tabindex="-1" aria-labelledby="addShedModalLabel" aria-hidden="true" data-bs-backdrop="static">
+<!-- Add Flock Modal -->
+<div class="modal fade" id="addFlockModal" tabindex="-1" aria-labelledby="addFlockModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('admin.sheds.store') }}" method="POST"
+            <form action="{{ route('admin.flocks.store') }}" method="POST"
                   class="needs-validation" novalidate>
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addShedModalLabel">Add Shed</h5>
+                    <h5 class="modal-title" id="addFlockModalLabel">Add Flock</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
                     <div class="row">
-                        {{-- Shed Name --}}
+                        {{-- Flock Name --}}
                         <div class="col-lg-6 mb-3">
-                            <label for="name" class="form-label">Shed Name<span class="text-danger ms-1">*</span></label>
+                            <label for="name" class="form-label">Flock Name<span class="text-danger ms-1">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" required>
-                            <div class="invalid-feedback">Shed name is required.</div>
+                            <div class="invalid-feedback">Flock name should be entered for identification.</div>
                         </div>
 
-                        {{-- Farm --}}
+                        {{-- Shed --}}
                         <div class="col-lg-6 mb-3">
-                            <label for="farm_id" class="form-label">Farm<span class="text-danger ms-1">*</span></label>
-                            <select class="form-select basic-select" id="farm_id" name="farm_id" required>
-                                <option value="{{ $farm->id }}">{{ $farm->name }}</option>
+                            <label for="shed_id" class="form-label">Shed<span class="text-danger ms-1">*</span></label>
+                            <select class="form-select basic-select" id="shed_id" name="shed_id" required>
+                                <option value="{{ $shed->id }}">{{ $shed->name }}</option>
                             </select>
-                            <div class="invalid-feedback">Farm is required.</div>
+                            <div class="invalid-feedback">Select a shed first as flock is cycled in a shed.</div>
                         </div>
 
-                        {{-- Capacity --}}
+                        {{-- Breed --}}
                         <div class="col-lg-6 mb-3">
-                            <label for="capacity" class="form-label">Capacity<span class="text-danger ms-1">*</span></label>
-                            <input type="number" id="capacity" name="capacity" class="form-control" required>
-                            <div class="invalid-feedback">Shed capacity is required to enter.</div>
-                        </div>
-
-                        {{-- Type --}}
-                        <div class="col-lg-6 mb-3">
-                            <label for="type" class="form-label">Shed Type<span class="text-danger ms-1">*</span></label>
-                            <select class="form-select basic-select" id="type" name="type" required>
-                                <option value="">Select Type</option>
-                                @foreach($types as $t)
-                                    <option value="{{ $t }}">{{ ucfirst($t) }}</option>
+                            <label for="breed_id" class="form-label">Breed<span class="text-danger ms-1">*</span></label>
+                            <select class="form-select basic-select" id="breed_id" name="breed_id" required>
+                                <option value="">Select Breed</option>
+                                @foreach($breeds as $breed)
+                                    <option value="{{ $breed->id }}">{{ $breed->name }}</option>
                                 @endforeach
                             </select>
-                            <div class="invalid-feedback">Shed type is required.</div>
+                            <div class="invalid-feedback">Flock breed is required to be selected.</div>
                         </div>
 
-                        {{-- Description --}}
-                        <div class="col-lg-12 mb-3">
-                            <label for="description" class="form-label">Other Details<span class="text-danger ms-1">*</span></label>
-                            <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                        {{-- Chicken Count --}}
+                        <div class="col-lg-6 mb-3">
+                            <label for="chicken_count" class="form-label">Chicken Count<span class="text-danger ms-1">*</span></label>
+                            <input type="number" id="chicken_count" name="chicken_count" class="form-control" required>
+                            <div class="invalid-feedback">Please mention the flock initial chicken count.</div>
+                        </div>
+
+                        {{-- Start Date --}}
+                        <div class="col-lg-6 mb-3">
+                            <label for="start_date" class="form-label">Start Date<span class="text-danger ms-1">*</span></label>
+                            <input type="date" class="form-control"
+                                   id="start_date" name="start_date" required/>
+                            <div class="invalid-feedback">Flock cycle start date is required.</div>
+                        </div>
+
+                        {{-- End Date --}}
+                        <div class="col-lg-6 mb-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control"
+                                   id="end_date" name="end_date"/>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success me-2">Save Shed</button>
+                    <button type="submit" class="btn btn-success me-2">Save Flock</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>

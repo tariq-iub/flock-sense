@@ -36,7 +36,7 @@
                 </div>
                 @endif
 
-                @if ($errors->any())
+                @if ($errors->any() || session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>
                                 <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
@@ -46,6 +46,10 @@
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
+
+                                @if(session('error'))
+                                    <li>{{ session('error') }}</li>
+                                @endif
                             </ul>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                                 <i class="fas fa-xmark"></i>
@@ -54,6 +58,7 @@
                 @endif
             </div>
         </div>
+
         <div class="row">
             <div class="col-xl-4">
                 <div class="card">
@@ -102,68 +107,79 @@
         </div>
     </div>
 
-    {{-- Reusable Edit Shed Modal --}}
-    <div class="modal fade" id="editShedModal" tabindex="-1" aria-labelledby="editShedModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <!-- Edit Flock Modal -->
+    <div class="modal fade" id="editFlockModal" tabindex="-1" aria-labelledby="editFlockModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="editShedForm" method="POST" class="needs-validation" novalidate>
+                <form id="editFlockForm" action="#" method="POST" class="needs-validation" novalidate>
                     @csrf
                     @method('PUT')
-
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editShedModalLabel">Edit Shed</h5>
+                        <h5 class="modal-title" id="editFlockModalLabel">Edit Flock</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body">
-                        <input type="hidden" id="edit_shed_id">
+                        <input type="hidden" id="edit_flock_id">
 
                         <div class="row">
-                            {{-- Shed Name --}}
+                            <!-- Flock Name -->
                             <div class="col-lg-6 mb-3">
-                                <label for="edit_name" class="form-label">Shed Name <span class="text-danger ms-1">*</span></label>
+                                <label for="edit_name" class="form-label">Flock Name<span class="text-danger ms-1">*</span></label>
                                 <input type="text" class="form-control" id="edit_name" name="name" required>
-                                <div class="invalid-feedback">Shed name is required.</div>
+                                <div class="invalid-feedback">Flock name should be entered for identification.</div>
                             </div>
 
-                            {{-- Farm --}}
+                            <!-- Shed -->
                             <div class="col-lg-6 mb-3">
-                                <label for="edit_farm_id" class="form-label">Farm <span class="text-danger ms-1">*</span></label>
-                                <select class="form-select basic-select" id="edit_farm_id" name="farm_id" required>
-                                    <option value="">Select Farm</option>
-                                    {{-- options filled by JS --}}
+                                <label for="edit_shed_id" class="form-label">Shed<span class="text-danger ms-1">*</span></label>
+                                <select class="form-select basic-select-edit" id="edit_shed_id" name="shed_id" required>
+                                    @foreach($sheds as $shed)
+                                    <option value="{{ $shed->id }}">{{ $shed->name }}</option>
+                                    @endforeach
                                 </select>
-                                <div class="invalid-feedback">Farm is required.</div>
+                                <div class="invalid-feedback">Select a shed as flock is cycled in a shed.</div>
                             </div>
 
-                            {{-- Capacity --}}
+                            <!-- Breed -->
                             <div class="col-lg-6 mb-3">
-                                <label for="edit_capacity" class="form-label">Capacity <span class="text-danger ms-1">*</span></label>
-                                <input type="number" id="edit_capacity" name="capacity" class="form-control" required>
-                                <div class="invalid-feedback">Shed capacity is required to enter.</div>
-                            </div>
-
-                            {{-- Type --}}
-                            <div class="col-lg-6 mb-3">
-                                <label for="edit_type" class="form-label">Shed Type <span class="text-danger ms-1">*</span></label>
-                                <select class="form-select basic-select" id="edit_type" name="type" required>
-                                    <option value="">Select Type</option>
-                                    {{-- options filled by JS --}}
+                                <label for="edit_breed_id" class="form-label">Breed<span class="text-danger ms-1">*</span></label>
+                                <select class="form-select basic-select-edit" id="edit_breed_id" name="breed_id" required>
+                                    <option value="">Select Breed</option>
+                                    @foreach($breeds as $b)
+                                        <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                    @endforeach
                                 </select>
-                                <div class="invalid-feedback">Shed type is required.</div>
+                                <div class="invalid-feedback">Flock breed is required.</div>
                             </div>
 
-                            {{-- Description --}}
-                            <div class="col-lg-12 mb-3">
-                                <label for="edit_description" class="form-label">Other Details</label>
-                                <textarea class="form-control" id="edit_description" name="description" rows="2"></textarea>
+                            <!-- Chicken Count -->
+                            <div class="col-lg-6 mb-3">
+                                <label for="edit_chicken_count" class="form-label">Chicken Count<span class="text-danger ms-1">*</span></label>
+                                <input type="number" id="edit_chicken_count" name="chicken_count" class="form-control" required>
+                                <div class="invalid-feedback">Please mention the flock initial chicken count.</div>
+                            </div>
+
+                            <!-- Start Date -->
+                            <div class="col-lg-6 mb-3">
+                                <label for="edit_start_date" class="form-label">Start Date<span class="text-danger ms-1">*</span></label>
+                                <input type="date" class="form-control"
+                                       id="edit_start_date" name="start_date" required/>
+                                <div class="invalid-feedback">Flock cycle start date is required.</div>
+                            </div>
+
+                            <!-- End Date -->
+                            <div class="col-lg-6 mb-3">
+                                <label for="edit_end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control"
+                                       id="edit_end_date" name="end_date"/>
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success me-2">Update Shed</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success me-2">Update Flock</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
@@ -198,10 +214,6 @@
     </div>
 
 @endsection
-
-@push('js')
-
-@endpush
 
 @push('js')
     <script>
@@ -259,151 +271,99 @@
             });
         });
     </script>
-
-    <script>
-        $(function() {
-            // Datatable
-            if($('.datatable-custom').length > 0) {
-                var table = $('.datatable-custom').DataTable({
-                    "bFilter": true,
-                    "sDom": 'fBtlpi',
-                    "ordering": true,
-                    "language": {
-                        search: ' ',
-                        sLengthMenu: '_MENU_',
-                        searchPlaceholder: "Search",
-                        sLengthMenu: 'Rows Per Page _MENU_ Entries',
-                        info: "_START_ - _END_ of _TOTAL_ items",
-                        paginate: {
-                            next: ' <i class=" fa fa-angle-right"></i>',
-                            previous: '<i class="fa fa-angle-left"></i> '
-                        },
-                    },
-                    initComplete: (settings, json)=> {
-                        $('.dataTables_filter').appendTo('#tableSearch');
-                        $('.dataTables_filter').appendTo('.search-input');
-                    },
-                });
-
-                $('#cityFilter').on('change', function() {
-                    var selected = $(this).val();
-                    table.column(1).search(selected).draw();
-                });
-
-                $('#typeFilter').on('change', function() {
-                    var selected = $(this).val();
-                    table.column(3).search(selected).draw();
-                });
-            }
-        });
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Blade-provided data (minimal & fast)
-            const farmsData = @json($farms->map(fn($f) => ['id' => $f->id, 'name' => $f->name]));
-            const typesData = @json($types); // e.g. ['broiler','breeder','layer']
+            const editModalEl = document.getElementById('editFlockModal');
+            const editModal = new bootstrap.Modal(editModalEl);
+            const form = document.getElementById('editFlockForm');
 
-            const form   = document.getElementById('editShedForm');
-            const modalEl = document.getElementById('editShedModal');
-            const modal  = new bootstrap.Modal(modalEl);
+            const field = {
+                id:            document.getElementById('edit_flock_id'),
+                name:          document.getElementById('edit_name'),
+                shed_id:       document.getElementById('edit_shed_id'),
+                breed_id:      document.getElementById('edit_breed_id'),
+                chicken_count: document.getElementById('edit_chicken_count'),
+                start_date:    document.getElementById('edit_start_date'),
+                end_date:      document.getElementById('edit_end_date'),
+            };
 
-            const idEl   = document.getElementById('edit_shed_id');
-            const nameEl = document.getElementById('edit_name');
-            const farmEl = document.getElementById('edit_farm_id');
-            const capEl  = document.getElementById('edit_capacity');
-            const typeEl = document.getElementById('edit_type');
-            const descEl = document.getElementById('edit_description');
-
-            // Populate static selects once
-            function populateFarms(selectedId = null) {
-                farmEl.innerHTML = `<option value="">Select Farm</option>`;
-                farmsData.forEach(f => {
-                    farmEl.innerHTML += `<option value="${f.id}" ${Number(f.id) === Number(selectedId) ? 'selected' : ''}>${f.name}</option>`;
-                });
-            }
-            function populateTypes(selected = null) {
-                typeEl.innerHTML = `<option value="">Select Type</option>`;
-                typesData.forEach(t => {
-                    typeEl.innerHTML += `<option value="${t}" ${t === selected ? 'selected' : ''}>${t.charAt(0).toUpperCase()+t.slice(1)}</option>`;
-                });
-            }
-
-            // Open modal handler (event delegation in case rows are dynamic)
-            document.body.addEventListener('click', async (e) => {
-                const btn = e.target.closest('.edit-shed-btn');
+            // Delegated click for all .edit-flock buttons
+            document.addEventListener('click', async function (e) {
+                const btn = e.target.closest('.edit-flock');
                 if (!btn) return;
 
-                const shedId = btn.getAttribute('data-shed-id');
-                if (!shedId) return;
+                const flockId = btn.getAttribute('data-flock-id');
+                if (!flockId) return;
 
-                // Fetch shed data from show endpoint
-                const res = await fetch(`/admin/sheds/${shedId}`, { headers: { 'Accept': 'application/json' }});
-                if (!res.ok) {
-                    alert('Failed to load shed.');
-                    return;
+                try {
+                    // Fetch flock JSON
+                    const res = await fetch(`{{ url('/admin/flocks') }}/${flockId}`, {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (!res.ok) throw new Error('Failed to load flock data');
+                    const data = await res.json();
+
+                    // Populate fields
+                    field.id.value            = data.id ?? '';
+                    field.name.value          = data.name ?? '';
+                    field.shed_id.value       = data.shed_id ?? '';
+                    field.breed_id.value      = data.breed_id ?? '';
+                    field.chicken_count.value = data.chicken_count ?? '';
+
+                    // Dates are already Y-m-d from controller
+                    field.start_date.value = data.start_date ?? '';
+                    field.end_date.value   = data.end_date ?? '';
+
+                    // Set form action to update route
+                    form.setAttribute('action', `{{ url('/admin/flocks') }}/${flockId}`);
+
+                    // Show modal
+                    editModal.show();
+
+                    $('.basic-select-edit').select2({
+                        dropdownParent: $('#editFlockModal'),
+                        width: '100%'
+                    });
+                } catch (err) {
+                    console.error(err);
+                    alert('Unable to load flock details. Please try again.');
                 }
-                const shed = await res.json();
-
-                // Fill fields
-                idEl.value   = shed.id;
-                nameEl.value = shed.name ?? '';
-                capEl.value  = shed.capacity ?? '';
-                descEl.value = shed.description ?? '';
-
-                // Populate selects with selected values
-                populateFarms(shed.farm_id ?? null);
-                populateTypes(shed.type ?? null);
-
-                // Set form action to update route
-                form.action = `/admin/sheds/${shed.id}`;
-
-                // If you use Select2 on these selects, re-init safely:
-                $('#edit_farm_id, #edit_type').each(function(){
-                  if ($(this).hasClass('select2-hidden-accessible')) $(this).select2('destroy');
-                  $(this).select2({ dropdownParent: $('#editShedModal'), width: '100%' });
-                });
-
-                modal.show();
             });
 
-            // Optional client-side Bootstrap validation
-            form.addEventListener('submit', function (e) {
+            // Optional: client-side bootstrap validation
+            form.addEventListener('submit', function (event) {
                 if (!form.checkValidity()) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    event.preventDefault();
+                    event.stopPropagation();
                 }
                 form.classList.add('was-validated');
-                // Default submit → PUT (via @method('PUT')) → page refresh with flash message
-            });
+            }, false);
         });
     </script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let deleteId = null;
+        let deleteId = null;
+        function OpenModal(ctrl) {
+            deleteId = $(ctrl).data('flock-id');
+            let name = $(ctrl).data('flock-name');
 
-            document.querySelectorAll('.open-delete-modal').forEach(function(el) {
-                el.addEventListener('click', function() {
-                    deleteId = this.getAttribute('data-shed-id');
-                    const shedName = this.getAttribute('data-shed-name');
-                    document.getElementById('delete-modal-message').textContent =
-                        `Are you sure you want to delete "${shedName}" data?`;
+            document.getElementById('delete-modal-message').textContent =
+                `Are you sure you want to delete "${name}" data?`;
 
-                    var modal = new bootstrap.Modal(document.getElementById('delete-modal'));
-                    modal.show();
-                });
-            });
+            var modal = new bootstrap.Modal(document.getElementById('delete-modal'));
+            modal.show();
+        }
 
-            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
-                if (deleteId) {
-                    document.getElementById('delete' + deleteId).submit();
-                }
-            });
+        document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+            if (deleteId) {
+                document.getElementById('delete' + deleteId).submit();
+            }
         });
     </script>
     <script>
         $(document).ready(function () {
             $('.basic-select').select2({
-                dropdownParent: $('#addShedModal'), // ensures it works inside Bootstrap modal
+                dropdownParent: $('#addFlockModal'), // ensures it works inside Bootstrap modal
                 width: '100%'
             });
         });

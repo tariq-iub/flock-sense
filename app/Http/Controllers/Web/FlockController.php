@@ -37,7 +37,7 @@ class FlockController extends Controller
      */
     public function create()
     {
-        //
+        // No implementation is required
     }
 
     /**
@@ -45,7 +45,19 @@ class FlockController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'shed_id' => 'required|integer|exists:sheds,id',
+            'breed_id' => 'required|integer|exists:breeds,id',
+            'chicken_count' => 'required|integer',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        Flock::create($validated);
+
+        return redirect()->back()
+            ->with('success', 'Flock has been added successfully.');
     }
 
     /**
@@ -53,7 +65,16 @@ class FlockController extends Controller
      */
     public function show(Flock $flock)
     {
-        //
+        // Ensure dates formatted for <input type="date">
+        return response()->json([
+            'id' => $flock->id,
+            'name' => $flock->name,
+            'shed_id' => $flock->shed_id,
+            'breed_id' => $flock->breed_id,
+            'chicken_count' => $flock->chicken_count,
+            'start_date' => optional($flock->start_date)->format('Y-m-d'),
+            'end_date' => optional($flock->end_date)->format('Y-m-d'),
+        ]);
     }
 
     /**
@@ -61,7 +82,7 @@ class FlockController extends Controller
      */
     public function edit(Flock $flock)
     {
-        //
+        // No implementation is required
     }
 
     /**
@@ -69,7 +90,19 @@ class FlockController extends Controller
      */
     public function update(Request $request, Flock $flock)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'shed_id' => 'required|integer|exists:sheds,id',
+            'breed_id' => 'required|integer|exists:breeds,id',
+            'chicken_count' => 'required|integer',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        $flock->update($validated);
+
+        return redirect()->back()
+            ->with('success', 'Flock has been updated successfully.');
     }
 
     /**
@@ -77,6 +110,15 @@ class FlockController extends Controller
      */
     public function destroy(Flock $flock)
     {
-        //
+        $flock->load('productionLogs');
+        if ($flock->productionLogs->count() == 0) {
+            $flock->delete();
+            return redirect()->back()
+                ->with('success', 'Flock has been deleted successfully.');
+        } else {
+            return redirect()->back()
+                ->with('error', 'Flock cannot be deleted because it has been used in production.');
+        }
+
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Breed;
 use App\Models\Farm;
 use App\Models\Shed;
 use Illuminate\Http\Request;
@@ -122,7 +123,7 @@ class ShedController extends Controller
         $shed = Shed::with('farm.owner', 'latestFlock', 'latestFlocks.breed')
             ->find($shedId);
         $farm = $shed->farm;
-
+        $breeds = Breed::all();
         $types = [
             'default',
             'brooder',
@@ -133,7 +134,7 @@ class ShedController extends Controller
 
         $view = view(
             'admin.sheds.shed_card',
-            compact('shed', 'farm', 'types')
+            compact('shed', 'farm', 'breeds')
         )->render();
 
         return response()->json(['html' => $view]);

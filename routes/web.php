@@ -6,11 +6,11 @@ use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DailyReportsController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\ExpenseController;
+use App\Http\Controllers\Web\FarmController;
+use App\Http\Controllers\Web\FeedController;
 use App\Http\Controllers\Web\FlockController;
 use App\Http\Controllers\Web\IotController;
-use App\Http\Controllers\Web\FarmController;
-use App\Http\Controllers\Web\ExpenseController;
-use App\Http\Controllers\Web\FeedController;
 use App\Http\Controllers\Web\LogsController;
 use App\Http\Controllers\Web\MapController;
 use App\Http\Controllers\Web\MedicineController;
@@ -19,10 +19,9 @@ use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\ShedController;
-use App\Models\User;
-use Illuminate\Support\Facades\Route;
 use App\Models\Flock;
 use App\Models\Shed;
+use Illuminate\Support\Facades\Route;
 
 // Welcome page
 Route::get('/', function () {
@@ -50,6 +49,7 @@ Route::post('/forget-password', [AuthController::class, 'forgotPassword'])->name
 // Password reset routes
 Route::get('/reset-password/{token}', function ($token) {
     $email = request('email');
+
     return view('auth.reset', compact('token', 'email'));
 })->name('password.reset');
 
@@ -102,11 +102,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
 
     Route::get('/get-devices', function (\Illuminate\Http\Request $request) {
         $shed = Shed::findOrFail($request->shed_id);
+
         return $shed->devices()
             ->wherePivot('is_active', true)
             ->get();
     });
-
 
     // Resource routes for clients and charts
     Route::resources([
@@ -189,6 +189,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
 
     // IoT
     Route::prefix('iot')->controller(IotController::class)->group(function () {
+        Route::get('/farm-devices', 'farmDevices')->name('farm.devices');
+        Route::post('/farm-devices/link', 'link')->name('farm.devices.link');
+        Route::post('/farm-devices/delink', 'delink')->name('farm.devices.delink');
+
         Route::get('/', 'index')->name('iot.index');
         Route::get('/create', 'create')->name('iot.create');
         Route::post('/', 'store')->name('iot.store');
@@ -197,9 +201,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
         Route::get('/devices/{device}/appliances', 'fetchAppliances');
-        Route::get('/farm-devices', 'farmDevices')->name('farm.devices');
-        Route::post('/farm-devices/link', 'link')->name('farm.devices.link');
-        Route::post('/farm-devices/delink', 'delink')->name('farm.devices.delink');
     });
 
     // Expenses
