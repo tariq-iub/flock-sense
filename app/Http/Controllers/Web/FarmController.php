@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Web;
 
-use Aaqib\GeoPakistan\Models\Tehsil;
+use Aaqib\GeoPakistan\Models\Province;
 use App\Http\Controllers\Controller;
 use App\Models\Farm;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Aaqib\GeoPakistan\Models\Province;
 
 class FarmController extends Controller
 {
@@ -110,6 +109,7 @@ class FarmController extends Controller
     public function destroy(Farm $farm)
     {
         $farm->delete();
+
         return redirect()
             ->route('admin.farms.index')
             ->with('success', 'Farm has been deleted successfully.');
@@ -121,6 +121,7 @@ class FarmController extends Controller
             ->find($farmId);
 
         $view = view('admin.farms.farm_card', compact('farm'))->render();
+
         return response()->json(['html' => $view]);
     }
 }
