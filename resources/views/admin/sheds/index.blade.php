@@ -102,7 +102,7 @@
                                         <i class="ti ti-user me-2"></i>{{ $shed->farm->owner->name }}
                                     </div>
                                 </td>
-                                <td>{{ $shed->farm->city->name }}</td>
+                                <td>{{ $shed->farm?->city?->name }}</td>
                                 <td class="text-center">{{ number_format($shed->capacity, 0) }}</td>
                                 <td>{{ ucwords($shed->type) }}</td>
                                 <td>
