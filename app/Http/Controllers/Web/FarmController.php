@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Web;
 
-use Aaqib\GeoPakistan\Models\Province;
 use App\Http\Controllers\Controller;
 use App\Models\Farm;
+use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
 

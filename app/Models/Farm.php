@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Aaqib\GeoPakistan\Models\District;
-use Aaqib\GeoPakistan\Models\Province;
-use Aaqib\GeoPakistan\Models\Tehsil;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
