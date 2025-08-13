@@ -52,14 +52,19 @@ Route::get('/reset-password/{token}', function ($token) {
     $email = request('email');
     return view('auth.reset', compact('token', 'email'));
 })->name('password.reset');
+
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
 // Email verification routes
 Route::get('/email/verify', function () {
     return view('auth.verification');
 })->middleware('auth')->name('verification.notice');
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->middleware(['auth', 'signed'])->name('verification.verify');
-Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
+    ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // Admin routes group with auth and role:admin middleware
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\PakistanTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Division
@@ -26,22 +27,22 @@ class Province extends Model
      */
     protected $appends = ['local_name','local_full_name','local_alias', 'local_abbr'];
 
-    public function divisions()
+    public function divisions(): HasMany
     {
         return $this->hasMany(Division::class);
     }
 
-    public function districts()
+    public function districts(): HasMany
     {
         return $this->hasMany(District::class);
     }
 
-    public function tehsils()
+    public function tehsils(): HasMany
     {
         return $this->hasMany(Tehsil::class);
     }
 
-    public function union_councels()
+    public function union_councels(): HasMany
     {
         return $this->hasMany(UnionCouncel::class);
     }
@@ -56,7 +57,7 @@ class Province extends Model
         return null;
     }
 
-    public function locales()
+    public function locales(): HasMany
     {
         return $this->hasMany(DivisionLocale::class);
     }

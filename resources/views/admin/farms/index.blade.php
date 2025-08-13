@@ -74,8 +74,7 @@
                     <select id="cityFilter" class="form-select">
                         <option value="">All Cities</option>
                         @foreach($cities as $row)
-                            @if($row == null) @continue @endif
-                            <option value="{{ $row->name }}">{{ $row->name }}</option>
+                            <option value="{{ $row?->name }}">{{ $row?->name }}</option>
                         @endforeach
                     </select>
                 </div>

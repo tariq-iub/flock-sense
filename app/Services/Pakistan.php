@@ -1,12 +1,13 @@
 <?php
 
-namespace Aaqib\GeoPakistan;
+namespace App\Services;
 
-use Aaqib\GeoPakistan\Models\Province;
-use Aaqib\GeoPakistan\Models\UnionCouncel;
-use Aaqib\GeoPakistan\Models\District;
-use Aaqib\GeoPakistan\Models\Division;
-use Aaqib\GeoPakistan\Models\Tehsil;
+use App\Exceptions\InvalidCodeException;
+use App\Models\District;
+use App\Models\Division;
+use App\Models\Province;
+use App\Models\Tehsil;
+use App\Models\UnionCouncel;
 
 /**
  * World
@@ -55,24 +56,39 @@ class Pakistan
 
     public static function getByCode($code)
     {
-        $code = strtolower($code);
-        if (strpos($code, '-')) {
-            list($country_code, $code) = explode('-', $code);
+        // Ensure the code is a string and convert to lowercase for consistent searching
+        $code = strtolower((string) $code);
+
+        $division = null;
+        $lookup_code = null;
+
+        // Check if the code contains a hyphen, indicating a combined country and local code
+        if (str_contains($code, '-')) {
+            [$country_code, $lookup_code] = explode('-', $code, 2);
             $division = self::getDivisionByCode($country_code);
         } else {
-            return self::getDivisionByCode($code);
+            // If no hyphen, the entire code is for a division
+            $division = self::getDivisionByCode($code);
         }
+
+        // Check if a division was found; if not, throw an exception
+        if (! $division) {
+            throw new InvalidCodeException('Invalid division code provided.');
+        }
+
+        // Now, determine which model to query based on the division's properties
         if ($division->has_district) {
+            // If the division has districts, find the district using the provided code
             return District::where([
                 ['division_id', $division->id],
-                ['code', $code],
-            ])->first();
+                ['code', $lookup_code],
+            ])->first(); // Add ->first() to return a single model instance
         }
+
+        // If the division does not have districts, find a union council
         return UnionCouncel::where([
             ['division_id', $division->id],
-            ['code', $code],
-        ]);
-
-        throw new Aaqib\GeoPakistan\Exceptions\InvalidCodeException("Code is invalid");
+            ['code', $lookup_code ?? $code], // Use the lookup_code if it exists, otherwise the full code
+        ])->first(); // Add ->first() to return a single model instance
     }
 }
