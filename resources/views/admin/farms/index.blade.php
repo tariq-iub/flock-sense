@@ -64,10 +64,17 @@
                     </div>
                 </div>
                 <div class="d-flex my-xl-auto right-content align-items-center row-gap-3">
-                    <select id="statusFilter" class="form-select">
+                    <select id="ownerFilter" class="form-select me-2">
                         <option value="">All Owners</option>
-                        @foreach([] as $row)
-                            <option value="{{ $row }}">{{ ucfirst($row) }}</option>
+                        @foreach($owners as $row)
+                            <option value="{{ $row->name }}">{{ $row->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <select id="cityFilter" class="form-select">
+                        <option value="">All Cities</option>
+                        @foreach($cities as $row)
+                            <option value="{{ $row->name }}">{{ $row->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -366,9 +373,14 @@
                     },
                 });
 
-                $('#statusFilter').on('change', function() {
+                $('#ownerFilter').on('change', function() {
                     var selected = $(this).val();
                     table.column(1).search(selected).draw();
+                });
+
+                $('#cityFilter').on('change', function() {
+                    var selected = $(this).val();
+                    table.column(4).search(selected).draw();
                 });
             }
         });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DailyReportsController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\FlockController;
 use App\Http\Controllers\Web\IotController;
 use App\Http\Controllers\Web\FarmController;
 use App\Http\Controllers\Web\ExpenseController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\ShedController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Models\Flock;
@@ -130,6 +132,24 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{farm}', 'show')->name('admin.farms.show');
         Route::put('/{farm}', 'update')->name('admin.farms.update');
         Route::delete('/{farm}', 'destroy')->name('admin.farms.destroy');
+    });
+
+    // Sheds
+    Route::prefix('sheds')->controller(ShedController::class)->group(function () {
+        Route::get('/', 'index')->name('admin.sheds.index');
+        Route::post('/', 'store')->name('admin.sheds.store');
+        Route::get('/{shed}', 'show')->name('admin.sheds.show');
+        Route::put('/{shed}', 'update')->name('admin.sheds.update');
+        Route::delete('/{shed}', 'destroy')->name('admin.sheds.destroy');
+    });
+
+    // Flocks
+    Route::prefix('flocks')->controller(FlockController::class)->group(function () {
+        Route::get('/', 'index')->name('admin.flocks.index');
+        Route::post('/', 'store')->name('admin.flocks.store');
+        Route::get('/{flock}', 'show')->name('admin.flocks.show');
+        Route::put('/{flock}', 'update')->name('admin.flocks.update');
+        Route::delete('/{flock}', 'destroy')->name('admin.flocks.destroy');
     });
 
     // Medicines

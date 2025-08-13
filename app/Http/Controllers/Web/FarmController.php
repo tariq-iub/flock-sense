@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use Aaqib\GeoPakistan\Models\Tehsil;
 use App\Http\Controllers\Controller;
 use App\Models\Farm;
 use App\Models\User;
@@ -17,14 +18,18 @@ class FarmController extends Controller
     {
         $farms = Farm::with(['owner', 'managers', 'sheds', 'province', 'district', 'city'])
             ->get();
+
         $owners = User::all();
+
         $provinces = Province::select('id', 'name')
             ->orderBy('name')
             ->get();
 
+        $cities = $farms->pluck('city')->unique();
+
         return view(
             'admin.farms.index',
-            compact('farms', 'provinces', 'owners')
+            compact('farms', 'provinces', 'owners', 'cities')
         );
     }
 

@@ -41,7 +41,7 @@ class Shed extends Model
             ->withPivot('link_date');
     }
 
-    public function shedDevices()
+    public function shedDevices(): HasMany
     {
         return $this->hasMany(ShedDevice::class);
     }
