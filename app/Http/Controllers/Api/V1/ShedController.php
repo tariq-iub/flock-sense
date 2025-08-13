@@ -32,6 +32,17 @@ class ShedController extends ApiController
             ->allowedSorts(['id', 'name', 'capacity', 'created_at'])
             ->get();
 
+        foreach ($sheds as $shed) {
+            $deviceIds = $shed->devices->pluck('id')->all();
+            if (!empty($deviceIds)) {
+                $sensorDataArr = $this->dynamoDbService->getSensorData($deviceIds, null, null, true);
+                $sensorData = collect($sensorDataArr)->keyBy('device_id');
+                foreach ($shed->devices as $device) {
+                    $device->latest_sensor_data = $sensorData[$device->id] ?? null;
+                }
+            }
+        }
+
         return ShedResource::collection($sheds);
     }
 
@@ -79,7 +90,8 @@ class ShedController extends ApiController
         $deviceIds = $shed->devices->pluck('id')->all();
         $sensorData = [];
         if (!empty($deviceIds)) {
-            $sensorDataArr = $this->dynamoDbService->getSensorData($deviceIds, null, true);
+            $sensorDataArr = $this->dynamoDbService->getSensorData($deviceIds, null, null, true);
+            \Log::debug('Fetched sensor data from DynamoDB:', $sensorDataArr);
             foreach ($sensorDataArr as $data) {
                 if (isset($data['device_id'])) {
                     $sensorData[$data['device_id']] = $data;

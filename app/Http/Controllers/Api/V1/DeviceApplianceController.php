@@ -153,9 +153,9 @@ class DeviceApplianceController extends ApiController
         } else {
             // Update existing appliance
             $appliance->updateStatus(
-            $validated['status'],
-            $validated['metrics'] ?? null
-        );
+                $validated['status'],
+                $validated['metrics'] ?? null
+            );
         }
 
         return new DeviceApplianceResource($appliance);
@@ -204,7 +204,6 @@ class DeviceApplianceController extends ApiController
 
         return response()->json([
             'message' => 'Statuses updated successfully',
-            'data' => DeviceApplianceResource::collection($updatedAppliances)
         ]);
     }
 
@@ -215,7 +214,7 @@ class DeviceApplianceController extends ApiController
     {
         $firstChar = strtolower(substr($key, 0, 1));
 
-        return match($firstChar) {
+        return match ($firstChar) {
             'f' => 'fan',
             'b' => 'brooder',
             'c' => 'cooling_pad',

@@ -38,14 +38,11 @@ class ShedResource extends JsonResource
                     ],
                 ]),
 
-                // Flattened latest sensor data from all devices in this shed
-                'sensor_data' => $this->whenLoaded('devices', function () {
-                    return $this->devices->map(function ($device) {
-                        return $device->latest_sensor_data
-                            ? new SensorDataResource((object) $device->latest_sensor_data)
-                            : null;
-                    })->filter()->values();
-                }),
+                'sensor_data' => isset($this->devices) ? $this->devices->map(function ($device) {
+                    return $device->latest_sensor_data
+                        ? new SensorDataResource((object) $device->latest_sensor_data)
+                        : null;
+                })->filter()->values() : [],
 
                 // Flattened appliances from all devices in this shed
                 'appliances' => $this->whenLoaded('devices', function () {

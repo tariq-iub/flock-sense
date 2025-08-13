@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class UserResource extends JsonResource
 {
@@ -22,6 +23,7 @@ class UserResource extends JsonResource
                 'email' => $this->email,
                 'phone' => $this->phone,
                 'avatar' => $this->media->first(),
+                'avatar_url' => optional($this->media->first(), fn($m) => Storage::disk('public')->url($m->file_path)),
                 'roles' => $this->getRoleNames(),
                 'farms_count' => $this->farms_count,
                 $this->mergeWhen($request->routeIs('users.show'), [
