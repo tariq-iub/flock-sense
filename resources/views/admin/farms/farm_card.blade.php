@@ -65,12 +65,7 @@
                                             <td class="fs-12">{{ $flock->breed->name }}</td>
                                             <td class="text-center fs-12">{{ $flock->start_date->format('d-m-Y') }}</td>
                                             <td class="text-center fs-12">
-                                                @if($flock->end_date)
-                                                    {{ (int)$flock->start_date->diffInDays($flock->end_date) }}
-                                                @else
-                                                    {{ (int)$flock->start_date->diffInDays(now()) }}
-                                                @endif
-
+                                                {{ $flock->age }} Days
                                             </td>
                                             <td class="text-center fs-12">{{ $flock->chicken_count }}</td>
                                         </tr>

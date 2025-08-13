@@ -36,6 +36,7 @@
                         <th class="text-center">Start Date</th>
                         <th class="text-center">Age</th>
                         <th class="text-center">Start Count</th>
+                        <th class="no-sort"></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -45,14 +46,32 @@
                             <td class="fs-12">{{ $flock->breed->name }}</td>
                             <td class="text-center fs-12">{{ $flock->start_date->format('d-m-Y') }}</td>
                             <td class="text-center fs-12">
-                                @if($flock->end_date)
-                                    {{ (int)$flock->start_date->diffInDays($flock->end_date) }}
-                                @else
-                                    {{ (int)$flock->start_date->diffInDays(now()) }}
-                                @endif
-
+                                {{ $flock->age }} Days
                             </td>
                             <td class="text-center fs-12">{{ $flock->chicken_count }}</td>
+                            <td class="action-table-data">
+                                <div class="action-icon d-inline-flex float-end">
+                                    <a href="javascript:void(0)"
+                                       class="p-2 border rounded me-2 edit-flock"
+                                       title="Edit Flock"
+                                       data-flock-id="{{ $flock->id }}"
+                                       data-flock-name="{{ $flock->name }}">
+                                        <i class="ti ti-edit"></i>
+                                    </a>
+
+                                    <a href="javascript:void(0);"
+                                       title="Delete Flock"
+                                       data-farm-id="{{ $flock->id }}"
+                                       data-farm-name="{{ $flock->name }}"
+                                       class="p-2 open-delete-modal">
+                                        <i data-feather="trash-2" class="feather-trash-2"></i>
+                                    </a>
+                                    <form action="{{ route('admin.flocks.destroy', $flock->id) }}" method="POST" id="delete{{ $flock->id }}">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
