@@ -84,7 +84,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
     Route::get('/iot/export/excel', [LogsController::class, 'exportExcel'])->name('iot.export.excel');
     Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
-    Route::get('/daily-reports', DailyReportsController::class)->name('daily.reports');
+
+    // Daily Reports
+    Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)

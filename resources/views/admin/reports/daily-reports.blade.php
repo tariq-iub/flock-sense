@@ -19,6 +19,10 @@
                 </li>
             </ul>
             <div class="page-btn">
+                <a href="javascript:void(0)" class="btn btn-primary" id="excelExportBtn">
+                    <i class="ti ti-file-excel me-1"></i>Excel
+                </a>
+
                 <a href="javascript:void(0)" class="btn btn-primary" id="print">
                     <i class="ti ti-printer me-1"></i>Print
                 </a>
@@ -62,6 +66,15 @@
                 <div class="card">
                     <div class="card-body">
                         <form id="filterForm" method="GET" action="{{ route('productions.index') }}">
+
+                            <div class="mb-3">
+                                <label class="form-label">Report Language</label>
+                                <select id="version" class="select2">
+                                    <option value="en">English</option>
+                                    <option value="ur">Urdu</option>
+                                </select>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Select Farm</label>
                                 <select id="farmSelect" class="select2">
@@ -75,19 +88,19 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Select Shed</label>
-                                <select name="filter[shed_id]" id="shedSelect" class="select2" disabled>
+                                <select id="shedSelect" name="filter[shed_id]" class="select2" disabled>
                                     <option value="">Select Shed</option>
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Select Flock</label>
-                                <select name="filter[flock_id]" id="flockSelect" class="select2" disabled>
+                                <select id="flockSelect" name="filter[flock_id]" class="select2" disabled>
                                     <option value="">Select Flock</option>
                                 </select>
                             </div>
                             <div class="mb-5">
                                 <label class="form-label">Select Date</label>
-                                <select id="report_date" name="filter[report_date]"  class="select2" disabled>
+                                <select id="dateSelect" name="filter[report_date]"  class="select2" disabled>
                                     <option value="">Select Report Date</option>
                                 </select>
                             </div>
@@ -101,9 +114,15 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body printArea">
-                        ...
+                <div class="card printArea">
+                    <div class="card-header">
+                        <h4>Daily Production Report</h4>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div id="reportArea">
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -119,6 +138,7 @@
                 var farmId = $(this).val();
                 $('#shedSelect').prop('disabled', true).html('<option value="">Select Shed</option>');
                 $('#flockSelect').prop('disabled', true).html('<option value="">Select Flock</option>');
+                $('#dateSelect').prop('disabled', true).html('<option value="">Select Report Date</option>');
                 $('#showLogsBtn').prop('disabled', true);
                 if (farmId) {
                     $.get('/admin/get-sheds', {farm_id: farmId}, function(sheds) {
@@ -130,10 +150,26 @@
                 }
             });
 
+            function formatedDates(log_dates)
+            {
+                const rawDates = Array.isArray(log_dates) ? log_dates : [];
+
+                // Use the date part before 'T' to avoid timezone shifts
+                const dates = rawDates
+                    .map(s => (typeof s === 'string' ? s.split('T')[0] : ''))
+                    .filter(Boolean)
+                    // ensure unique and sorted
+                    .filter((v, i, arr) => arr.indexOf(v) === i)
+                    .sort((a, b) => a.localeCompare(b));
+
+                return dates;
+            }
+
             // When shed changes, load flocks
             $('#shedSelect').on('change', function() {
                 var shedId = $(this).val();
                 $('#flockSelect').prop('disabled', true).html('<option value="">Select Flock</option>');
+                $('#dateSelect').prop('disabled', true).html('<option value="">Select Report Date</option>');
                 $('#showLogsBtn').prop('disabled', true);
                 if (shedId) {
                     $.get('/admin/get-flocks', {shed_id: shedId}, function(flocks) {
@@ -142,35 +178,21 @@
                             $('#flockSelect').append('<option value="' + flock.id + '">' + flock.name + '</option>');
                         });
                     });
+
+                    $.get(`/api/v1/production/report/headers/${shedId}`, function(data) {
+                        $('#dateSelect').prop('disabled', false);
+                        var dates = formatedDates(data.production_log_dates);
+                        $.each(dates, function(i, date) {
+                            $('#dateSelect').append('<option value="' + date + '">' + date + '</option>');
+                        });
+                    });
                 }
             });
 
             // Enable submit when all selects are chosen
-            $('#flockSelect').on('change', function() {
+            $('#dateSelect').on('change', function() {
                 $('#showLogsBtn').prop('disabled', !$(this).val());
             });
-
-            // Pre-select (when returning after submit)
-            @if(isset($farmId) && $farmId)
-            $.get('/admin/get-sheds', {farm_id: '{{ $farmId }}'}, function(sheds) {
-                $('#shedSelect').prop('disabled', false);
-                $.each(sheds, function(i, shed) {
-                    var selected = (shed.id == '{{ request('filter.shed_id') }}') ? 'selected' : '';
-                    $('#shedSelect').append('<option value="'+shed.id+'" '+selected+'>'+shed.name+'</option>');
-                });
-
-                @if(request('filter.shed_id'))
-                $.get('/admin/get-flocks', {shed_id: '{{ request('filter.shed_id') }}'}, function(flocks) {
-                    $('#flockSelect').prop('disabled', false);
-                    $.each(flocks, function(i, flock) {
-                        var selected = (flock.id == '{{ request('filter.flock_id') }}') ? 'selected' : '';
-                        $('#flockSelect').append('<option value="' + flock.id + '" ' + selected + '>' + flock.name + '</option>');
-                    });
-                    $('#showLogsBtn').prop('disabled', '{{ $farmId ? false : true }}');
-                });
-                @endif
-            });
-            @endif
 
             $('#excelExportBtn').on('click', function (e) {
                 e.preventDefault();

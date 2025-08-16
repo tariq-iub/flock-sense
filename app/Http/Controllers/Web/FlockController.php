@@ -119,6 +119,5 @@ class FlockController extends Controller
             return redirect()->back()
                 ->with('error', 'Flock cannot be deleted because it has been used in production.');
         }
-
     }
 }
