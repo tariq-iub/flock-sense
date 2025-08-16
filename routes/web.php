@@ -135,7 +135,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{farm}', 'show')->name('admin.farms.show');
         Route::put('/{farm}', 'update')->name('admin.farms.update');
         Route::delete('/{farm}', 'destroy')->name('admin.farms.destroy');
-        Route::get('/farms/{farm}/data', 'farmData')->name('farms.data');
+        Route::get('/{farm}/data', 'farmData')->name('farms.data');
     });
 
     // Sheds
