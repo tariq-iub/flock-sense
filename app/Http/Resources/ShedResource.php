@@ -43,6 +43,13 @@ class ShedResource extends JsonResource
                             'daily_mortality' => $flock->daily_mortality,
                             'weekly_mortality' => $flock->weekly_mortality,
                             'all_time_mortality' => $flock->all_time_mortality,
+
+                            'weight' => [
+                                'avg_weight' => $flock->latest_weight_log['avg_weight'] ?? 0,
+                                'daily_gain' => $flock->latest_weight_log['avg_weight_gain'] ?? 0,
+                                'fcr' => $flock->latest_weight_log['feed_conversion_ratio'] ?? 0,
+                                'record_time' => $flock->latest_weight_log['created_at'] ?? null,
+                            ],
                         ];
                     });
                 }),
