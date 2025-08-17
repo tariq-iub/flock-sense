@@ -43,24 +43,6 @@ class FarmResource extends JsonResource
 
                 'sheds' => ShedResource::collection($this->sheds),
 
-                // Access flocks via sheds using mergeWhen
-                $this->mergeWhen(
-                    in_array('flocks', explode(',', $request->query('include', ''))),
-                    [
-                        'flocks' => $this->sheds->map(function ($shed) {
-                            return $shed->flocks->map(function ($flock) {
-                                return [
-                                    'flock_id' => $flock->id,
-                                    'live_bird_count' => $flock->live_bird_count,
-                                    'daily_mortality' => $flock->daily_mortality,
-                                    'weekly_mortality' => $flock->weekly_mortality,
-                                    'all_time_mortality' => $flock->all_time_mortality,
-                                ];
-                            });
-                        }),
-                    ]
-                ),
-
                 $this->mergeWhen($this->relationLoaded('owner'), [
                     'owner' => [
                         'id' => $this->owner->id,

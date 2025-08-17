@@ -30,6 +30,23 @@ class ShedResource extends JsonResource
                 'created_at' => $this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d H:i:s') : null,
                 'updated_at' => $this->updated_at ? Carbon::parse($this->updated_at)->format('Y-m-d H:i:s') : null,
 
+                'flocks' => $this->whenLoaded('flocks', function () {
+                    return $this->flocks->map(function ($flock) {
+                        return [
+                            'id' => $flock->id,
+                            'name' => $flock->name,
+                            'start_date' => isset($flock->start_date) && $flock->start_date ? Carbon::parse($flock->start_date)->format('Y-m-d') : null,
+                            'end_date' => isset($flock->end_date) && $flock->end_date ? Carbon::parse($flock->end_date)->format('Y-m-d') : null,
+                            'chicken_count' => $flock->chicken_count,
+                            'status' => $flock->status,
+                            'live_bird_count' => $flock->live_bird_count,
+                            'daily_mortality' => $flock->daily_mortality,
+                            'weekly_mortality' => $flock->weekly_mortality,
+                            'all_time_mortality' => $flock->all_time_mortality,
+                        ];
+                    });
+                }),
+
                 $this->mergeWhen($this->relationLoaded('farm'), [
                     'farm' => [
                         'id' => $this->farm->id,
@@ -40,7 +57,7 @@ class ShedResource extends JsonResource
 
                 'sensor_data' => isset($this->devices) ? $this->devices->map(function ($device) {
                     return $device->latest_sensor_data
-                        ? new SensorDataResource((object) $device->latest_sensor_data)
+                        ? new SensorDataResource((object)$device->latest_sensor_data)
                         : null;
                 })->filter()->values() : [],
 
