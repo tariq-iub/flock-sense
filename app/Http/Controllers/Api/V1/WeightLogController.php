@@ -16,7 +16,7 @@ class WeightLogController extends Controller
     {
         // ✅ Validation
         $validator = Validator::make($request->all(), [
-            'flock_id' => 'nullable|exists:flocks,id',
+            'flock_id' => 'required|exists:flocks,id',
             'range' => 'nullable|in:all,today,week,month',
         ]);
 
