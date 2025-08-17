@@ -58,11 +58,16 @@ class AuthController extends ApiController
     public function login(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => 'required|email',
+            'login' => 'required|string', // can be email or phone
             'password' => 'required|string',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $loginField = filter_var($request->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $credentials = [
+            $loginField => $request->login,
+            'password' => $request->password,
+        ];
 
         if (!Auth::attempt($credentials)) {
             return response()->json([
