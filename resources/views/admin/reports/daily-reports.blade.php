@@ -19,10 +19,6 @@
                 </li>
             </ul>
             <div class="page-btn">
-                <a href="javascript:void(0)" class="btn btn-primary" id="excelExportBtn">
-                    <i class="ti ti-file-excel me-1"></i>Excel
-                </a>
-
                 <a href="javascript:void(0)" class="btn btn-primary" id="print">
                     <i class="ti ti-printer me-1"></i>Print
                 </a>
@@ -65,63 +61,60 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
-                        <form id="filterForm" method="GET" action="{{ route('productions.index') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Report Language</label>
+                            <select id="version" class="select2">
+                                <option value="en">English</option>
+                                <option value="ur">Urdu</option>
+                            </select>
+                        </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Report Language</label>
-                                <select id="version" class="select2">
-                                    <option value="en">English</option>
-                                    <option value="ur">Urdu</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Select Farm</label>
-                                <select id="farmSelect" class="select2">
-                                    <option value="">Select Farm</option>
-                                    @foreach($farms as $farm)
-                                        <option value="{{ $farm->id }}" {{ (isset($farmId) && $farmId == $farm->id) ? 'selected' : '' }}>
-                                            {{ $farm->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Select Shed</label>
-                                <select id="shedSelect" name="filter[shed_id]" class="select2" disabled>
-                                    <option value="">Select Shed</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Select Flock</label>
-                                <select id="flockSelect" name="filter[flock_id]" class="select2" disabled>
-                                    <option value="">Select Flock</option>
-                                </select>
-                            </div>
-                            <div class="mb-5">
-                                <label class="form-label">Select Date</label>
-                                <select id="dateSelect" name="filter[report_date]"  class="select2" disabled>
-                                    <option value="">Select Report Date</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <button class="btn btn-success w-100" type="submit" id="showLogsBtn" disabled>
-                                    Get Daily Report
-                                </button>
-                            </div>
-                        </form>
+                        <div class="mb-3">
+                            <label class="form-label">Select Farm</label>
+                            <select id="farmSelect" class="select2">
+                                <option value="">Select Farm</option>
+                                @foreach($farms as $farm)
+                                    <option value="{{ $farm->id }}" {{ (isset($farmId) && $farmId == $farm->id) ? 'selected' : '' }}>
+                                        {{ $farm->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Shed</label>
+                            <select id="shedSelect" name="filter[shed_id]" class="select2" disabled>
+                                <option value="">Select Shed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Select Flock</label>
+                            <select id="flockSelect" name="filter[flock_id]" class="select2" disabled>
+                                <option value="">Select Flock</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Select Date</label>
+                            <select id="dateSelect" name="filter[report_date]"  class="select2" disabled>
+                                <option value="">Select Report Date</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-grid">
+                            <button class="btn btn-outline-success" type="button" id="showLogsBtn" disabled>
+                                Get Daily Report
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-8">
                 <div class="card printArea">
                     <div class="card-header">
                         <h4>Daily Production Report</h4>
                     </div>
 
-                    <div class="card-body p-0">
+                    <div class="card-body skeleton">
                         <div id="reportArea">
-
                         </div>
                     </div>
                 </div>
@@ -193,19 +186,6 @@
             $('#dateSelect').on('change', function() {
                 $('#showLogsBtn').prop('disabled', !$(this).val());
             });
-
-            $('#excelExportBtn').on('click', function (e) {
-                e.preventDefault();
-                // Gather filter query
-                var params = [];
-                var shedId = $('#shedSelect').val();
-                var flockId = $('#flockSelect').val();
-                if (shedId) params.push('filter[shed_id]=' + encodeURIComponent(shedId));
-                if (flockId) params.push('filter[flock_id]=' + encodeURIComponent(flockId));
-                var url = "{{ route('productions.export.excel') }}";
-                if (params.length) url += '?' + params.join('&');
-                window.location = url;
-            });
         });
     </script>
     <script>
@@ -226,6 +206,18 @@
                 $("div.printArea").printArea(options);
                 $('.hide-it').show();
             });
+        });
+    </script>
+    <script>
+        $('#showLogsBtn').on('click', function() {
+            var version = $('#version').val();
+            var shed_id = $('#shedSelect').val();
+            var report_date = $('#dateSelect').val();
+
+            $('#reportArea').html('<div class="text-center py-5"><div class="spinner-border text-success"></div></div>');
+            $.get(`/admin/daily-report-card/${version}?shed_id=${shed_id}&date=${report_date}`, function(data) {
+                $('#reportArea').html(data);
+            })
         });
     </script>
 @endpush

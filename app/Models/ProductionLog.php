@@ -35,23 +35,47 @@ class ProductionLog extends Model
         'production_log_date' => 'datetime',
     ];
 
-    public function flock() : BelongsTo
+    public function flock(): BelongsTo
     {
         return $this->belongsTo(Flock::class);
     }
 
-    public function shed() : BelongsTo
+    public function shed(): BelongsTo
     {
         return $this->belongsTo(Shed::class);
     }
 
-    public function user() : BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function weightLog() : HasOne
+    public function weightLog(): HasOne
     {
         return $this->hasOne(WeightLog::class);
+    }
+
+    /**
+     * Get the cumulative mortality (day + night)
+     * up to the current log’s date for the same flock.
+     */
+    public function getTodateMortalityAttribute(): int
+    {
+        return self::where('flock_id', $this->flock_id)
+            ->whereDate('production_log_date', '<=', $this->production_log_date)
+            ->sum(\DB::raw('day_mortality_count + night_mortality_count'));
+    }
+
+    /**
+     * Get the cumulative feed consumption (day + night)
+     * up to the current log’s date for the same flock.
+     */
+    public function getTodateFeedConsumedAttribute(): float
+    {
+        return self::where('flock_id', $this->flock_id)
+            ->whereDate('production_log_date', '<=', $this->production_log_date)
+            ->sum(\DB::raw('day_feed_consumed + night_feed_consumed'));
+
+        //        return $total / 1000;
     }
 }

@@ -87,6 +87,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
 
     // Daily Reports
     Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
+    Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
