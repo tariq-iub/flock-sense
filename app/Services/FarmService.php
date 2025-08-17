@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Farm;
 use App\Models\ProductionLog;
+use App\Models\WeightLog;
 use App\Services\DynamoDbService;
 use Carbon\Carbon;
 
@@ -96,6 +97,42 @@ class FarmService
                 foreach ($shed->devices as $device) {
                     $data = $this->dynamo->getSensorData([$device->id], null, null, true); // correct argument order
                     $device->latest_sensor_data = !empty($data) ? (object)$data[0] : null;
+                }
+            }
+        }
+
+        return $farms;
+    }
+
+    /**
+     * Attach the latest weight log to each flock in the given farms.
+     */
+    public function attachLatestWeightLogs($farms)
+    {
+        foreach ($farms as $farm) {
+            foreach ($farm->sheds as $shed) {
+                foreach ($shed->flocks as $flock) {
+
+                    $latestWeightLog = WeightLog::where('flock_id', $flock->id)
+                        ->orderByDesc('created_at')
+                        ->select([
+                            'id',
+                            'avg_weight',
+                            'avg_weight_gain',
+                            'feed_conversion_ratio',
+                            'created_at'
+                        ])
+                        ->first();
+
+                    // Inject only the required fields into the flock
+                    $flock->latest_weight_log = $latestWeightLog
+                        ? [
+                            'avg_weight' => $latestWeightLog->avg_weight,
+                            'avg_weight_gain' => $latestWeightLog->avg_weight_gain,
+                            'feed_conversion_ratio' => $latestWeightLog->feed_conversion_ratio,
+                            'created_at' => $latestWeightLog->created_at,
+                        ]
+                        : null;
                 }
             }
         }

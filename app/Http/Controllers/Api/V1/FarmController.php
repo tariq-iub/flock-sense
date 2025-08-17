@@ -44,6 +44,9 @@ class FarmController extends ApiController
         // Fetch and process the data (mortalities and live bird count)
         $farms = $this->farmService->processFarmData($farms);
 
+        // Attach Weight & FCR to Flocks
+        $farms = $this->farmService->attachLatestWeightLogs($farms);
+
         // Fetch sensor data for devices
         $farms = $this->farmService->fetchSensorData($farms);
 
