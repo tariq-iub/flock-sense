@@ -87,6 +87,8 @@ Route::get('production/report/headers/{id}', [ProductionLogController::class, 'd
 Route::get('production/report/history', [ProductionLogController::class, 'history'])->name('productions.report.history');
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
 
+Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
+
 // Address Credentials
 Route::get('provinces', function () {
     return Province::select('id', 'name')
@@ -107,8 +109,6 @@ Route::get('cities/{districtId}', function ($districtId) {
         ->orderBy('name')
         ->get();
 })->name('cities');
-
-Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
 
 Route::fallback(function () {
     return response()->json([
