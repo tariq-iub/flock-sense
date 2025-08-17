@@ -35,6 +35,12 @@ class FarmController extends ApiController
             ->withCount('sheds')
             ->get();
 
+        $farms->load([
+            'sheds' => function ($query) {
+                $query->withCount(['flocks', 'devices']);
+            }
+        ]);
+
         // Fetch and process the data (mortalities and live bird count)
         $farms = $this->farmService->processFarmData($farms);
 
