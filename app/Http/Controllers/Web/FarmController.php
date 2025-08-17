@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Farm;
+use App\Models\Province;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class FarmController extends Controller
@@ -13,8 +15,21 @@ class FarmController extends Controller
      */
     public function index()
     {
-        $farms = Farm::with('owner', 'managers', 'sheds')->get();
-        return view('admin.farms.index', compact('farms'));
+        $farms = Farm::with(['owner', 'managers', 'sheds', 'province', 'district', 'city'])
+            ->get();
+
+        $owners = User::all();
+
+        $provinces = Province::select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        $cities = $farms->pluck('city')->unique();
+
+        return view(
+            'admin.farms.index',
+            compact('farms', 'provinces', 'owners', 'cities')
+        );
     }
 
     /**
@@ -30,7 +45,22 @@ class FarmController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'province_id' => 'nullable|exists:pakistan_provinces,id',
+            'district_id' => 'nullable|exists:pakistan_districts,id',
+            'city_id' => 'nullable|exists:pakistan_tehsils,id',
+            'address' => 'required|string|max:500',
+            'owner_id' => 'required|exists:users,id',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+        ]);
+
+        $farm = Farm::create($validated);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Farm is added successfully.');
     }
 
     /**
@@ -38,7 +68,8 @@ class FarmController extends Controller
      */
     public function show(Farm $farm)
     {
-        // No implementation is required
+        return response()
+            ->json($farm->load(['owner', 'managers', 'sheds', 'province', 'district', 'city']));
     }
 
     /**
@@ -54,7 +85,22 @@ class FarmController extends Controller
      */
     public function update(Request $request, Farm $farm)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'province_id' => 'nullable|exists:pakistan_provinces,id',
+            'district_id' => 'nullable|exists:pakistan_districts,id',
+            'city_id' => 'nullable|exists:pakistan_tehsils,id',
+            'address' => 'required|string|max:500',
+            'owner_id' => 'required|exists:users,id',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+        ]);
+
+        $farm->update($validated);
+
+        return redirect()
+            ->route('admin.farms.index')
+            ->with('success', 'Farm has been updated successfully.');
     }
 
     /**
@@ -62,15 +108,31 @@ class FarmController extends Controller
      */
     public function destroy(Farm $farm)
     {
-        //
+        $farm->delete();
+
+        return redirect()
+            ->route('admin.farms.index')
+            ->with('success', 'Farm has been deleted successfully.');
     }
 
     public function farmData($farmId)
     {
-        $farm = Farm::with('sheds.latestFlocks.breed')
+        $farm = Farm::with('owner', 'sheds.latestFlocks.breed')
             ->find($farmId);
 
-        $view = view('admin.farms.farm_card', compact('farm'))->render();
+        $types = [
+            'default',
+            'brooder',
+            'layer',
+            'broiler',
+            'hatchery',
+        ];
+
+        $view = view(
+            'admin.farms.farm_card',
+            compact('farm', 'types')
+        )->render();
+
         return response()->json(['html' => $view]);
     }
 }

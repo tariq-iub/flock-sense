@@ -6,7 +6,7 @@
 
     /* multiple select */
     $('.js-example-basic-multiple').select2();
-	
+
 // Single Select Placeholder
 $("#select2-with-placeholder").select2({
 	placeholder: "Select a state",
@@ -62,19 +62,6 @@ $("#select2-with-placeholder").select2({
     $(".js-example-basic-multiple-limit-max").select2({
         maximumSelectionLength: 3,
         placeholder: "Choose Person",
-    });
-
-    /* Disablind select 2 controls */
-    $(".js-example-disabled").select2();
-    $(".js-example-disabled-multi").select2();
-
-    $(".js-programmatic-enable").on("click", function () {
-        $(".js-example-disabled").prop("disabled", false);
-        $(".js-example-disabled-multi").prop("disabled", false);
-    });
-    $(".js-programmatic-disable").on("click", function () {
-        $(".js-example-disabled").prop("disabled", true);
-        $(".js-example-disabled-multi").prop("disabled", true);
     });
 
 })();

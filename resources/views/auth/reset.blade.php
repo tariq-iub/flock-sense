@@ -47,7 +47,7 @@
                                         <div class="mb-3">
                                             <label class="form-label">Confirm Password <span class="text-danger"> *</span></label>
                                             <div class="pass-group">
-                                                <input type="password" name="password_confirmation" class="pass-inputa form-control" required>
+                                                <input type="password" name="password_confirmation" class="pass-input form-control" required>
                                                 <span class="ti toggle-passworda ti-eye-off text-gray-9"></span>
                                             </div>
                                         </div>

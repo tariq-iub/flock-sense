@@ -11,7 +11,16 @@ class Farm extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'address', 'owner_id', 'latitude', 'longitude'];
+    protected $fillable = [
+        'name',
+        'province_id',
+        'district_id',
+        'city_id',
+        'address',
+        'owner_id',
+        'latitude',
+        'longitude',
+    ];
 
     public function owner(): BelongsTo
     {
@@ -49,5 +58,20 @@ class Farm extends Model
         return $this->sheds->sum(function ($shed) {
             return $shed->flocks->sum('chicken_count');
         });
+    }
+
+    public function province(): BelongsTo
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(Tehsil::class, 'city_id');
     }
 }

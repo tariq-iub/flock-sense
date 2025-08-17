@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Web;
 
 use App\Exports\ProductionLogsExport;
 use App\Http\Controllers\Controller;
-use App\Models\Chart;
 use App\Models\Farm;
 use App\Models\Flock;
 use App\Models\ProductionLog;
 use App\Models\Shed;
-use App\Models\WeightLog;
 use App\Services\WeightLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

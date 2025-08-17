@@ -276,8 +276,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Save User</button>
+                        <button type="submit" class="btn btn-success me-2">Save User</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
@@ -355,11 +355,11 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success" id="updateBtn">
+                        <button type="submit" class="btn btn-success me-2" id="updateBtn">
                             <span id="updateBtnText">Update User</span>
                             <span class="spinner-border spinner-border-sm d-none" id="updateSpinner" role="status" aria-hidden="true"></span>
                         </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Flock extends Model
 {
@@ -24,6 +25,19 @@ class Flock extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
+
+    /**
+     * Get the age of the flock in days.
+     *
+     * @return int
+     */
+    public function getAgeAttribute(): int
+    {
+        $startDate = Carbon::parse($this->start_date);
+        $endDate = $this->end_date ? Carbon::parse($this->end_date) : Carbon::now();
+
+        return $startDate->diffInDays($endDate);
+    }
 
     public function shed() : BelongsTo
     {

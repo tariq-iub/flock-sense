@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\PakistanTrait;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+/**
+ * Division
+ */
+class Province extends Model
+{
+    use PakistanTrait;
+
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = 'pakistan_provinces';
+
+    /**
+     * append names
+     *
+     * @var array
+     */
+    protected $appends = ['local_name','local_full_name','local_alias', 'local_abbr'];
+
+    public function divisions(): HasMany
+    {
+        return $this->hasMany(Division::class);
+    }
+
+    public function districts(): HasMany
+    {
+        return $this->hasMany(District::class);
+    }
+
+    public function tehsils(): HasMany
+    {
+        return $this->hasMany(Tehsil::class);
+    }
+
+    public function union_councels(): HasMany
+    {
+        return $this->hasMany(UnionCouncel::class);
+    }
+
+    public function children()
+    {
+        return $this->districts;
+    }
+
+    public function parent()
+    {
+        return null;
+    }
+
+    public function locales(): HasMany
+    {
+        return $this->hasMany(DivisionLocale::class);
+    }
+    /**
+     * Get Division by name
+     *
+     * @param string $name
+     * @return collection
+     */
+    public static function getByName($name)
+    {
+        $localized = DivisionLocale::where('name', $name)->first();
+        if (is_null($localized)) {
+            return $localized;
+        }
+        return $localized->region;
+    }
+
+    /**
+     * Get Division by Abbreviation
+     *
+     * @param string $name
+     * @return collection
+     */
+    public static function getByAbbr($abbr)
+    {
+        $localized = DivisionLocale::where('abbr', $abbr)->first();
+        if (is_null($localized)) {
+            return $localized;
+        }
+        return $localized->region;
+    }
+
+    /**
+     * Search Division by name
+     *
+     * @param string $name
+     * @return collection
+     */
+    public static function searchByName($name)
+    {
+        return DivisionLocale::where('name', 'like', "%" . $name . "%")
+            ->get()->map(function ($item) {
+                return $item->division;
+            });
+    }
+}

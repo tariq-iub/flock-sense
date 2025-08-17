@@ -2,25 +2,22 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Exports\ProductionLogsExport;
-use App\Http\Resources\DailyReportHeaders;
-use App\Models\Chart;
-use App\Models\Farm;
+use App\Http\Controllers\ApiController;
 use App\Models\Flock;
 use App\Models\ProductionLog;
 use App\Models\Shed;
-use App\Models\WeightLog;
+use App\Services\DailyReportService;
 use App\Services\WeightLogService;
-use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Maatwebsite\Excel\Facades\Excel;
-use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use App\Http\Controllers\ApiController;
+use Spatie\QueryBuilder\QueryBuilder;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductionLogController extends ApiController
 {
+    public function __construct(private DailyReportService $dailyReportService) {}
+
     public function index(Request $request)
     {
         $logs = QueryBuilder::for(ProductionLog::class)
@@ -93,9 +90,9 @@ class ProductionLogController extends ApiController
 
         // Optionally: Only create weight log if provided and valid
         if (
-            !empty($validated['with_weight_log']) &&
-            !empty($validated['weighted_chickens_count']) &&
-            !empty($validated['total_weight'])
+            ! empty($validated['with_weight_log']) &&
+            ! empty($validated['weighted_chickens_count']) &&
+            ! empty($validated['total_weight'])
         ) {
             app(WeightLogService::class)->createOrUpdateWeightLog(
                 $productionLog,
@@ -132,7 +129,7 @@ class ProductionLogController extends ApiController
             'fcr' => 'numeric|min:0',
             'fcr_standard_diff' => 'numeric',
             'vet_visited' => 'boolean',
-            'is_vaccinated' => 'boolean'
+            'is_vaccinated' => 'boolean',
         ]);
 
         $productionLog->update($validatedData);
@@ -143,6 +140,7 @@ class ProductionLogController extends ApiController
     public function destroy(ProductionLog $productionLog)
     {
         $productionLog->delete();
+
         return response()->json(null, 204);
     }
 
@@ -150,7 +148,7 @@ class ProductionLogController extends ApiController
     {
         if ($shedId) {
             $shed = Shed::with('latestFlock.productionLogs')->find($shedId);
-            if (!$shed) {
+            if (! $shed) {
                 return response()->json(['message' => 'Shed not found'], 404);
             }
 
@@ -175,17 +173,17 @@ class ProductionLogController extends ApiController
             'date' => 'required|date_format:Y-m-d', // Ensure date format
         ]);
 
-        $shedId = $request->input('shed_id');
-        $reportDate = $request->input('date');
+        try {
+            $payload = $this->dailyReportService->build(
+                (int) $request->input('shed_id'),
+                (string) $request->input('date'),
+                (string) $version
+            );
 
-        $shed = Shed::with(['latestFlock'])->find($shedId);
-        if (!$shed) {
-            return response()->json(['message' => 'Shed not found.'], 404);
-        }
-
-        $latestFlock = $shed->latestFlock;
-        if (!$latestFlock) {
-            return response()->json(['message' => 'No active flock found for this shed.'], 404);
+            return response()->json($payload, 200);
+        } catch (NotFoundHttpException $e) {
+            // Preserve your original 404 messages
+            return response()->json(['message' => $e->getMessage()], 404);
         }
 
         $logs = ProductionLog::where('flock_id', $latestFlock->id)

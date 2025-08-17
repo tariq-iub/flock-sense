@@ -45968,4 +45968,51 @@ span.flatpickr-weekday {
   background: #E8E9EA;
 }
 
+.pass-input{
+    font-family: 'Segoe UI Symbol', 'Arial', sans-serif;
+    font-size: 1rem; /* Keep this normal to retain input height */
+    line-height: 1;  /* Normalize line height */
+    /* The following works on WebKit browsers to style bullets */
+    -webkit-text-security: disc;
+
+    /* Optional improvements */
+    letter-spacing: 0.15em;
+    padding: 0.375rem 0.75rem;
+}
+
+@font-face {
+    font-family: jameel;
+    src: url("../fonts/jameel.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.urdu {
+    font-family: jameel, sans-serif;
+    font-size: xx-large;
+    direction: rtl;
+}
+
+.urdu_normal {
+    font-family: jameel, sans-serif;
+    direction: rtl;
+}
+
+.first {
+    padding: 20px;
+    text-align: justify;
+    font-family: jameel, sans-serif;
+    font-size: x-large;
+    direction: rtl;
+}
+
+.second {
+    padding: 20px;
+    text-align: justify;
+    font-family: jameel, sans-serif;
+    font-size: large;
+    direction: rtl;
+}
+
+
 /*# sourceMappingURL=style.css.map */

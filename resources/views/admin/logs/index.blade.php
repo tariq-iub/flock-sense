@@ -54,6 +54,7 @@
                 @endif
             </div>
         </div>
+
         <div class="card">
             <div class="card-body pb-1">
                 <form id="filterForm" method="GET" action="{{ route('productions.index') }}" class="row g-2 mb-3">

@@ -8,7 +8,6 @@ use App\Models\Connectivity;
 use App\Models\Device;
 use App\Models\Shed;
 use App\Models\ShedDevice;
-use App\Models\DeviceEvent;
 use App\Services\DeviceEventService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +42,7 @@ class IotController extends Controller
             [
                 'device' => null,
                 'capabilities' => $capabilities,
-                'connectivities' => $connectivities
+                'connectivities' => $connectivities,
             ]
         );
     }
@@ -69,7 +68,7 @@ class IotController extends Controller
             'manufacturer' => $validated['manufacturer'],
             'firmware_version' => $validated['firmware_version'],
             'connectivity_type' => $validated['connectivity_type'],
-            'battery_operated' => $validated['battery_operated']
+            'battery_operated' => $validated['battery_operated'],
         ]);
 
         $device->capabilities()->syncWithoutDetaching($validated['capabilities']);
@@ -92,7 +91,7 @@ class IotController extends Controller
             [
                 'device' => $device,
                 'capabilities' => $capabilities,
-                'connectivities' => $connectivities
+                'connectivities' => $connectivities,
             ]
         );
     }
@@ -111,7 +110,7 @@ class IotController extends Controller
             [
                 'device' => $device,
                 'capabilities' => $capabilities,
-                'connectivities' => $connectivities
+                'connectivities' => $connectivities,
             ]
         );
     }
@@ -144,6 +143,7 @@ class IotController extends Controller
     public function destroy(Device $device)
     {
         $device->delete();
+
         return redirect()->route('iot.index')
             ->with('success', 'Device has been deleted successfully.');
     }
@@ -152,8 +152,8 @@ class IotController extends Controller
     {
         $devices = Device::all();
         $sheds = Shed::with('farm')->get();
-        $availableDevices = Device::whereDoesntHave('shedDevices', fn($q) => $q->where('is_active', true))->get();
-        $linkedDevices = Device::whereHas('shedDevices', fn($q) => $q->where('is_active', true))->get();
+        $availableDevices = Device::whereDoesntHave('shedDevices', fn ($q) => $q->where('is_active', true))->get();
+        $linkedDevices = Device::whereHas('shedDevices', fn ($q) => $q->where('is_active', true))->get();
 
         return view(
             'admin.devices.farm_devices',
@@ -169,7 +169,7 @@ class IotController extends Controller
         $request->validate([
             'shed_id' => 'required|exists:sheds,id',
             'device_id' => 'required|exists:devices,id',
-            'location_in_shed' => 'nullable|string|max:255'
+            'location_in_shed' => 'nullable|string|max:255',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -185,7 +185,7 @@ class IotController extends Controller
                 $request->device_id,
                 'linked',
                 [
-                    'shed_id'  => $request->shed_id,
+                    'shed_id' => $request->shed_id,
                     'location' => $request->location_in_shed,
                 ],
                 'info',
@@ -225,7 +225,7 @@ class IotController extends Controller
                     $request->device_id,
                     'delinked',
                     [
-                        'shed_id'  => $request->shed_id,
+                        'shed_id' => $request->shed_id,
                         'location' => $request->location_in_shed,
                     ],
                     'info',
@@ -245,7 +245,10 @@ class IotController extends Controller
     {
         $device = Device::with('appliances')->findOrFail($deviceId);
 
-        $html = view('admin.devices.partials.appliance-info', compact('device'))->render();
+        $html = view(
+            'admin.devices.partials.appliance-info',
+            compact('device')
+        )->render();
 
         return response()->json(['html' => $html]);
     }
