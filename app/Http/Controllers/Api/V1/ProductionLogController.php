@@ -38,21 +38,21 @@ class ProductionLogController extends ApiController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'shed_id'                => 'required|exists:sheds,id',
-            'flock_id'               => 'required|exists:flocks,id',
-            'day_mortality_count'    => 'required|integer|min:0',
-            'night_mortality_count'  => 'required|integer|min:0',
-            'net_count'              => 'nullable|integer|min:0',
-            'day_feed_consumed'      => 'required|numeric|min:0',
-            'night_feed_consumed'    => 'required|numeric|min:0',
-            'day_water_consumed'     => 'required|numeric|min:0',
-            'night_water_consumed'   => 'required|numeric|min:0',
-            'is_vaccinated'          => 'required|boolean',
-            'day_medicine'           => 'nullable|string',
-            'night_medicine'         => 'nullable|string',
-            'with_weight_log'        => 'nullable|boolean',
-            'weighted_chickens_count'=> 'nullable|numeric|min:0',
-            'total_weight'           => 'nullable|numeric|min:0',
+            'shed_id' => 'required|exists:sheds,id',
+            'flock_id' => 'required|exists:flocks,id',
+            'day_mortality_count' => 'required|integer|min:0',
+            'night_mortality_count' => 'required|integer|min:0',
+            'net_count' => 'nullable|integer|min:0',
+            'day_feed_consumed' => 'required|numeric|min:0',
+            'night_feed_consumed' => 'required|numeric|min:0',
+            'day_water_consumed' => 'required|numeric|min:0',
+            'night_water_consumed' => 'required|numeric|min:0',
+            'is_vaccinated' => 'required|boolean',
+            'day_medicine' => 'nullable|string',
+            'night_medicine' => 'nullable|string',
+            'with_weight_log' => 'nullable|boolean',
+            'weighted_chickens_count' => 'nullable|numeric|min:0',
+            'total_weight' => 'nullable|numeric|min:0',
         ]);
 
         $flock = Flock::findOrFail($validated['flock_id']);
@@ -74,21 +74,21 @@ class ProductionLogController extends ApiController
 
         // Prepare data for new ProductionLog
         $productionLog = ProductionLog::create([
-            'shed_id'               => $validated['shed_id'],
-            'flock_id'              => $validated['flock_id'],
-            'age'                   => $age,
-            'day_mortality_count'   => $validated['day_mortality_count'],
+            'shed_id' => $validated['shed_id'],
+            'flock_id' => $validated['flock_id'],
+            'age' => $age,
+            'day_mortality_count' => $validated['day_mortality_count'],
             'night_mortality_count' => $validated['night_mortality_count'],
-            'net_count'             => $net_count,
-            'livability'            => $livability,
-            'day_feed_consumed'     => $validated['day_feed_consumed'],
-            'night_feed_consumed'   => $validated['night_feed_consumed'],
-            'day_water_consumed'    => $validated['day_water_consumed'],
-            'night_water_consumed'  => $validated['night_water_consumed'],
-            'is_vaccinated'         => $validated['is_vaccinated'],
-            'day_medicine'          => $validated['day_medicine'],
-            'night_medicine'        => $validated['night_medicine'],
-            'user_id'               => Auth::id(),
+            'net_count' => $net_count,
+            'livability' => $livability,
+            'day_feed_consumed' => $validated['day_feed_consumed'],
+            'night_feed_consumed' => $validated['night_feed_consumed'],
+            'day_water_consumed' => $validated['day_water_consumed'],
+            'night_water_consumed' => $validated['night_water_consumed'],
+            'is_vaccinated' => $validated['is_vaccinated'],
+            'day_medicine' => $validated['day_medicine'],
+            'night_medicine' => $validated['night_medicine'],
+            'user_id' => Auth::id(),
         ]);
 
         // Optionally: Only create weight log if provided and valid
@@ -148,7 +148,7 @@ class ProductionLogController extends ApiController
 
     public function dailyReportHeaders($shedId)
     {
-        if($shedId) {
+        if ($shedId) {
             $shed = Shed::with('latestFlock.productionLogs')->find($shedId);
             if (!$shed) {
                 return response()->json(['message' => 'Shed not found'], 404);
@@ -163,8 +163,7 @@ class ProductionLogController extends ApiController
                 'flock_name' => $shed->latestFlock->name,
                 'production_log_dates' => $productionLogDates,
             ], 200);
-        }
-        else {
+        } else {
             return response()->json(['message' => 'Shed id is not provided.'], 404);
         }
     }
@@ -173,7 +172,7 @@ class ProductionLogController extends ApiController
     {
         $request->validate([
             'shed_id' => 'required|integer|exists:sheds,id',
-            'date'    => 'required|date_format:Y-m-d', // Ensure date format
+            'date' => 'required|date_format:Y-m-d', // Ensure date format
         ]);
 
         $shedId = $request->input('shed_id');
@@ -200,7 +199,7 @@ class ProductionLogController extends ApiController
         }
 
         $data = $logs->first();
-        if($version == 'en') {
+        if ($version == 'en') {
             return response()->json([
                 'shed' => $shed->name,
                 'flock' => $latestFlock->name,
@@ -234,8 +233,7 @@ class ProductionLogController extends ApiController
                 'submit_by' => $data->user->name,
                 'submit_at' => $data->created_at->diffForHumans(),
             ], 200);
-        }
-        else {
+        } else {
             return response()->json([
                 'شیڈ' => $shed->name, // Shed
                 'فلاک' => $latestFlock->name, // Flock
@@ -268,6 +266,93 @@ class ProductionLogController extends ApiController
                 'رپورٹر‌' => $data->user->name, // Submit By
             ], 200);
         }
+    }
 
+    public function history(Request $request)
+    {
+        $request->validate([
+            'shed_id' => 'required|integer|exists:sheds,id',
+            'range' => 'nullable|string|in:today,7days,30days,this_month,last_month,all,custom',
+            'start_date' => 'nullable|date_format:Y-m-d|required_if:range,custom',
+            'end_date' => 'nullable|date_format:Y-m-d|required_if:range,custom|after_or_equal:start_date',
+        ]);
+
+        $shedId = $request->input('shed_id');
+        $range = $request->input('range', 'all'); // default all
+
+        $query = ProductionLog::where('shed_id', $shedId);
+
+        // Apply range filters
+        switch ($range) {
+            case 'today':
+                $query->whereDate('production_log_date', today());
+                break;
+
+            case '7days':
+                $query->whereBetween('production_log_date', [now()->subDays(7)->startOfDay(), now()->endOfDay()]);
+                break;
+
+            case '30days':
+                $query->whereBetween('production_log_date', [now()->subDays(30)->startOfDay(), now()->endOfDay()]);
+                break;
+
+            case 'this_month':
+                $query->whereMonth('production_log_date', now()->month)
+                    ->whereYear('production_log_date', now()->year);
+                break;
+
+            case 'last_month':
+                $lastMonth = now()->subMonth();
+                $query->whereMonth('production_log_date', $lastMonth->month)
+                    ->whereYear('production_log_date', $lastMonth->year);
+                break;
+
+            case 'custom':
+                $query->whereBetween('production_log_date', [
+                    $request->input('start_date'),
+                    $request->input('end_date')
+                ]);
+                break;
+
+            case 'all':
+            default:
+                // No filter applied
+                break;
+        }
+
+        $logs = $query->orderBy('production_log_date', 'asc')->get();
+
+        if ($logs->isEmpty()) {
+            return response()->json(['message' => 'No production data found for the given criteria.'], 404);
+        }
+
+        // Format response only with production_logs table data
+        $formatted = $logs->map(function ($data) {
+            return [
+                'date' => $data->production_log_date->format('d-m-Y'),
+                'age' => $data->age . ' Days',
+                'day_mortality_count' => $data->day_mortality_count,
+                'night_mortality_count' => $data->night_mortality_count,
+                'net_count' => $data->net_count,
+                'livability' => $data->livability . ' %',
+                'day_feed_consumed' => round($data->day_feed_consumed / 1000, 2) . ' Kg',
+                'night_feed_consumed' => round($data->night_feed_consumed / 1000, 2) . ' Kg',
+                'avg_feed_consumed' => round($data->avg_feed_consumed / 1000, 2) . ' Kg',
+                'day_water_consumed' => round($data->day_water_consumed / 1000, 2) . ' L',
+                'night_water_consumed' => round($data->night_water_consumed / 1000, 2) . ' L',
+                'avg_water_consumed' => round($data->avg_water_consumed / 1000, 2) . ' L',
+                'is_vaccinated' => ($data->is_vaccinated ? 'Yes' : 'No'),
+                'day_medicine' => $data->day_medicine ?? '',
+                'night_medicine' => $data->night_medicine ?? '',
+                'submit_at' => $data->created_at->diffForHumans(),
+            ];
+        });
+
+        return response()->json([
+            'shed_id' => $shedId,
+            'total_records' => $logs->count(),
+            'range' => $range,
+            'history' => $formatted,
+        ], 200);
     }
 }
