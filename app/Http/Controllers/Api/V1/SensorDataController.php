@@ -49,7 +49,6 @@ class SensorDataController extends ApiController
         return response()->json(['message' => 'Sensor data stored successfully.'], 201);
     }
 
-
     public function fetchByShed(Request $request, int $shedId)
     {
         $validated = $request->validate([
