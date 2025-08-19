@@ -35,98 +35,22 @@ class FarmController extends ApiController
             ->withCount('sheds')
             ->get();
 
+        $farms->load([
+            'sheds' => function ($query) {
+                $query->withCount(['flocks', 'devices']);
+            }
+        ]);
+
         // Fetch and process the data (mortalities and live bird count)
         $farms = $this->farmService->processFarmData($farms);
+
+        // Attach Weight & FCR to Flocks
+        $farms = $this->farmService->attachLatestWeightLogs($farms);
 
         // Fetch sensor data for devices
         $farms = $this->farmService->fetchSensorData($farms);
 
         return FarmResource::collection($farms);
-
-//        $dynamo = app(DynamoDbService::class);
-//
-//        foreach ($farms as $farm) {
-//            foreach ($farm->sheds as $shed) {
-//                foreach ($shed->devices as $device) {
-//                    $data = $dynamo->getSensorData([$device->id], null, null, true); // correct argument order
-//                    $device->latest_sensor_data = !empty($data) ? (object)$data[0] : null;
-//                }
-//            }
-//        }
-//
-////        // Iterate over each farm, shed, and flock to calculate live birds
-////        foreach ($farms as $farm) {
-////            $totalLiveBirdCount = 0; // Initialize total live bird count for the farm
-////
-////            foreach ($farm->sheds as $shed) {
-////                foreach ($shed->flocks as $flock) {
-////                    // Get the initial bird count from the flock
-////                    $initialBirdCount = $flock->chicken_count;
-////
-////                    // Get the mortality data for this flock (daily and nightly)
-////                    $mortalityData = ProductionLog::where('flock_id', $flock->id)
-////                            ->whereBetween('production_log_date', [$flock->start_date, now()])
-////                            ->sum('day_mortality_count') + ProductionLog::where('flock_id', $flock->id)
-////                            ->whereBetween('production_log_date', [$flock->start_date, now()])
-////                            ->sum('night_mortality_count');
-////
-////                    // Calculate the live bird count for this flock
-////                    $liveBirdCount = $initialBirdCount - $mortalityData;
-////
-////                    // Add the live bird count of this flock to the total for the farm
-////                    $totalLiveBirdCount += $liveBirdCount;
-////
-////                    // Add live bird count to the flock for reference in the API response
-////                    $flock->live_bird_count = $liveBirdCount;
-////                }
-////            }
-////
-////            // Add total live bird count to the farm object
-////            $farm->total_live_bird_count = $totalLiveBirdCount;
-////        }
-//
-//        // Iterate over each farm, shed, and flock to calculate mortalities and live birds
-//        foreach ($farms as $farm) {
-//            $totalLiveBirdCount = 0; // Initialize total live bird count for the farm
-//            $totalDailyMortality = 0; // Initialize total daily mortality for the farm
-//            $totalWeeklyMortality = 0; // Initialize total weekly mortality for the farm
-//            $totalAllTimeMortality = 0; // Initialize total all-time mortality for the farm
-//
-//            foreach ($farm->sheds as $shed) {
-//                foreach ($shed->flocks as $flock) {
-//                    // Get the initial bird count from the flock
-//                    $initialBirdCount = $flock->chicken_count;
-//
-//                    // Get mortality data for this flock
-//                    $dailyMortality = $this->getMortality($flock, 1);  // Last 1 day
-//                    $weeklyMortality = $this->getMortality($flock, 7);  // Last 7 days
-//                    $allTimeMortality = $this->getMortality($flock, 'all');  // All-time mortality
-//
-//                    // Add the mortalities to the totals
-//                    $totalDailyMortality += $dailyMortality;
-//                    $totalWeeklyMortality += $weeklyMortality;
-//                    $totalAllTimeMortality += $allTimeMortality;
-//
-//                    // Calculate the live bird count for this flock
-//                    $liveBirdCount = $initialBirdCount - $allTimeMortality;
-//
-//                    // Add the live bird count of this flock to the total for the farm
-//                    $totalLiveBirdCount += $liveBirdCount;
-//
-//                    // Add live bird count and mortalities to the flock for reference in the API response
-//                    $flock->live_bird_count = $liveBirdCount;
-//                    $flock->daily_mortality = $dailyMortality;
-//                    $flock->weekly_mortality = $weeklyMortality;
-//                    $flock->all_time_mortality = $allTimeMortality;
-//                }
-//            }
-//
-//            // Add total live bird count and total mortalities to the farm object
-//            $farm->total_live_bird_count = $totalLiveBirdCount;
-//            $farm->total_daily_mortality = $totalDailyMortality;
-//            $farm->total_weekly_mortality = $totalWeeklyMortality;
-//            $farm->total_all_time_mortality = $totalAllTimeMortality;
-//        }
     }
 
     /**

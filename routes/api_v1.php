@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\V1\UserSettingsController;
 use App\Models\District;
 use App\Models\Province;
 use App\Models\Tehsil;
+use App\Http\Controllers\Api\V1\WeightLogController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Other routes
@@ -82,7 +84,10 @@ Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceControl
 
 // Daily reports
 Route::get('production/report/headers/{id}', [ProductionLogController::class, 'dailyReportHeaders'])->name('productions.report.headers');
+Route::get('production/report/history', [ProductionLogController::class, 'history'])->name('productions.report.history');
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
+
+Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
 
 // Address Credentials
 Route::get('provinces', function () {

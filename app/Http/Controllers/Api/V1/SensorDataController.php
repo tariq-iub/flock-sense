@@ -39,8 +39,8 @@ class SensorDataController extends ApiController
         $sensorData = array_merge(
             $validated,
             collect($request->except(['device_serial']))  // All except serial_no
-                ->reject(fn($value) => is_null($value)) // Optional: skip nulls
-                ->toArray()
+            ->reject(fn($value) => is_null($value)) // Optional: skip nulls
+            ->toArray()
         );
 
         // ✅ Store in DynamoDB
@@ -49,72 +49,99 @@ class SensorDataController extends ApiController
         return response()->json(['message' => 'Sensor data stored successfully.'], 201);
     }
 
-
     public function fetchByShed(Request $request, int $shedId)
     {
         $validated = $request->validate([
-            'range' => 'required|in:latest,last_hour,last_12_hours,day,week,month'
+            'range' => 'nullable|in:latest,last_hour,last_12_hours,day,week,month,custom',
+            'from' => 'required_if:range,custom|date_format:Y-m-d H:i:s',
+            'to' => 'required_if:range,custom|date_format:Y-m-d H:i:s|after_or_equal:from',
         ]);
 
-        // Get all devices in this shed
         $deviceIds = ShedDevice::where('shed_id', $shedId)->pluck('device_id')->toArray();
-
         if (empty($deviceIds)) {
             return response()->json(['data' => []], 200);
         }
 
-        $fromTimestamp = $this->getTimeRange($validated['range']);
-        $results = $this->dynamoDbService->getSensorData($deviceIds, null, null, true);
+        $fromTimestamp = null;
+        $toTimestamp = null;
+        $latest = false;
 
-        return response()->json(['data' => SensorDataResource::collection($results)], 200);
+        if (($validated['range'] ?? null) === 'custom') {
+            $fromTimestamp = Carbon::parse($validated['from'])->timestamp;
+            $toTimestamp = Carbon::parse($validated['to'])->timestamp;
+        } elseif (($validated['range'] ?? null) === 'latest') {
+            $latest = true;
+        } elseif (!empty($validated['range'])) {
+            $fromTimestamp = $this->getTimeRange($validated['range']);
+        }
+
+        $results = $this->dynamoDbService->getSensorData(
+            $deviceIds,
+            $fromTimestamp,
+            $toTimestamp,
+            $latest
+        );
+
+        // 🔥 Remove device_id from each record
+        $cleaned = collect($results)->map(function ($record) {
+            unset($record['device_id']);
+            return $record;
+        })->values();
+
+        return response()->json(['data' => $cleaned], 200);
     }
 
     public function fetchByFarm(Request $request, int $farmId)
     {
         try {
             $validated = $request->validate([
-                'range' => 'required|in:latest,last_hour,last_12_hours,day,week,month'
+                'range' => 'nullable|in:latest,last_hour,last_12_hours,day,week,month,custom',
+                'from' => 'required_if:range,custom|date_format:Y-m-d H:i:s',
+                'to' => 'required_if:range,custom|date_format:Y-m-d H:i:s|after_or_equal:from',
             ]);
 
-            // DEBUG: Log the farm ID being requested
-            Log::info('DEBUG fetchByFarm - Farm ID requested:', ['farm_id' => $farmId]);
-
-            // Get all sheds under this farm
             $shedIds = Shed::where('farm_id', $farmId)->pluck('id')->toArray();
-            Log::info('DEBUG fetchByFarm - Shed IDs found:', ['shed_ids' => $shedIds]);
-
             if (empty($shedIds)) {
-                Log::info('DEBUG fetchByFarm - No sheds found for farm', ['farm_id' => $farmId]);
-                return response()->json(['data' => [], 'debug' => 'No sheds found for this farm'], 200);
+                return response()->json(['data' => []], 200);
             }
 
-            // Get all devices in those sheds
             $deviceIds = ShedDevice::whereIn('shed_id', $shedIds)->pluck('device_id')->toArray();
-            Log::info('DEBUG fetchByFarm - Device IDs found:', ['device_ids' => $deviceIds]);
-
             if (empty($deviceIds)) {
-                Log::info('DEBUG fetchByFarm - No devices found in sheds', ['shed_ids' => $shedIds]);
-                return response()->json(['data' => [], 'debug' => 'No devices found in farm sheds'], 200);
+                return response()->json(['data' => []], 200);
             }
 
-            $fromTimestamp = $this->getTimeRange($validated['range']);
-            Log::info('DEBUG fetchByFarm - Querying DynamoDB:', [
-                'device_ids' => $deviceIds,
-                'from_timestamp' => $fromTimestamp,
-                'is_latest' => $validated['range'] === 'latest'
-            ]);
+            $fromTimestamp = null;
+            $toTimestamp = null;
+            $latest = false;
 
-            $results = $this->dynamoDbService->getSensorData($deviceIds, $fromTimestamp, $validated['range'] === 'latest');
-            Log::info('DEBUG fetchByFarm - DynamoDB results count:', ['count' => count($results)]);
+            if (($validated['range'] ?? null) === 'custom') {
+                $fromTimestamp = Carbon::parse($validated['from'])->timestamp;
+                $toTimestamp = Carbon::parse($validated['to'])->timestamp;
+            } elseif (($validated['range'] ?? null) === 'latest') {
+                $latest = true;
+            } elseif (!empty($validated['range'])) {
+                $fromTimestamp = $this->getTimeRange($validated['range']);
+            }
 
-            return response()->json(['data' => SensorDataResource::collection($results)], 200);
+            $results = $this->dynamoDbService->getSensorData(
+                $deviceIds,
+                $fromTimestamp,
+                $toTimestamp,
+                $latest
+            );
+
+            // 🔥 Remove device_id from each record
+            $cleaned = collect($results)->map(function ($record) {
+                unset($record['device_id']);
+                return $record;
+            })->values();
+
+            return response()->json(['data' => $cleaned], 200);
 
         } catch (\Throwable $e) {
             Log::error('Error in fetchByFarm', [
                 'farm_id' => $farmId,
                 'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
             ]);
 
             return response()->json([

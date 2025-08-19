@@ -185,5 +185,172 @@ class ProductionLogController extends ApiController
             // Preserve your original 404 messages
             return response()->json(['message' => $e->getMessage()], 404);
         }
+
+        $logs = ProductionLog::where('flock_id', $latestFlock->id)
+            ->where('shed_id', $shedId)
+            ->whereDate('production_log_date', $reportDate)
+            ->with(['user', 'weightLog'])
+            ->get();
+
+        if ($logs->isEmpty()) {
+            return response()->json(['message' => 'No production data found for the specified date.'], 404);
+        }
+
+        $data = $logs->first();
+        if ($version == 'en') {
+            return response()->json([
+                'shed' => $shed->name,
+                'flock' => $latestFlock->name,
+                'flock_count' => $latestFlock->chicken_count,
+                'date' => $data->production_log_date->format('d-m-Y'),
+                "age" => $data->age . ' Days',
+                "day_mortality_count" => $data->day_mortality_count,
+                "night_mortality_count" => $data->night_mortality_count,
+                "net_count" => $data->net_count,
+                "livability" => $data->livability . ' %',
+                "day_feed_consumed" => round($data->day_feed_consumed / 1000, 2) . ' Kg',
+                "night_feed_consumed" => round($data->night_feed_consumed / 1000, 2) . ' Kg',
+                "avg_feed_consumed" => round($data->avg_feed_consumed / 1000, 2) . ' Kg',
+                "day_water_consumed" => round($data->day_water_consumed / 1000, 2) . ' L',
+                "night_water_consumed" => round($data->night_water_consumed / 1000, 2) . ' L',
+                "avg_water_consumed" => round($data->avg_water_consumed / 1000, 2) . ' L',
+                "is_vaccinated" => ($data->is_vaccinated ? 'Yes' : 'No'),
+                "day_medicine" => $data->day_medicine ?? '',
+                "night_medicine" => $data->night_medicine ?? '',
+                'weighted_chickens' => $data->weightLog->weighted_chickens_count ?? '',
+                'recorded_weight' => ($data->weightLog) ? round($data->weightLog->total_weight / 1000, 2) . ' Kg' : '',
+                'avg_weight' => ($data->weightLog) ? round($data->weightLog->avg_weight / 1000, 2) . ' Kg' : '',
+                'avg_weight_gain' => ($data->weightLog) ? round($data->weightLog->avg_weight_gain / 1000, 2) . ' Kg' : '',
+                'flock_weight' => ($data->weightLog) ? round($data->weightLog->aggregated_total_weight / 1000, 2) . ' Kg' : '',
+                'feed_efficiency' => ($data->weightLog) ? round($data->weightLog->feed_efficiency, 2) : '',
+                'fcr' => ($data->weightLog) ? round($data->weightLog->feed_conversion_ratio, 2) : '',
+                'adjusted_fcr' => ($data->weightLog) ? round($data->weightLog->adjusted_feed_conversion_ratio, 2) : '',
+                'fcr_diff' => ($data->weightLog) ? round($data->weightLog->fcr_standard_diff, 2) : '',
+                'cv' => ($data->weightLog) ? round($data->weightLog->coefficient_of_variation, 2) . ' %' : '',
+                'pef' => ($data->weightLog) ? round($data->weightLog->production_efficiency_factor, 2) : '',
+                'submit_by' => $data->user->name,
+                'submit_at' => $data->created_at->diffForHumans(),
+            ], 200);
+        } else {
+            return response()->json([
+                'شیڈ' => $shed->name, // Shed
+                'فلاک' => $latestFlock->name, // Flock
+                'فلاک تعداد' => $latestFlock->chicken_count . '', // Flock Count
+                'تاریخ' => $data->production_log_date->format('d-m-Y'), // Date
+                'عمر' => $data->age . ' دن', // Age (Days)
+                'دن اموات تعداد' => $data->day_mortality_count . '', // Day Mortality Count
+                'شب اموات تعداد' => $data->night_mortality_count . '', // Night Mortality Count
+                'خالص تعداد' => $data->net_count . '', // Net Count
+                'زندہ رہنے کی شرح' => $data->livability . '', // Livability
+                'دن خوراک صرف شدہ' => round($data->day_feed_consumed / 1000, 2) . ' کلوگرام', // Day Feed Consumed (Kg)
+                'شب خوراک صرف شدہ' => round($data->night_feed_consumed / 1000, 2) . ' کلوگرام', // Night Feed Consumed (Kg)
+                'اوسط خوراک صرف شدہ' => round($data->avg_feed_consumed / 1000, 2) . ' کلوگرام', // Avg Feed Consumed (Kg)
+                'دن پانی صرف شدہ' => round($data->day_water_consumed / 1000, 2) . ' لیٹر', // Day Water Consumed (L)
+                'شب پانی صرف شدہ' => round($data->night_water_consumed / 1000, 2) . ' لیٹر', // Night Water Consumed (L)
+                'اوسط پانی صرف شدہ' => round($data->avg_water_consumed / 1000, 2) . ' لیٹر', // Avg Water Consumed (L)
+                'ویکسین شدہ' => ($data->is_vaccinated ? 'ہاں' : 'نہیں'), // Is Vaccinated (Yes/No)
+                'دن دوا' => $data->day_medicine ?? '', // Day Medicine
+                'شب دوا' => $data->night_medicine ?? '', // Night Medicine
+                'وزن شدہ چکنز' => $data->weightLog->weighted_chickens_count . '' ?? '', // Weighted Chickens
+                'ریکارڈ شدہ وزن' => ($data->weightLog) ? round($data->weightLog->total_weight / 1000, 2) . ' کلوگرام' : '', // Recorded Weight (Kg)
+                'اوسط وزن' => ($data->weightLog) ? round($data->weightLog->avg_weight / 1000, 2) . ' کلوگرام' : '', // Avg Weight (Kg)
+                'اوسط وزن میں اضافہ' => ($data->weightLog) ? round($data->weightLog->avg_weight_gain / 1000, 2) . ' کلوگرام' : '', // Avg Weight Gain (Kg)
+                'فلاک وزن' => ($data->weightLog) ? round($data->weightLog->aggregated_total_weight / 1000, 2) . ' کلوگرام' : '', // Flock Weight (Kg)
+                'خوراک کی کارکردگی' => ($data->weightLog) ? round($data->weightLog->feed_efficiency, 2) . '' : '', // Feed Efficiency
+                'FCR' => ($data->weightLog) ? round($data->weightLog->feed_conversion_ratio, 2) . '' : '', // FCR (kept as is, as it's an acronym)
+                'FCR Diff' => ($data->weightLog) ? round($data->weightLog->fcr_standard_diff, 2) . '' : '', // FCR Diff
+                'CV' => ($data->weightLog) ? round($data->weightLog->coefficient_of_variation, 2) . ' %' : '', // CV (kept as is, as it's an acronym)
+                'PEF' => ($data->weightLog) ? round($data->weightLog->production_efficiency_factor, 2) . '' : '', // PEF (kept as is, as it's an acronym)
+                'رپورٹر‌' => $data->user->name, // Submit By
+            ], 200);
+        }
+    }
+
+    public function history(Request $request)
+    {
+        $request->validate([
+            'shed_id' => 'required|integer|exists:sheds,id',
+            'range' => 'nullable|string|in:today,7days,30days,this_month,last_month,all,custom',
+            'start_date' => 'nullable|date_format:Y-m-d|required_if:range,custom',
+            'end_date' => 'nullable|date_format:Y-m-d|required_if:range,custom|after_or_equal:start_date',
+        ]);
+
+        $shedId = $request->input('shed_id');
+        $range = $request->input('range', 'all'); // default all
+
+        $query = ProductionLog::where('shed_id', $shedId);
+
+        // Apply range filters
+        switch ($range) {
+            case 'today':
+                $query->whereDate('production_log_date', today());
+                break;
+
+            case '7days':
+                $query->whereBetween('production_log_date', [now()->subDays(7)->startOfDay(), now()->endOfDay()]);
+                break;
+
+            case '30days':
+                $query->whereBetween('production_log_date', [now()->subDays(30)->startOfDay(), now()->endOfDay()]);
+                break;
+
+            case 'this_month':
+                $query->whereMonth('production_log_date', now()->month)
+                    ->whereYear('production_log_date', now()->year);
+                break;
+
+            case 'last_month':
+                $lastMonth = now()->subMonth();
+                $query->whereMonth('production_log_date', $lastMonth->month)
+                    ->whereYear('production_log_date', $lastMonth->year);
+                break;
+
+            case 'custom':
+                $query->whereBetween('production_log_date', [
+                    $request->input('start_date'),
+                    $request->input('end_date')
+                ]);
+                break;
+
+            case 'all':
+            default:
+                // No filter applied
+                break;
+        }
+
+        $logs = $query->orderBy('production_log_date', 'asc')->get();
+
+        if ($logs->isEmpty()) {
+            return response()->json(['message' => 'No production data found for the given criteria.'], 404);
+        }
+
+        // Format response only with production_logs table data
+        $formatted = $logs->map(function ($data) {
+            return [
+                'date' => $data->production_log_date->format('d-m-Y'),
+                'age' => $data->age . ' Days',
+                'day_mortality_count' => $data->day_mortality_count,
+                'night_mortality_count' => $data->night_mortality_count,
+                'net_count' => $data->net_count,
+                'livability' => $data->livability . ' %',
+                'day_feed_consumed' => round($data->day_feed_consumed / 1000, 2) . ' Kg',
+                'night_feed_consumed' => round($data->night_feed_consumed / 1000, 2) . ' Kg',
+                'avg_feed_consumed' => round($data->avg_feed_consumed / 1000, 2) . ' Kg',
+                'day_water_consumed' => round($data->day_water_consumed / 1000, 2) . ' L',
+                'night_water_consumed' => round($data->night_water_consumed / 1000, 2) . ' L',
+                'avg_water_consumed' => round($data->avg_water_consumed / 1000, 2) . ' L',
+                'is_vaccinated' => ($data->is_vaccinated ? 'Yes' : 'No'),
+                'day_medicine' => $data->day_medicine ?? '',
+                'night_medicine' => $data->night_medicine ?? '',
+                'submit_at' => $data->created_at->diffForHumans(),
+            ];
+        });
+
+        return response()->json([
+            'shed_id' => $shedId,
+            'total_records' => $logs->count(),
+            'range' => $range,
+            'history' => $formatted,
+        ], 200);
     }
 }

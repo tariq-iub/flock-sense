@@ -25,6 +25,7 @@ class FlockResource extends JsonResource
                 'chicken_count' => $this->chicken_count,
                 'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
                 'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+
                 $this->mergeWhen($this->relationLoaded('shed'), [
                     'shed' => [
                         'id' => $this->shed->id,
@@ -33,6 +34,7 @@ class FlockResource extends JsonResource
                         'type' => $this->shed->type,
                     ],
                 ]),
+
                 $this->mergeWhen($this->relationLoaded('breed'), [
                     'breed' => [
                         'id' => $this->breed->id,
