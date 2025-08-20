@@ -78,8 +78,8 @@
                                             {{ $shed->name }}
                                         </h5>
                                         <small class="text-body-secondary">
-                                            Farm: {{ $shed->farm->name }}<br>
-                                            Owner: {{ $shed->farm->owner->name }}
+                                            Farm: {{ $shed->farm?->name }}<br>
+                                            Owner: {{ $shed->farm?->owner?->name }}
                                         </small>
                                     </div>
                                     <div>

@@ -200,7 +200,7 @@
                             <div class="col-lg-4 mb-3">
                                 <label for="province" class="form-label">Province<span class="text-danger ms-1">*</span></label>
                                 <select class="form-select basic-select" id="province" name="province_id" required>
-                                    <option value="">Select Province</option>
+                                    <option value="" selected disabled>Select Province</option>
                                     @foreach($provinces as $province)
                                         <option value="{{ $province->id }}">{{ $province->name }}</option>
                                     @endforeach
@@ -212,7 +212,7 @@
                             <div class="col-lg-4 mb-3">
                                 <label for="district" class="form-label">District<span class="text-danger ms-1">*</span></label>
                                 <select class="form-select basic-select" id="district" name="district_id" required>
-                                    <option value="">Select District</option>
+                                    <option value="" selected disabled>Select District</option>
                                 </select>
                                 <div class="invalid-feedback">District is required.</div>
                             </div>
@@ -221,7 +221,7 @@
                             <div class="col-lg-4 mb-3">
                                 <label for="city" class="form-label">City<span class="text-danger ms-1">*</span></label>
                                 <select class="form-select select2" id="city" name="city_id" required>
-                                    <option value="">Select City</option>
+                                    <option value="" selected disabled>Select City</option>
                                 </select>
                                 <div class="invalid-feedback">City is required.</div>
                             </div>
@@ -282,17 +282,43 @@
 
     <script>
         function resetSelect(selectElement, placeholder) {
-            $(selectElement).empty().append(new Option(placeholder, ''));
+            // Clear existing options
+            $(selectElement).empty();
+
+            // Create a new Option element
+            const placeholderOption = new Option(placeholder, '');
+
+            // Set the disabled and selected attributes on the placeholder option
+            // so it cannot be chosen and serves as a default.
+            $(placeholderOption).prop('disabled', true).prop('selected', true);
+
+            // Append the placeholder option to the select element
+            $(selectElement).append(placeholderOption);
+
+            // Trigger a change to update the UI
             $(selectElement).val('').trigger('change');
         }
 
         function populateSelect(selectElement, data, placeholder, selectedId = null) {
+            // Reset the select with the disabled placeholder
             resetSelect(selectElement, placeholder);
-            data.forEach(item => {
-                const option = new Option(item.name, item.id, false, item.id == selectedId);
-                $(selectElement).append(option);
-            });
+
+            // Check if there is data to populate
+            if (data && data.length > 0) {
+                data.forEach(item => {
+                    const option = new Option(item.name, item.id, false, item.id == selectedId);
+                    $(selectElement).append(option);
+                });
+            }
+
+            // Trigger change after populating
             $(selectElement).trigger('change');
+
+            // If a specific option was selected, remove the disabled attribute from the placeholder
+            // This isn't strictly necessary but can be a good practice for some UIs
+            if (selectedId !== null && selectedId !== '') {
+                $(selectElement).find('option:disabled').prop('selected', false);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {

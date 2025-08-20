@@ -98,8 +98,8 @@
                                 <td>
                                     {{ $shed->name }}
                                     <div class="text-info fs-10">
-                                        <i class="ti ti-building me-2"></i>{{ $shed->farm->name }}<br>
-                                        <i class="ti ti-user me-2"></i>{{ $shed->farm->owner->name }}
+                                        <i class="ti ti-building me-2"></i>{{ $shed->farm?->name }}<br>
+                                        <i class="ti ti-user me-2"></i>{{ $shed->farm?->owner?->name }}
                                     </div>
                                 </td>
                                 <td>{{ $shed->farm?->city?->name }}</td>
