@@ -30,7 +30,7 @@
                             <h5 class="mb-3">{{ $shed->name }}</h5>
                             <div class="d-flex justify-content-between mb-3">
                                 <div class="text-info">
-                                    <i class="ti ti-map-pin me-2"></i>{{ $farm->address }} | {{ $farm->city->name }}<br>
+                                    <i class="ti ti-map-pin me-2"></i>{{ $farm->address }} | {{ $farm->city?->name }}<br>
                                     <i class="ti ti-calculator me-2"></i>Capacity: {{ number_format($shed->capacity, 0) }}<br>
                                     <i class="ti ti-brand-abstract me-2"></i>Shed Type: {{ ucwords($shed->type) }}
                                 </div>

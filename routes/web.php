@@ -60,8 +60,8 @@ Route::get('/email/verify', function () {
     return view('auth.verification');
 })->middleware('auth')->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-    ->middleware(['auth', 'signed'])->name('verification.verify');
+//Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+//    ->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
@@ -69,15 +69,14 @@ Route::post('/email/verification-notification', [AuthController::class, 'resendV
 // Admin routes group with auth and role:admin middleware
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
     // Register routes (GET and POST)
-    Route::get('/register', [AuthController::class, 'register'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
+//    Route::get('/register', [AuthController::class, 'register'])->name('register');
+//    Route::post('/register', [AuthController::class, 'register'])->name('register');
 
     // Logout route (POST)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Dashboard routes (both GET and POST)
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
-    Route::post('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
     Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');

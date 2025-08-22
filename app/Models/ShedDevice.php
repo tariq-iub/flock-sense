@@ -23,7 +23,7 @@ class ShedDevice extends Model
     /**
      * Relationship: Belongs to Shed.
      */
-    public function shed() : BelongsTo
+    public function shed(): BelongsTo
     {
         return $this->belongsTo(Shed::class);
     }
@@ -31,7 +31,7 @@ class ShedDevice extends Model
     /**
      * Relationship: Belongs to Device.
      */
-    public function device() : BelongsTo
+    public function device(): BelongsTo
     {
         return $this->belongsTo(Device::class);
     }

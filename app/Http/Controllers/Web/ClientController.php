@@ -74,8 +74,8 @@ class ClientController extends Controller
     {
         $user = User::with([
             'farms.sheds.flocks',
-            'settings',
             'farms' => fn ($query) => $query->withCount('sheds'),
+            'settings',
         ])->withCount('farms')
             ->findOrFail($userId);
 

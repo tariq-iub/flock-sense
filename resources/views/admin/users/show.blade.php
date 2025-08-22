@@ -44,11 +44,8 @@
                             <div class="text-center mb-3">
                                 <a href="javascript:void(0);" class="avatar avatar-xl online avatar-rounded">
                                     @php
-                                        $firstMedia = $user->media()->orderBy('order_column')->first();
-                                        $path = asset("assets/img/user.jpg");
-                                        if ($firstMedia && \File::exists(public_path($firstMedia->file_path))) {
-                                            $path = asset($firstMedia->file_path);
-                                        }
+                                        $media = $user->media()->orderBy('order_column')->first();
+                                        $path = $media ? $media->url : asset("assets/img/user.jpg");
                                     @endphp
                                     <img src="{{ $path }}" alt="Img">
                                 </a>

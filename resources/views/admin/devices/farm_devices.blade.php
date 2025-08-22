@@ -79,8 +79,7 @@
                             <tr>
                                 <td>
                                     <span class="fw-bold">{{ $device->serial_no }}</span>
-                                    <br>
-                                    <small class="text-muted">{{ $device->model_number . ' (Firmware: ' . $device->firmware_version . ')' }}</small>
+                                    <div class="text-muted fs-10">{{ $device->model_number . ' (Firmware: ' . $device->firmware_version . ')' }}</div>
                                 </td>
                                 <td>
                                     @foreach($device->capabilities as $cap)
@@ -105,9 +104,9 @@
                                     $currentShed = $device->currentShed();
                                     @endphp
                                     @if($currentShed)
-                                        <span class="text-info fw-bold">{{ $currentShed->shed->name }}</span>
+                                        <span class="text-info fw-bold">{{ $currentShed->shed?->name }}</span>
                                         <br>
-                                        <small class="text-muted">{{ $currentShed->shed->farm->name }}</small>
+                                        <small class="text-muted">{{ $currentShed->shed?->farm?->name }}</small>
                                     @else
                                         <span class="badge bg-soft-danger">Not Linked</span>
                                     @endif
