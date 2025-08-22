@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 
 class UserResource extends JsonResource
 {
@@ -15,6 +14,8 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $media = $this->media()->orderBy('order_column')->first();
+
         return [
             'type' => 'user',
             'id' => $this->id,
@@ -22,17 +23,17 @@ class UserResource extends JsonResource
                 'name' => $this->name,
                 'email' => $this->email,
                 'phone' => $this->phone,
-                'avatar' => $this->media->first(),
-                'avatar_url' => optional($this->media->first(), fn($m) => Storage::disk('public')->url($m->file_path)),
+                'avatar' => $media,
+                'avatar_url' => $media ? $media->url : asset('assets/img/user.jpg'),
                 'roles' => $this->getRoleNames(),
                 'farms_count' => $this->farms_count,
                 $this->mergeWhen($request->routeIs('users.show'), [
                     'sheds_count' => $this->sheds_count,
                     'birds_count' => $this->birds_count,
                 ]),
-                'email_verified' => ($this->email_verified_at) ? "Yes" : "No",
+                'email_verified' => ($this->email_verified_at) ? 'Yes' : 'No',
                 'create_at' => $this->created_at->format('Y-m-d H:i:s'),
-            ]
+            ],
         ];
     }
 }

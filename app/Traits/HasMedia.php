@@ -4,33 +4,27 @@ namespace App\Traits;
 
 use App\Models\Media;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 trait HasMedia
 {
-    public function media() : MorphMany
+    public function media(): MorphMany
     {
         return $this->morphMany(Media::class, 'model');
     }
 
-    public function addMedia($file, $folder = 'media')
+    public function addMedia($file)
     {
         $name = time() . '_media';
         $filename = $name . '.' . $file->getClientOriginalExtension();
 
-        $destinationPath = public_path("{$folder}");
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0775, true);
-        }
-
+        // Store using 'media' disk
+        $file->storeAs('', $filename, 'media'); // no folder prefix needed since disk points to /media
         $size = $file->getSize();
-        $file->move($destinationPath, $filename);
-        $path = "{$folder}/{$filename}";
 
         return $this->media()->create([
             'file_name' => $filename,
-            'file_path' => $path,
+            'file_path' => Storage::disk('media')->url($filename), // /storage/media/filename.jpg
             'size' => $size,
         ]);
     }
@@ -38,9 +32,14 @@ trait HasMedia
     public function deleteMedia($mediaId): ?bool
     {
         $media = $this->media()->findOrFail($mediaId);
-        if (File::exists($media->file_path)) {
-            File::delete($media->file_path);
+
+        // Extract just the filename from the URL path
+        $filename = basename($media->file_path);
+
+        if (Storage::disk('media')->exists($filename)) {
+            Storage::disk('media')->delete($filename);
         }
+
         return $media->delete();
     }
 

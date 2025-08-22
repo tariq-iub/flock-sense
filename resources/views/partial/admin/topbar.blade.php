@@ -265,12 +265,12 @@
             </li>
 
             @php
-                $path = "assets/img/user.jpg";
+                $path = asset("assets/img/user.jpg");
                 $user = Auth::user();
-                $media = $user->media->first();
+                $media = $user->media()->orderBy('order_column')->first();
                 if($media)
                 {
-                    $path = $media->file_path;
+                    $path = $media->url;
                 }
             @endphp
 
