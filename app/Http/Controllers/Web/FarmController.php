@@ -19,6 +19,7 @@ class FarmController extends Controller
             ->get();
 
         $owners = User::all();
+        $managers = User::all();
 
         $provinces = Province::select('id', 'name')
             ->orderBy('name')
@@ -28,7 +29,7 @@ class FarmController extends Controller
 
         return view(
             'admin.farms.index',
-            compact('farms', 'provinces', 'owners', 'cities')
+            compact('farms', 'managers', 'provinces', 'owners', 'cities')
         );
     }
 
@@ -134,5 +135,21 @@ class FarmController extends Controller
         )->render();
 
         return response()->json(['html' => $view]);
+    }
+
+    public function assignManager(Request $request, Farm $farm)
+    {
+        $request->validate([
+            'manager_id' => 'required|exists:users,id',
+        ]);
+
+        // Remove old managers
+        $farm->managers()->detach();
+
+        // Assign new manager
+        $farm->managers()->attach($request->manager_id);
+
+        return redirect()->back()
+            ->with('success', 'Manager has been assigned successfully.');
     }
 }

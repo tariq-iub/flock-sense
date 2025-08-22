@@ -10,7 +10,7 @@
             </div>
             <h3 class="h2 mb-3">Error 500: Internal Server Error</h3>
             <p>
-                Server has encountered an unexpected condition that prevented it from fulfilling the request.
+                Server has encountered an unexpected condition that prevented it from fulfilling the request.<br>
                 We apologise and are fixing the problem. Please try again at a later stage.
             </p>
             <a href="javascript:history.back()" class="btn btn-primary">Back to Previous Page</a>

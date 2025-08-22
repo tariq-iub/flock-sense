@@ -103,6 +103,7 @@
                                 <td>
                                     @if($farm->managers->count() > 0)
                                         {{ ucwords($farm->managers->first()->name) }}
+                                        <div class="text-muted fs-10">{{ $farm->managers->first()->pivot->link_date }}</div>
                                     @else
                                         <span class="text-danger fs-10">No Manager Added</span>
                                     @endif
@@ -130,7 +131,16 @@
                                            data-farm-name="{{ $farm->name }}">
                                             <i class="ti ti-edit"></i>
                                         </a>
-
+                                        <a href="javascript:void(0)"
+                                           class="p-2 border rounded me-2 manage-staff"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title="Manage Staff"
+                                           data-farm-id="{{ $farm->id }}"
+                                           data-manager-id="{{ optional($farm->managers->first())->id }}"
+                                           data-farm-name="{{ $farm->name }}">
+                                            <i class="ti ti-users"></i>
+                                        </a>
                                         <a href="javascript:void(0);"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
@@ -346,6 +356,40 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Management Modal -->
+    <div class="modal fade" id="manageStaffModal" tabindex="-1" aria-labelledby="manageStaffModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="manageStaffForm" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="manageStaffModalLabel">Manage Farm Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="staff_farm_id" name="farm_id">
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Manager</label>
+                            <select id="manager_id" name="manager_id" class="form-select basic-select3" required>
+                                @foreach($managers as $manager)
+                                    <option value="{{ $manager->id }}">{{ $manager->name }} ({{ $manager->email }})</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Please select a manager.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success me-2">Save Manager</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -602,12 +646,34 @@
                 width: '100%'
             });
         });
-
         $(document).ready(function () {
             $('.basic-select2').select2({
                 dropdownParent: $('#editFarmModal'), // ensures it works inside Bootstrap modal
                 width: '100%'
             });
+        });
+        $(document).ready(function () {
+            $('.basic-select3').select2({
+                dropdownParent: $('#manageStaffModal'), // ensures it works inside Bootstrap modal
+                width: '100%'
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.manage-staff', function ()
+        {
+            const farmId = $(this).data('farm-id');
+            const managerId = $(this).data('manager-id');
+
+            $('#staff_farm_id').val(farmId);
+            $('#manageStaffForm').attr('action', '/admin/farms/' + farmId + '/assign-manager');
+
+            // Reset and preselect manager
+            $('#manager_id').val(managerId).trigger('change');
+
+            var modal = new bootstrap.Modal(document.getElementById('manageStaffModal'));
+            modal.show();
         });
     </script>
 @endpush

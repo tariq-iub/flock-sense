@@ -34,12 +34,14 @@ class Farm extends Model
 
     public function managers()
     {
-        return $this->belongsToMany(User::class, 'farm_managers', 'farm_id', 'manager_id')->withPivot('link_date');
+        return $this->belongsToMany(User::class, 'farm_managers', 'farm_id', 'manager_id')
+            ->withPivot('link_date');
     }
 
     public function staff()
     {
-        return $this->belongsToMany(User::class, 'farm_staff', 'farm_id', 'worker_id')->withPivot('link_date');
+        return $this->belongsToMany(User::class, 'farm_staff', 'farm_id', 'worker_id')
+            ->withPivot('link_date');
     }
 
     public function getFlocksCountAttribute(): int
