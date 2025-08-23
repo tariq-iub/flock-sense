@@ -71,20 +71,23 @@ class FarmService
      */
     public function getMortality($flock, $period)
     {
-        $query = ProductionLog::where('flock_id', $flock->id);
+        $query = ProductionLog::where('flock_id', $flock->id)
+            ->orderByDesc('production_log_date'); // latest first
 
         if ($period === 1) {
-            // Last 1 day
-            $query->where('production_log_date', '>=', now()->subDay());
+            // Last 1 record (latest entry)
+            $logs = $query->limit(1)->get();
         } elseif ($period === 7) {
-            // Last 7 days
-            $query->where('production_log_date', '>=', now()->subWeek());
+            // Last 7 records
+            $logs = $query->limit(7)->get();
         } elseif ($period === 'all') {
-            // All-time mortality
-            $query->where('production_log_date', '>=', $flock->start_date);
+            // All records since flock started
+            $logs = $query->where('production_log_date', '>=', $flock->start_date)->get();
+        } else {
+            return 0; // fallback
         }
 
-        return $query->sum('day_mortality_count') + $query->sum('night_mortality_count');
+        return $logs->sum('day_mortality_count') + $logs->sum('night_mortality_count');
     }
 
     /**
