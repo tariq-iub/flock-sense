@@ -496,9 +496,9 @@
                     document.getElementById('edit-role').value = roleName;
 
                     // Profile image preview (handle if media array is empty)
-                    if (user.media && user.media.length > 0 && user.media[0].file_path) {
+                    if (user.media && user.media.length > 0 && user.media[0].file_name) {
                         // Always use the correct absolute path
-                        let imgPath = window.location.origin + '/media/' + user.media[0].file_path.replace(/^media[\/\\]?/, '');
+                        let imgPath = window.location.origin + '/storage/media/' + user.media[0].file_name;
                         let img = document.getElementById('editProfileImgTag');
                         img.src = imgPath;
                         img.classList.remove('d-none');
