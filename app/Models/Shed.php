@@ -48,7 +48,9 @@ class Shed extends Model
 
     public function activeDevices()
     {
-        return $this->shedDevices()->where('is_active', true)->with('device');
+        return $this->shedDevices()
+            ->where('is_active', true)
+            ->with('device');
     }
 
     public function productionLogs(): HasMany

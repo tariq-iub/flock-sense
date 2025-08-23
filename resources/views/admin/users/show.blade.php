@@ -50,7 +50,10 @@
                                     <img src="{{ $path }}" alt="Img">
                                 </a>
                                 <h5 class="mb-1"><a href="javascript:void(0);">{{ $user->name }} </a></h5>
-                                <p class="fs-12">{{ $user->email }}</p>
+                                <p class="fs-12">
+                                    {{ $user->email }}<br>
+                                    {{ $user->phone }}
+                                </p>
                             </div>
                             <div class="row g-1">
                                 <div class="col-sm-4">
@@ -73,6 +76,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if(auth()->user()->hasAnyRole(['admin', 'owner']))
                         <div class="mb-4">
                             <a href="javascript:void(0);"
                                class="btn btn-primary d-inline-flex align-items-center justify-content-center w-100"
@@ -80,6 +85,8 @@
                                 <i class="ti ti-circle-plus me-2"></i>Add Farm
                             </a>
                         </div>
+                        @endif
+
                         <div class="list-group" id="farmList">
                             @foreach($user->farms as $farm)
                                 <a href="javascript:void(0)" class="list-group-item list-group-item-action farm-item"

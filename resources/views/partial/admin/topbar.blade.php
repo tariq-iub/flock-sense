@@ -202,7 +202,7 @@
                                 <a href="activities.html">
                                     <div class="media d-flex">
 													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="assets/img/profiles/avatar-13.jpg">
+														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
 													</span>
                                         <div class="flex-grow-1">
                                             <p class="noti-details"><span class="noti-title">James Kirwin</span> confirmed his order.  Order No: #78901.Estimated delivery: 2 days</p>
@@ -215,7 +215,7 @@
                                 <a href="activities.html">
                                     <div class="media d-flex">
 													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="assets/img/profiles/avatar-03.jpg">
+														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
 													</span>
                                         <div class="flex-grow-1">
                                             <p class="noti-details"><span class="noti-title">Leo Kelly</span> cancelled his order scheduled for  17 Jan 2025</p>
@@ -228,7 +228,7 @@
                                 <a href="activities.html" class="recent-msg">
                                     <div class="media d-flex">
 													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="assets/img/profiles/avatar-17.jpg">
+														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
 													</span>
                                         <div class="flex-grow-1">
                                             <p class="noti-details">Payment of $50 received for Order #67890 from <span class="noti-title">Antonio Engle</span></p>
@@ -241,7 +241,7 @@
                                 <a href="activities.html" class="recent-msg">
                                     <div class="media d-flex">
 													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="assets/img/profiles/avatar-02.jpg">
+														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
 													</span>
                                         <div class="flex-grow-1">
                                             <p class="noti-details"><span class="noti-title">Andrea</span> confirmed his order.  Order No: #73401.Estimated delivery: 3 days</p>
@@ -289,10 +289,10 @@
                         </span>
                         <div>
                             <h6 class="fw-medium">{{ $user->name }}</h6>
-                            <p>{{ ucfirst($user->getRoleNames()->first()) ?? 'User' }}</p>
+                            <p>{{ $user->phone ?? $user->email }}</p>
                         </div>
                     </div>
-                    <a class="dropdown-item" href="profile.html"><i class="ti ti-user-circle me-2"></i>MyProfile</a>
+                    <a class="dropdown-item" href="{{ route('clients.show', $user) }}"><i class="ti ti-user-circle me-2"></i>My Profile</a>
                     <a class="dropdown-item" href="sales-report.html"><i class="ti ti-file-text me-2"></i>Reports</a>
                     <a class="dropdown-item" href="general-settings.html"><i class="ti ti-settings-2 me-2"></i>Settings</a>
                     <hr class="my-2">
