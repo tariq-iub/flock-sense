@@ -26,14 +26,29 @@ class FarmController extends ApiController
      */
     public function index(Request $request)
     {
-        $farms = QueryBuilder::for(Farm::class)
-            ->where('owner_id', $request->user()->id)
+        $user = $request->user();
+
+        $query = QueryBuilder::for(Farm::class)
             ->allowedFilters(['id', 'name'])
             ->allowedIncludes(['sheds'])
             ->allowedSorts(['id', 'name'])
             ->with(['sheds.devices.appliances', 'sheds.flocks'])
-            ->withCount('sheds')
-            ->get();
+            ->withCount('sheds');
+
+        // Role-based farm access
+        if ($user->hasRole('owner')) {
+            $query->where('owner_id', $user->id);
+        } elseif ($user->hasRole('manager')) {
+            $query->whereHas('managers', function ($q) use ($user) {
+                $q->where('manager_id', $user->id);
+            });
+        } elseif ($user->hasRole('worker')) {
+            $query->whereHas('staff', function ($q) use ($user) {
+                $q->where('worker_id', $user->id);
+            });
+        }
+
+        $farms = $query->get();
 
         $farms->load([
             'sheds' => function ($query) {
