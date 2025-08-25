@@ -27,6 +27,9 @@ class SensorDataResource extends JsonResource
                     'device_id' => $data['device_id'] ?? null,
                     'timestamp' => $data['timestamp'] ?? null,
                 ],
+                [
+                    'brooder_temp' => null,
+                ],
                 collect($data)
                     ->except(['device_id', 'timestamp'])
                     ->toArray()
