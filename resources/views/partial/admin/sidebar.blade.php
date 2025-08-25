@@ -33,6 +33,7 @@
             </ul>
         </div>
     </div>
+
     <div class="sidebar-header p-3 pb-0 pt-2">
         <div class="text-center rounded bg-light p-2 mb-4 sidebar-profile d-flex align-items-center">
             <div class="avatar avatar-md onlin">
@@ -94,7 +95,6 @@
                                          Route::is('admin.farms.*') ||
                                          Route::is('admin.sheds.*') ||
                                          Route::is('admin.flocks.*') ||
-                                         Route::is('daily.reports') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>System Admin</span><span class="menu-arrow"></span>
@@ -152,12 +152,6 @@
                                     <a href="{{ route('admin.flocks.index') }}"
                                        class="{{ request()->routeIs('admin.flocks.*') ? 'active' : '' }}">
                                         Flock Management
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('daily.reports') }}"
-                                       class="{{ request()->routeIs('daily.reports') ? 'active' : '' }}">
-                                        Daily Reports
                                     </a>
                                 </li>
                             </ul>
@@ -223,6 +217,7 @@
                         </li>
                     </ul>
                 </li>
+                @admin
                 <li class="submenu-open">
                     <h6 class="submenu-hdr">OPERATIONS</h6>
                     <ul>
@@ -255,51 +250,151 @@
                                 <span>System Settings</span>
                             </a>
                         </li>
-                        <li><a href="product-list.html"><i data-feather="box"></i><span>Subscriptions</span></a></li>
-                        <li><a href="add-product.html"><i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span></a></li>
-                        <li><a href="qrcode.html"><i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span></a></li>
-                    </ul>
-                </li>
-                <li class="submenu-open">
-                    <h6 class="submenu-hdr">REPORTS</h6>
-                    <ul>
-                        <li>
-                            <a href="{{ route('reports.income') }}"
-                               class="{{ request()->routeIs('reports.income') ? 'active' : '' }}">
-                                <i class="ti ti-chart-ppf fs-16 me-2"></i>
-                                Income Report
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('reports.expenses') }}"
-                               class="{{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
-                                <i class="ti ti-file-vector fs-16 me-2"></i>
-                                Expense Report
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('reports.tax') }}"
-                               class="{{ request()->routeIs('reports.tax') ? 'active' : '' }}">
-                                <i class="ti ti-chart-dots-2 fs-16 me-2"></i>
-                                Tax Report
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('reports.devices.sales') }}"
-                               class="{{ request()->routeIs('reports.devices.sales') ? 'active' : '' }}">
+                        <li><a href="#"><i data-feather="box"></i><span>Subscriptions</span></a></li>
+                        <li><a href="#"><i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span></a></li>
+                        <li><a href="#"><i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span></a></li>
+                        <li class="submenu">
+                            <a href="javascript:void(0);"
+                               class="{{ Route::is('daily.reports') ||
+                                         Route::is('reports.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-chart-bar fs-16 me-2"></i>
-                                Sales Report
+                                <span>Reports</span>
+                                <span class="menu-arrow"></span>
                             </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('reports.annual') }}"
-                               class="{{ request()->routeIs('reports.annual') ? 'active' : '' }}">
-                                <i class="ti ti-report-search fs-16 me-2"></i>
-                                Annual Report
-                            </a>
+                            <ul>
+                                <li>
+                                    <a href="{{ route('daily.reports') }}"
+                                       class="{{ request()->routeIs('daily.reports') ? 'active' : '' }}">
+                                        Daily Reports
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('reports.income') }}"
+                                       class="{{ request()->routeIs('reports.income') ? 'active' : '' }}">
+                                        Income Report
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('reports.expenses') }}"
+                                       class="{{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
+                                        Expense Report
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('reports.tax') }}"
+                                       class="{{ request()->routeIs('reports.tax') ? 'active' : '' }}">
+                                        Tax Report
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('reports.devices.sales') }}"
+                                       class="{{ request()->routeIs('reports.devices.sales') ? 'active' : '' }}">
+                                        <i class="ti ti-chart-bar fs-16 me-2"></i>
+                                        Sales Report
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('reports.annual') }}"
+                                       class="{{ request()->routeIs('reports.annual') ? 'active' : '' }}">
+                                        Annual Report
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </li>
+                @endadmin
+
+                @if(auth()->user()->hasAnyRole(['admin', 'owner', 'manager']))
+                    <li class="submenu-open">
+                        <h6 class="submenu-hdr">NAVIGATION</h6>
+                        <ul>
+                            <li class="submenu">
+                                <a href="javascript:void(0);"
+                                   class="{{ Route::is('productions.*') ||
+                                         Route::is('iot.logs') ? 'subdrop active' : '' }}">
+                                    <i class="ti ti-devices fs-16 me-2"></i>
+                                    <span>Logs</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li>
+                                        <a href="{{ route('productions.index') }}"
+                                           class="{{ Route::is('productions.index') ? 'active' : '' }}">
+                                            Production Logs
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('iot.logs') }}"
+                                           class="{{ Route::is('iot.logs') ? 'active' : '' }}">
+                                            IoT Logs
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-settings-automation fs-16 me-2"></i>
+                                    <span>System Settings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"><i data-feather="box"></i><span>Subscriptions</span></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="ti ti-table-plus fs-16 me-2"></i><span>Complaints / Requests</span></a>
+                            </li>
+                            <li class="submenu">
+                                <a href="javascript:void(0);"
+                                   class="{{ Route::is('daily.reports') ||
+                                         Route::is('reports.*') ? 'subdrop active' : '' }}">
+                                    <i class="ti ti-chart-bar fs-16 me-2"></i>
+                                    <span>Reports</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul>
+                                    <li>
+                                        <a href="{{ route('daily.reports') }}"
+                                           class="{{ request()->routeIs('daily.reports') ? 'active' : '' }}">
+                                            Daily Reports
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('reports.income') }}"
+                                           class="{{ request()->routeIs('reports.income') ? 'active' : '' }}">
+                                            Income Report
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('reports.expenses') }}"
+                                           class="{{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
+                                            Expense Report
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('reports.tax') }}"
+                                           class="{{ request()->routeIs('reports.tax') ? 'active' : '' }}">
+                                            Tax Report
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('reports.devices.sales') }}"
+                                           class="{{ request()->routeIs('reports.devices.sales') ? 'active' : '' }}">
+                                            <i class="ti ti-chart-bar fs-16 me-2"></i>
+                                            Sales Report
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('reports.annual') }}"
+                                           class="{{ request()->routeIs('reports.annual') ? 'active' : '' }}">
+                                            Annual Report
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
             </ul>
         </div>
     </div>

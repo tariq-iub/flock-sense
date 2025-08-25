@@ -18,6 +18,7 @@ use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
+use App\Http\Controllers\Web\SettingController;
 use App\Http\Controllers\Web\ShedController;
 use App\Models\Flock;
 use App\Models\Shed;
@@ -66,6 +67,8 @@ Route::get('/email/verify', function () {
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
+
+
 // Admin routes group with auth and role:admin middleware
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
     // Register routes (GET and POST)
@@ -87,6 +90,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     // Daily Reports
     Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
     Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
+
+    // Settings
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -236,4 +242,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/annual', 'annual')->name('reports.annual');
     });
 
+});
+
+Route::group(['prefix' => 'user', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
+    // Daily Reports
+    Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
+    Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
 });
