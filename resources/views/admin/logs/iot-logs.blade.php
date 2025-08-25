@@ -181,7 +181,7 @@
                                 <br>
                                 <small class="text-muted">{{ $shed_name }}</small>
                             </td>
-                            <td class="text-center">{{  \Carbon\Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i:s A') }}</td>
+                            <td class="text-center">{{  \Carbon\Carbon::createFromTimestamp($row['timestamp'], 'Asia/Karachi')->format('d-m-Y h:i:s A') }}</td>
                             <td class="text-center">{{ $row['temp1'] ?? '' }}</td>
                             <td class="text-center">{{ $row['temp2'] ?? '' }}</td>
                             <td class="text-center">{{ $row['humidity'] ?? '' }}</td>

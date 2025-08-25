@@ -68,7 +68,7 @@ class LogsController extends Controller
                 // Prepare raw data for Chart.js (datetime x-axis)
                 $data = collect($logs)->map(function ($row) {
                     return [
-                        'timestamp' => Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i A'),
+                        'timestamp' => Carbon::createFromTimestamp($row['timestamp'], 'Asia/Karachi')->format('d-m-Y h:i A'),
                         'shed_temp' => (float) $row['temp1'] ?? 0,
                         'brooder_temp' => (float) $row['temp2'] ?? 0,
                         'humidity' => (float) $row['humidity'] ?? 0,
@@ -80,7 +80,7 @@ class LogsController extends Controller
             } else {
                 // Group by day and average each metric
                 $data = collect($logs)->groupBy(function ($row) {
-                    return Carbon::createFromTimestamp($row['timestamp'])->format('Y-m-d');
+                    return Carbon::createFromTimestamp($row['timestamp'], 'Asia/Karachi')->format('Y-m-d');
                 })->map(function ($group, $date) {
                     return [
                         'timestamp' => $date,
