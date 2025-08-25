@@ -9,11 +9,9 @@ use App\Models\Device;
 use App\Models\Farm;
 use App\Services\DeviceEventService;
 use App\Services\DynamoDbService;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class LogsController extends Controller
 {
@@ -59,20 +57,20 @@ class LogsController extends Controller
         $date_range = null;
         $chart = [];
 
-        if($request->filled('filter.shed_id') && $request->filled('filter.device_id'))
-        {
+        if ($request->filled('filter.shed_id') && $request->filled('filter.device_id')) {
             $farmId = $request->input('filter.farm_id');
             $date_range = $request->input('filter.date_range');
             $device_id = $request->input('filter.device_id');
             $device = Device::find($device_id);
-            list($logs, $days) = $this->logData($device_id, $date_range);
+            [$logs, $days] = $this->logData($device_id, $date_range);
 
             if ($days <= 7) {
                 // Prepare raw data for Chart.js (datetime x-axis)
                 $data = collect($logs)->map(function ($row) {
                     return [
                         'timestamp' => Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i A'),
-                        'temperature' => (float) $row['temperature'] ?? 0,
+                        'shed_temp' => (float) $row['temp1'] ?? 0,
+                        'brooder_temp' => (float) $row['temp2'] ?? 0,
                         'humidity' => (float) $row['humidity'] ?? 0,
                         'ammonia' => (isset($row['ammonia'])) ? (float) $row['ammonia'] : 0,
                         'carbon_dioxide' => (isset($row['carbon_dioxide'])) ? (float) $row['carbon_dioxide'] : 0,
@@ -86,7 +84,8 @@ class LogsController extends Controller
                 })->map(function ($group, $date) {
                     return [
                         'timestamp' => $date,
-                        'temperature' => round($group->avg('temperature'), 2),
+                        'shed_temp' => round($group->avg('temp1'), 2),
+                        'brooder_temp' => round($group->avg('temp2'), 2),
                         'humidity' => round($group->avg('humidity'), 2),
                         'ammonia' => round($group->avg('ammonia'), 2),
                         'carbon_dioxide' => round($group->avg('carbon_dioxide'), 2),
@@ -99,11 +98,19 @@ class LogsController extends Controller
                 'labels' => array_column($data, 'timestamp'),
                 'datasets' => [
                     [
-                        'label' => 'Temperature (°C)',
-                        'data' => array_column($data, 'temperature'),
+                        'label' => 'Shed Temperature (°C)',
+                        'data' => array_column($data, 'shed_temp'),
                         'yAxisID' => 'y',
                         'borderColor' => '#f87171',
                         'backgroundColor' => 'rgba(248,113,113,0.1)',
+                        'tension' => 0.4,
+                    ],
+                    [
+                        'label' => 'Brooder Temperature (°C)',
+                        'data' => array_column($data, 'brooder_temp'),
+                        'yAxisID' => 'y',
+                        'borderColor' => '#f871bd',
+                        'backgroundColor' => 'rgba(248,113,189,0.1)',
                         'tension' => 0.4,
                     ],
                     [
@@ -156,11 +163,6 @@ class LogsController extends Controller
         );
     }
 
-    /**
-     * @param $device_id
-     * @param $date_range
-     * @return array
-     */
     public function logData($device_id, $date_range): array
     {
         [$start, $end] = explode(' - ', $date_range);
@@ -168,15 +170,16 @@ class LogsController extends Controller
         $endDate = Carbon::createFromFormat('m/d/Y', trim($end))->endOfDay();
         $days = $startDate->diffInDays($endDate) + 1;
 
-        $dynamoService = new DynamoDbService();
+        $dynamoService = new DynamoDbService;
         $logs = $dynamoService->getSensorData(
             [$device_id],
-            (int)$startDate->timestamp,
-            (int)$endDate->timestamp,
+            (int) $startDate->timestamp,
+            (int) $endDate->timestamp,
             false,
             false
         );
-        return array($logs, $days);
+
+        return [$logs, $days];
     }
 
     public function exportExcel(Request $request)
@@ -185,7 +188,7 @@ class LogsController extends Controller
         $date_range = $request->input('filter.date_range');
         $device = Device::find($device_id);
 
-        list($logs, $days) = $this->logData($device_id, $date_range);
+        [$logs, $days] = $this->logData($device_id, $date_range);
 
         return Excel::download(new IotLogsExport($device, $logs), 'device-logs.xlsx');
     }

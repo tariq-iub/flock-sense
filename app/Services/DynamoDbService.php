@@ -1,13 +1,14 @@
 <?php
+
 //
-//namespace App\Services;
+// namespace App\Services;
 //
-//use Aws\DynamoDb\DynamoDbClient;
-//use Aws\Sdk;
-//use Illuminate\Support\Facades\Log;
+// use Aws\DynamoDb\DynamoDbClient;
+// use Aws\Sdk;
+// use Illuminate\Support\Facades\Log;
 //
-//class DynamoDbService
-//{
+// class DynamoDbService
+// {
 //    protected $client;
 //    protected $table = 'sensor-data';
 //
@@ -119,18 +120,17 @@
 //
 //        return $results;
 //    }
-//}
-
+// }
 
 namespace App\Services;
 
-use Aws\DynamoDb\DynamoDbClient;
 use Aws\Sdk;
 use Illuminate\Support\Facades\Log;
 
 class DynamoDbService
 {
     protected $client;
+
     protected $table = 'sensor-data';
 
     public function __construct()
@@ -162,13 +162,13 @@ class DynamoDbService
         Log::info('[DynamoDbService] Storing sensor data:', $data);
 
         $item = [
-            'device_id' => ['N' => (string)$data['device_id']],
-            'timestamp' => ['N' => (string)$data['timestamp']],
+            'device_id' => ['N' => (string) $data['device_id']],
+            'timestamp' => ['N' => (string) $data['timestamp']],
         ];
 
         foreach ($data as $key => $value) {
-            if (!in_array($key, ['device_id', 'timestamp']) && $value !== null) {
-                $item[$key] = ['N' => (string)$value];
+            if (! in_array($key, ['device_id', 'timestamp']) && $value !== null) {
+                $item[$key] = ['N' => (string) $value];
             }
         }
 
@@ -181,19 +181,18 @@ class DynamoDbService
         } catch (\Exception $e) {
             Log::error('[DynamoDbService] Failed to store sensor data.', [
                 'error' => $e->getMessage(),
-                'item' => $item
+                'item' => $item,
             ]);
         }
     }
 
     public function getSensorData(
         array $deviceIds,
-        ?int  $fromTimestamp,
-        ?int  $toTimestamp = null,
-        bool  $latest = false,
-        bool  $ascOrder = true
-    ): array
-    {
+        ?int $fromTimestamp,
+        ?int $toTimestamp = null,
+        bool $latest = false,
+        bool $ascOrder = true
+    ): array {
         Log::info('[DynamoDbService] Fetching sensor data with parameters', [
             'deviceIds' => $deviceIds,
             'from' => $fromTimestamp,
@@ -204,8 +203,9 @@ class DynamoDbService
 
         $results = [];
 
-        if (empty($deviceIds) || (!$latest && $fromTimestamp === null)) {
+        if (empty($deviceIds) || (! $latest && $fromTimestamp === null)) {
             Log::warning('[DynamoDbService] Missing deviceIds or fromTimestamp. Returning empty result.');
+
             return $results;
         }
 
@@ -216,7 +216,7 @@ class DynamoDbService
                         'TableName' => $this->table,
                         'KeyConditionExpression' => 'device_id = :device_id',
                         'ExpressionAttributeValues' => [
-                            ':device_id' => ['N' => (string)$deviceId],
+                            ':device_id' => ['N' => (string) $deviceId],
                         ],
                         'ScanIndexForward' => false,
                         'Limit' => 1,
@@ -227,9 +227,9 @@ class DynamoDbService
                         'KeyConditionExpression' => 'device_id = :device_id AND #ts BETWEEN :from_ts AND :to_ts',
                         'ExpressionAttributeNames' => ['#ts' => 'timestamp'],
                         'ExpressionAttributeValues' => [
-                            ':device_id' => ['N' => (string)$deviceId],
-                            ':from_ts' => ['N' => (string)$fromTimestamp],
-                            ':to_ts' => ['N' => (string)$toTimestamp],
+                            ':device_id' => ['N' => (string) $deviceId],
+                            ':from_ts' => ['N' => (string) $fromTimestamp],
+                            ':to_ts' => ['N' => (string) $toTimestamp],
                         ],
                         'ScanIndexForward' => $ascOrder,
                     ];
@@ -239,8 +239,8 @@ class DynamoDbService
                         'KeyConditionExpression' => 'device_id = :device_id AND #ts >= :from_ts',
                         'ExpressionAttributeNames' => ['#ts' => 'timestamp'],
                         'ExpressionAttributeValues' => [
-                            ':device_id' => ['N' => (string)$deviceId],
-                            ':from_ts' => ['N' => (string)$fromTimestamp],
+                            ':device_id' => ['N' => (string) $deviceId],
+                            ':from_ts' => ['N' => (string) $fromTimestamp],
                         ],
                         'ScanIndexForward' => $ascOrder,
                     ];
@@ -248,13 +248,13 @@ class DynamoDbService
 
                 Log::debug('[DynamoDbService] Executing query for device:', [
                     'device_id' => $deviceId,
-                    'query' => $query
+                    'query' => $query,
                 ]);
 
                 $response = $this->client->query($query);
 
                 if (isset($response['Items']) && count($response['Items']) > 0) {
-                    Log::info("[DynamoDbService] Retrieved " . count($response['Items']) . " records for device_id {$deviceId}");
+                    Log::info('[DynamoDbService] Retrieved '.count($response['Items'])." records for device_id {$deviceId}");
                 } else {
                     Log::warning("[DynamoDbService] No data found for device_id {$deviceId}");
                 }
@@ -262,13 +262,13 @@ class DynamoDbService
                 foreach ($response['Items'] as $item) {
                     $record = [];
                     foreach ($item as $key => $value) {
-                        $record[$key] = isset($value['N']) ? (float)$value['N'] : (string)array_values($value)[0];
+                        $record[$key] = isset($value['N']) ? (float) $value['N'] : (string) array_values($value)[0];
                     }
                     $results[] = $record;
                 }
             } catch (\Exception $e) {
-                Log::error('[DynamoDbService] Failed to fetch data for device_id ' . $deviceId, [
-                    'error' => $e->getMessage()
+                Log::error('[DynamoDbService] Failed to fetch data for device_id '.$deviceId, [
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

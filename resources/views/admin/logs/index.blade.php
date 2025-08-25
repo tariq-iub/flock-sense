@@ -159,7 +159,7 @@
                             <th class="text-center">Age (Days)</th>
                             <th class="text-center">Mortality (D/N)</th>
                             <th class="text-center">Opening Count</th>
-                            <th class="text-center">Net Count</th>
+                            <th class="text-center">Live Birds</th>
                             <th class="text-center">Livability (%)</th>
                             <th class="text-center">Feed (D/N)</th>
                             <th class="text-center">Water (D/N)</th>
@@ -323,7 +323,7 @@
 
                         // Bar datasets
                         {
-                            label: 'Feed Conv. Ratio',
+                            label: 'FCR',
                             data: @json($feedConversionRatio),
                             backgroundColor: 'rgba(168,85,247,0.7)', // purple-400
                             type: 'bar',
@@ -339,7 +339,7 @@
                             order: 2,
                         },
                         {
-                            label: 'Prod. Eff. Factor',
+                            label: 'PEF',
                             data: @json($productionEfficiencyFactor),
                             backgroundColor: 'rgba(52,211,153,0.7)', // green-400
                             type: 'bar',
@@ -398,7 +398,7 @@
                             position: 'right',
                             grid: { drawOnChartArea: false },
                             offset: true,
-                            title: { display: true, text: 'Prod. Eff. Factor' },
+                            title: { display: true, text: 'PEF' },
                         }
                     }
                 }

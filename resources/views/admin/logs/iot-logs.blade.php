@@ -161,7 +161,8 @@
                         <tr>
                             <th class="text-center">Device</th>
                             <th class="text-center">Log Time</th>
-                            <th class="text-center">Temperature (°C)</th>
+                            <th class="text-center">Shed Temp (°C)</th>
+                            <th class="text-center">Brooder Temp (°C)</th>
                             <th class="text-center">Humidity (%)</th>
                             <th class="text-center">NH<sub>3</sub> (ppm)</th>
                             <th class="text-center">CO<sub>2</sub> (ppm)</th>
@@ -181,7 +182,8 @@
                                 <small class="text-muted">{{ $shed_name }}</small>
                             </td>
                             <td class="text-center">{{  \Carbon\Carbon::createFromTimestamp($row['timestamp'])->format('d-m-Y H:i:s A') }}</td>
-                            <td class="text-center">{{ $row['temperature'] ?? '' }}</td>
+                            <td class="text-center">{{ $row['temp1'] ?? '' }}</td>
+                            <td class="text-center">{{ $row['temp2'] ?? '' }}</td>
                             <td class="text-center">{{ $row['humidity'] ?? '' }}</td>
                             <td class="text-center">{{ $row['ammonia'] ?? '' }}</td>
                             <td class="text-center">{{ $row['carbon_dioxide'] ?? '' }}</td>
