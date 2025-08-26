@@ -8,7 +8,7 @@ class ManagerAnalyticsService
 {
     public function getAnalyticsData(array $filters = []): array
     {
-        $start_date = $filters['start_date'] ?: now()->subDays(28)->toDateString();
+        $start_date = $filters['start_date'] ?: now()->subDays(30)->toDateString();
         $end_date = $filters['end_date'] ?: now()->toDateString();
 
         $sql = "WITH active_flocks AS (
@@ -26,7 +26,7 @@ class ManagerAnalyticsService
                   JOIN (
                     SELECT flock_id, MAX(production_log_date) AS max_d
                     FROM production_logs
-                    WHERE production_log_date BETWEEN '2025-05-30' AND '2025-07-14'
+                    WHERE production_log_date BETWEEN '{$start_date}' AND '{$end_date}'
                     GROUP BY flock_id
                   ) x ON x.flock_id = pl.flock_id AND x.max_d = pl.production_log_date
                 ),
@@ -61,7 +61,7 @@ class ManagerAnalyticsService
                   JOIN flocks f   ON f.id = pl.flock_id
                   JOIN sheds  s   ON s.id = f.shed_id
                   WHERE s.farm_id = {$filters['farm_id']}
-                    AND pl.production_log_date BETWEEN '2025-05-30' AND '2025-07-14'
+                    AND pl.production_log_date BETWEEN '{$start_date}' AND '{$end_date}'
                 ),
                 fcr_pef AS (
                   -- FCR/PEF via weight_logs (latest per flock within window)
@@ -74,7 +74,7 @@ class ManagerAnalyticsService
                   JOIN flocks f ON f.id = wl.flock_id
                   JOIN sheds  s ON s.id = f.shed_id
                   WHERE s.farm_id = {$filters['farm_id']}
-                    AND pl.production_log_date BETWEEN '2025-05-30' AND '2025-07-14'
+                    AND pl.production_log_date BETWEEN '{$start_date}' AND '{$end_date}'
                 )
                 SELECT
                   (SELECT COUNT(*) FROM active_flocks)                             AS active_flocks,
@@ -93,6 +93,73 @@ class ManagerAnalyticsService
                   ROUND(COALESCE((SELECT period_feed_kg FROM farm_window),0), 2)   AS feed_kg_window,
                   ROUND(COALESCE((SELECT period_water_l FROM farm_window),0), 2)   AS water_l_window
                 FROM chosen_pl ch";
+
         return DB::select($sql);
+    }
+
+    public function getMortalityRateData(array $filters = []): array
+    {
+        $start_date = $filters['start_date'] ?: now()->subDays(30)->toDateString();
+        $end_date = $filters['end_date'] ?: now()->toDateString();
+
+        $sql = "WITH plw AS (
+                  SELECT
+                    pl.flock_id,
+                    f.NAME AS flock_name,
+                    DATE(pl.production_log_date) AS d,
+                    pl.age,
+                    (pl.day_mortality_count + pl.night_mortality_count) AS deaths,
+                    pl.net_count AS end_count
+                  FROM
+                    production_logs pl
+                    JOIN flocks f ON f.id = pl.flock_id
+                    JOIN sheds s ON s.id = f.shed_id
+                  WHERE
+                    pl.production_log_date BETWEEN '{$start_date}'
+                    AND '{$end_date}'
+                    AND s.farm_id = {$filters['farm_id']}
+                ),
+                x AS (
+                  SELECT
+                    plw.*,
+                    LAG(plw.end_count) OVER (PARTITION BY plw.flock_id ORDER BY plw.d) AS prev_end
+                  FROM
+                    plw
+                ) SELECT
+                  x.flock_id,
+                  x.flock_name,
+                  x.d,
+                  x.age,
+                  CASE
+                    WHEN COALESCE(x.prev_end, x.end_count + x.deaths) = 0 THEN
+                      0
+                    ELSE
+                      (x.deaths * 1.0) / COALESCE(x.prev_end, x.end_count + x.deaths)
+                  END AS mortality_rate
+                FROM
+                  x
+                ORDER BY
+                  x.flock_id,
+                  x.d";
+
+        $rows = DB::select($sql);
+
+        $seriesByFlock = [];
+        foreach ($rows as $r) {
+            $key = $r->flock_id;
+            if (! isset($seriesByFlock[$key])) {
+                $seriesByFlock[$key] = [
+                    'label' => "{$r->flock_name} (#{$r->flock_id})",
+                    'data' => [],
+                ];
+            }
+            // Chart.js expects y as number; convert to percentage later in options
+            $seriesByFlock[$key]['data'][] = [
+                'x' => $r->age,                                // YYYY-MM-DD
+                'y' => round(((float) $r->mortality_rate) * 100, 4),  // % for nicer tooltips
+            ];
+        }
+
+        return array_values($seriesByFlock);
     }
 }
