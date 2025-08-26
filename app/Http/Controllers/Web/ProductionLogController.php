@@ -22,7 +22,10 @@ class ProductionLogController extends Controller
      */
     public function index(Request $request)
     {
-        $farms = Farm::with('sheds.flocks')->orderBy('name')->get();
+        $farms = Farm::with('sheds.flocks')
+            ->orderBy('name')
+            ->get();
+
         $logs = collect();
         $farmId = null;
         $ages = null;

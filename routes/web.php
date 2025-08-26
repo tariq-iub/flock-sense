@@ -61,25 +61,28 @@ Route::get('/email/verify', function () {
     return view('auth.verification');
 })->middleware('auth')->name('verification.notice');
 
-//Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+// Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
 //    ->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-
-
-// Admin routes group with auth and role:admin middleware
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
-    // Register routes (GET and POST)
-//    Route::get('/register', [AuthController::class, 'register'])->name('register');
-//    Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
 
     // Logout route (POST)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Dashboard routes (both GET and POST)
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    // Daily Reports
+    Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
+    Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
+});
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
+    // Register routes (GET and POST)
+    //    Route::get('/register', [AuthController::class, 'register'])->name('register');
+    //    Route::post('/register', [AuthController::class, 'register'])->name('register');
 
     Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
     Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');
@@ -92,7 +95,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
 
     // Settings
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::get('/setting/personal', [SettingController::class, 'personal'])->name('setting.personal');
+    Route::get('/setting/general', [SettingController::class, 'general'])->name('setting.general');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -216,9 +220,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::prefix('expenses')->controller(ExpenseController::class)->group(function () {
         Route::get('/', 'index')->name('expenses.index');
         Route::post('/', 'store')->name('expenses.store');
-        Route::put('/expenses/{expense}', 'update')->name('expenses.update');
-        Route::delete('/expenses/{expense}', 'delete')->name('expenses.destroy');
-        Route::get('/expenses/{expense}/toggle', 'toggle')->name('expenses.toggle');
+        Route::get('/{expense}', 'show')->name('expenses.show');
+        Route::put('/{expense}', 'update')->name('expenses.update');
+        Route::delete('/{expense}', 'destroy')->name('expenses.destroy');
+        Route::get('/{expense}/toggle', 'toggle')->name('expenses.toggle');
     });
 
     // Productions Logs
@@ -242,10 +247,4 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/annual', 'annual')->name('reports.annual');
     });
 
-});
-
-Route::group(['prefix' => 'user', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
-    // Daily Reports
-    Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
-    Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
 });

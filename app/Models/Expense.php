@@ -17,6 +17,8 @@ class Expense extends Model
     protected $fillable = [
         'category',
         'item',
+        'description',
+        'is_active',
     ];
 
     protected $casts = [
@@ -36,7 +38,6 @@ class Expense extends Model
             ->pluck('category');
     }
 
-
     public static function categoriesWithitems()
     {
         return self::where('is_active', true)
@@ -55,8 +56,8 @@ class Expense extends Model
                             'description' => $item->description,
                         ];
                     })->filter(function ($item) {
-                        return !is_null($item['item']);
-                    })->values()
+                        return ! is_null($item['item']);
+                    })->values(),
                 ];
             })->values();
     }

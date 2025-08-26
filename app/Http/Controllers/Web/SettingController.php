@@ -6,8 +6,13 @@ use App\Http\Controllers\Controller;
 
 class SettingController extends Controller
 {
-    public function index()
+    public function personal()
     {
-        //
+        return view('admin.coming-soon');
+    }
+
+    public function general()
+    {
+        return view('admin.coming-soon');
     }
 }

@@ -97,13 +97,9 @@
                                 </td>
                                 <td>
                                     @if($expense->is_active)
-                                        <span class="p-1 pe-2 rounded-1 text-primary bg-success-transparent fs-10">
-                                        <i class="ti ti-check me-1 fs-11"></i> Active
-                                    </span>
+                                        <span class="badge bg-success">Active</span>
                                     @else
-                                        <span class="p-1 pe-2 rounded-1 text-danger bg-danger-transparent fs-10">
-                                        <i class="ti ti-ban me-1 fs-11"></i> Blocked
-                                    </span>
+                                        <span class="badge bg-danger">Blocked</span>
                                     @endif
                                 </td>
                                 <td class="action-table-data">
@@ -136,8 +132,7 @@
                                            data-bs-original-title="Delete Expense"
                                            data-expense-id="{{ $expense->id }}"
                                            data-expense-name="{{ $expense->item }}"
-                                           class="p-2 open-delete-modal"
-                                           onclick="(new bootstrap.Modal(document.getElementById('delete-modal'))).show();">
+                                           class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
                                         <form action="{{ route('expenses.destroy', $expense->id) }}" method="POST" id="delete{{ $expense->id }}">
@@ -160,7 +155,7 @@
     <div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('expenses.store') }}" class="needs-validation" novalidate method="POST">
+                <form action="{{ route('expenses.store') }}" method="POST" class="needs-validation" novalidate>
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="addExpenseModalLabel">Add Expense</h5>
@@ -204,8 +199,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Save Expense</button>
+                        <button type="submit" class="btn btn-success me-2">Save Expense</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
@@ -213,33 +208,51 @@
     </div>
 
     <!-- Edit expense Modal -->
-    <div class="modal fade" id="editExpenseModal" tabindex="-1" aria-labelledby="editexpenseModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="editExpenseModal" tabindex="-1" aria-labelledby="editExpenseModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="editexpenseForm" action="" class="needs-validation" novalidate method="POST">
+                <form id="editExpenseForm" method="POST" class="needs-validation" novalidate>
                     @csrf
                     @method('PUT')
+
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editexpenseModalLabel">Edit expense</h5>
+                        <h5 class="modal-title" id="editExpenseModalLabel">Edit Expense</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <input type="hidden" id="edit-expense-id" name="id" value="">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">expense Name<span class="text-danger ms-1">*</span></label>
-                                    <input type="text" class="form-control" id="edit-name" name="name" required>
-                                    <div class="invalid-feedback">
-                                        expense name is required.
-                                    </div>
-                                </div>
-                            </div>
+                        <input type="hidden" id="edit_expense_id" name="expense_id">
+
+                        <div class="mb-3">
+                            <label for="edit_category" class="form-label">Category<span class="text-danger">*</span></label>
+                            <select id="edit_category" name="category" class="form-select" required>
+                                @foreach($categories as $row)
+                                    <option value="{{ $row }}">{{ $row }}</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Category is required.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_item" class="form-label">Item Name<span class="text-danger">*</span></label>
+                            <input type="text" id="edit_item" name="item" class="form-control" required>
+                            <div class="invalid-feedback">Item name is required.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_description" class="form-label">Description</label>
+                            <textarea id="edit_description" name="description" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="edit_is_active" name="is_active" value="1">
+                            <label class="form-check-label" for="edit_is_active">Is Active</label>
                         </div>
                     </div>
+
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Update expense</button>
+                        <button type="submit" class="btn btn-success me-2">Update Expense</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
@@ -310,30 +323,28 @@
     </script>
     <script>
         $(function(){
-            $('.expenses-data').on('click', function() {
+            $('.edit-expense').on('click', function() {
                 var expenseId = $(this).data('expense-id');
                 var expenseName = $(this).data('expense-name');
 
-                // Show loading spinner in modal body
-                $('#attachexpensesModal .modal-body').html('<div class="text-center py-5"><div class="spinner-border text-success"></div></div>');
-                $('#attachexpensesModalLabel').text('Attach expenses - ' + expenseName);
+                var form = document.getElementById('editExpenseForm');
+                form.action = '/admin/expenses/' + expenseId;
 
-                // Open the modal
-                var modal = new bootstrap.Modal(document.getElementById('attachExpensesModal'));
-                modal.show();
+                $('#editExpenseModalLabels').text('Edit Expense - ' + expenseName);
 
                 // Fetch the attached expenses via AJAX
-                $.ajax({
-                    url: '/admin/expenses/' + expenseId + '/expenses',
-                    method: 'GET',
-                    success: function(data) {
-                        $('#attachexpensesModalLabel').text('Attach expenses - ' + data.expense_name);
-                        $('#attachexpensesModal .modal-body').html(data.html);
-                    },
-                    error: function() {
-                        $('#attachexpensesModal .modal-body').html('<div class="alert alert-danger">Failed to load expenses.</div>');
-                    }
+                $.get('/admin/expenses/' + expenseId, function(data) {
+                    // Populate fields
+                    $('#edit_expense_id').val(data.id);
+                    $('#edit_category').val(data.category);
+                    $('#edit_item').val(data.item);
+                    $('#edit_description').val(data.description);
+                    $('#edit_is_active').val(data.is_active);
                 });
+
+                // Open the modal
+                var modal = new bootstrap.Modal(document.getElementById('editExpenseModal'));
+                modal.show();
             });
         });
     </script>
@@ -357,6 +368,25 @@
                     var modal = new bootstrap.Modal(document.getElementById('editexpenseModal'));
                     modal.show();
                 });
+            });
+
+            let deleteId = null;
+            document.querySelectorAll('.open-delete-modal').forEach(function(el) {
+                el.addEventListener('click', function() {
+                    deleteId = this.getAttribute('data-expense-id');
+                    const expenseName = this.getAttribute('data-expense-name');
+                    document.getElementById('delete-modal-message').textContent =
+                        `Are you sure you want to delete "${expenseName}" data?`;
+
+                    var modal = new bootstrap.Modal(document.getElementById('delete-modal'));
+                    modal.show();
+                });
+            });
+
+            document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+                if (deleteId) {
+                    document.getElementById('delete' + deleteId).submit();
+                }
             });
         });
     </script>

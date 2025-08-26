@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\FarmScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,6 +11,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Farm extends Model
 {
     use HasFactory;
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new FarmScope);
+    }
 
     protected $fillable = [
         'name',
@@ -46,7 +55,9 @@ class Farm extends Model
 
     public function getFlocksCountAttribute(): int
     {
-        if (!$this->relationLoaded('sheds')) return 0;
+        if (! $this->relationLoaded('sheds')) {
+            return 0;
+        }
 
         return $this->sheds->sum(function ($shed) {
             return $shed->flocks->count();
@@ -55,7 +66,9 @@ class Farm extends Model
 
     public function getBirdsCountAttribute(): int
     {
-        if (!$this->relationLoaded('sheds')) return 0;
+        if (! $this->relationLoaded('sheds')) {
+            return 0;
+        }
 
         return $this->sheds->sum(function ($shed) {
             return $shed->flocks->sum('chicken_count');

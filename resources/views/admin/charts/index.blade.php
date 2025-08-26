@@ -113,12 +113,12 @@
                                 </td>
                                 <td class="text-center">
                                     @if($chart->is_active)
-                                    <span class="p-1 pe-2 rounded-1 text-success bg-success-transparent fs-10">
-                                        <i class="ti ti-check me-1 fs-11"></i> Active
+                                    <span class="badge bg-success">
+                                        Active
                                     </span>
                                     @else
-                                        <span class="p-1 pe-2 rounded-1 text-danger bg-danger-transparent fs-10">
-                                        <i class="ti ti-ban me-1 fs-11"></i> Blocked
+                                        <span class="badge bg-danger">
+                                            Blocked
                                     </span>
                                     @endif
                                 </td>

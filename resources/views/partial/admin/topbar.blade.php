@@ -294,7 +294,7 @@
                     </div>
                     <a class="dropdown-item" href="{{ route('clients.show', $user) }}"><i class="ti ti-user-circle me-2"></i>My Profile</a>
                     <a class="dropdown-item" href="{{ route('daily.reports') }}"><i class="ti ti-file-text me-2"></i>Daily Reports</a>
-                    <a class="dropdown-item" href="{{ route('setting.index') }}"><i class="ti ti-settings-2 me-2"></i>Settings</a>
+                    <a class="dropdown-item" href="{{ route('setting.personal') }}"><i class="ti ti-settings-2 me-2"></i>Settings</a>
                     <hr class="my-2">
                     <a class="dropdown-item logout pb-0" href="javascript:void(0)" onclick="$('#logout').submit();">
                         <i class="ti ti-logout me-2"></i>Logout
@@ -313,7 +313,7 @@
                aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
             <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="{{ route('clients.show', $user) }}">My Profile</a>
-                <a class="dropdown-item" href="{{ route('settings.index') }}">Settings</a>
+                <a class="dropdown-item" href="{{ route('setting.personal') }}">Settings</a>
                 <a class="dropdown-item" href="javascript:void(0)" onclick="$('#logout').submit();">Logout</a>
             </div>
         </div>

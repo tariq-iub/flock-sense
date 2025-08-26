@@ -15,8 +15,8 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
-            abort(401,'Unauthenticated');
+        if (! $user) {
+            abort(401, 'Unauthenticated');
         }
 
         if ($user->hasRole('admin')) {

@@ -17,63 +17,6 @@
     </div>
     <!-- /Logo -->
 
-    <div class="modern-profile p-3 pb-0">
-        <div class="text-center rounded bg-light p-3 mb-4 user-profile">
-            <div class="avatar avatar-lg online mb-3">
-                <img src="assets/img/customer/customer15.jpg" alt="Img" class="img-fluid rounded-circle">
-            </div>
-            <h6 class="fs-14 fw-bold mb-1">Adrian Herman</h6>
-            <p class="fs-12 mb-0">System Admin</p>
-        </div>
-        <div class="sidebar-nav mb-3">
-            <ul class="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified bg-transparent" role="tablist">
-                <li class="nav-item"><a class="nav-link active border-0" href="#">Menu</a></li>
-                <li class="nav-item"><a class="nav-link border-0" href="chat.html">Chats</a></li>
-                <li class="nav-item"><a class="nav-link border-0" href="email.html">Inbox</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="sidebar-header p-3 pb-0 pt-2">
-        <div class="text-center rounded bg-light p-2 mb-4 sidebar-profile d-flex align-items-center">
-            <div class="avatar avatar-md onlin">
-                <img src="assets/img/customer/customer15.jpg" alt="Img" class="img-fluid rounded-circle">
-            </div>
-            <div class="text-start sidebar-profile-info ms-2">
-                <h6 class="fs-14 fw-bold mb-1">Adrian Herman</h6>
-                <p class="fs-12">System Admin</p>
-            </div>
-        </div>
-        <div class="d-flex align-items-center justify-content-between menu-item mb-3">
-            <div>
-                <a href="index.html" class="btn btn-sm btn-icon bg-light">
-                    <i class="ti ti-layout-grid-remove"></i>
-                </a>
-            </div>
-            <div>
-                <a href="chat.html" class="btn btn-sm btn-icon bg-light">
-                    <i class="ti ti-brand-hipchat"></i>
-                </a>
-            </div>
-            <div>
-                <a href="email.html" class="btn btn-sm btn-icon bg-light position-relative">
-                    <i class="ti ti-message"></i>
-                </a>
-            </div>
-            <div class="notification-item">
-                <a href="activities.html" class="btn btn-sm btn-icon bg-light position-relative">
-                    <i class="ti ti-bell"></i>
-                    <span class="notification-status-dot"></span>
-                </a>
-            </div>
-            <div class="me-0">
-                <a href="general-settings.html" class="btn btn-sm btn-icon bg-light">
-                    <i class="ti ti-settings"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
@@ -221,29 +164,6 @@
                 <li class="submenu-open">
                     <h6 class="submenu-hdr">OPERATIONS</h6>
                     <ul>
-                        <li class="submenu">
-                            <a href="javascript:void(0);"
-                               class="{{ Route::is('productions.*') ||
-                                         Route::is('iot.logs') ? 'subdrop active' : '' }}">
-                                <i class="ti ti-devices fs-16 me-2"></i>
-                                <span>Logs & Analysis</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li>
-                                    <a href="{{ route('productions.index') }}"
-                                       class="{{ Route::is('productions.index') ? 'active' : '' }}">
-                                        Production Logs
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('iot.logs') }}"
-                                       class="{{ Route::is('iot.logs') ? 'active' : '' }}">
-                                        IoT Logs
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
                         <li>
                             <a href="#">
                                 <i class="ti ti-settings-automation fs-16 me-2"></i>
@@ -253,54 +173,6 @@
                         <li><a href="#"><i data-feather="box"></i><span>Subscriptions</span></a></li>
                         <li><a href="#"><i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span></a></li>
                         <li><a href="#"><i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span></a></li>
-                        <li class="submenu">
-                            <a href="javascript:void(0);"
-                               class="{{ Route::is('daily.reports') ||
-                                         Route::is('reports.*') ? 'subdrop active' : '' }}">
-                                <i class="ti ti-chart-bar fs-16 me-2"></i>
-                                <span>Reports</span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <ul>
-                                <li>
-                                    <a href="{{ route('daily.reports') }}"
-                                       class="{{ request()->routeIs('daily.reports') ? 'active' : '' }}">
-                                        Daily Reports
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('reports.income') }}"
-                                       class="{{ request()->routeIs('reports.income') ? 'active' : '' }}">
-                                        Income Report
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('reports.expenses') }}"
-                                       class="{{ request()->routeIs('reports.expenses') ? 'active' : '' }}">
-                                        Expense Report
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('reports.tax') }}"
-                                       class="{{ request()->routeIs('reports.tax') ? 'active' : '' }}">
-                                        Tax Report
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('reports.devices.sales') }}"
-                                       class="{{ request()->routeIs('reports.devices.sales') ? 'active' : '' }}">
-                                        <i class="ti ti-chart-bar fs-16 me-2"></i>
-                                        Sales Report
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('reports.annual') }}"
-                                       class="{{ request()->routeIs('reports.annual') ? 'active' : '' }}">
-                                        Annual Report
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
                     </ul>
                 </li>
                 @endadmin
@@ -314,7 +186,7 @@
                                    class="{{ Route::is('productions.*') ||
                                          Route::is('iot.logs') ? 'subdrop active' : '' }}">
                                     <i class="ti ti-devices fs-16 me-2"></i>
-                                    <span>Logs</span>
+                                    <span>Logs & Analysis</span>
                                     <span class="menu-arrow"></span>
                                 </a>
                                 <ul>
@@ -331,18 +203,6 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <i class="ti ti-settings-automation fs-16 me-2"></i>
-                                    <span>System Settings</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><i data-feather="box"></i><span>Subscriptions</span></a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="ti ti-table-plus fs-16 me-2"></i><span>Complaints / Requests</span></a>
                             </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);"
@@ -380,7 +240,6 @@
                                     <li>
                                         <a href="{{ route('reports.devices.sales') }}"
                                            class="{{ request()->routeIs('reports.devices.sales') ? 'active' : '' }}">
-                                            <i class="ti ti-chart-bar fs-16 me-2"></i>
                                             Sales Report
                                         </a>
                                     </li>
@@ -391,6 +250,18 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-settings-automation fs-16 me-2"></i>
+                                    <span>System Settings</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#"><i data-feather="box"></i><span>Subscriptions</span></a>
+                            </li>
+                            <li>
+                                <a href="#"><i class="ti ti-table-plus fs-16 me-2"></i><span>Complaints / Requests</span></a>
                             </li>
                         </ul>
                     </li>

@@ -15,6 +15,7 @@ class ExpenseController extends Controller
     {
         $expenses = Expense::all();
         $categories = Expense::categories();
+
         return view(
             'admin.expenses.index',
             compact('expenses', 'categories')
@@ -30,13 +31,20 @@ class ExpenseController extends Controller
             'category' => 'required|string|max:255',
             'item' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'is_active' => 'required|boolean',
         ]);
+        $validated['is_active'] = (isset($request->is_active)) ? true : false;
 
         Expense::create($validated);
+
         return redirect()
             ->route('expenses.index')
             ->with('success', 'Expense has been created successfully.');
+    }
+
+    public function show($id)
+    {
+        $expense = Expense::findOrFail($id);
+        return response()->json($expense);
     }
 
     /**
@@ -48,9 +56,8 @@ class ExpenseController extends Controller
             'category' => 'required|string|max:255',
             'item' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'is_active' => 'required|boolean',
         ]);
-
+        $validated['is_active'] = (isset($request->is_active)) ? true : false;
         $expense->update($validated);
 
         return redirect()
@@ -72,10 +79,11 @@ class ExpenseController extends Controller
 
     public function toggle(Expense $expense)
     {
-        $expense->is_active = !$expense->is_active;
+        $toggle = ($expense->is_active) ? 'blocked' : 'activated';
+        $expense->is_active = ! $expense->is_active;
         $expense->save();
-        return redirect()->back()->with([
-            'success' => "Status of Expense: {$expense->item} has been changed successfully."
-        ]);
+
+        return redirect()->back()
+            ->with('success', "Status of Expense: {$expense->item} has been {$toggle} successfully.");
     }
 }
