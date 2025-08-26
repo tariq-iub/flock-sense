@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\DB;
+
+class ManagerAnalyticsService
+{
+    public function getAnalyticsData(array $filters = []): array
+    {
+        $start_date = $filters['start_date'] ?: now()->subDays(28)->toDateString();
+        $end_date = $filters['end_date'] ?: now()->toDateString();
+
+        $sql = "WITH active_flocks AS (
+                  SELECT f.id, f.shed_id, f.chicken_count, f.start_date, f.end_date
+                  FROM flocks f
+                  JOIN sheds s ON s.id = f.shed_id
+                  WHERE s.farm_id = {$filters['farm_id']}
+                    AND f.start_date <= CURRENT_DATE()
+                    AND (f.end_date IS NULL OR f.end_date >= CURRENT_DATE())
+                ),
+                latest_pl AS (
+                  -- Latest production log per active flock within window (falls back to latest overall)
+                  SELECT pl.*
+                  FROM production_logs pl
+                  JOIN (
+                    SELECT flock_id, MAX(production_log_date) AS max_d
+                    FROM production_logs
+                    WHERE production_log_date BETWEEN '2025-05-30' AND '2025-07-14'
+                    GROUP BY flock_id
+                  ) x ON x.flock_id = pl.flock_id AND x.max_d = pl.production_log_date
+                ),
+                fallback_pl AS (
+                  -- If a flock has no log in the window, take its latest ever
+                  SELECT pl.*
+                  FROM production_logs pl
+                  JOIN (
+                    SELECT flock_id, MAX(production_log_date) AS max_d
+                    FROM production_logs
+                    GROUP BY flock_id
+                  ) x ON x.flock_id = pl.flock_id AND x.max_d = pl.production_log_date
+                ),
+                chosen_pl AS (
+                  -- Prefer latest within window; otherwise fallback latest
+                  SELECT af.id AS flock_id,
+                         COALESCE(lp.net_count, fp.net_count)           AS net_count,
+                         COALESCE(lp.livability, fp.livability)         AS livability,
+                         COALESCE(lp.day_mortality_count,0)+COALESCE(lp.night_mortality_count,0) AS win_mortality,
+                         COALESCE(fp.day_mortality_count,0)+COALESCE(fp.night_mortality_count,0) AS fb_mortality
+                  FROM active_flocks af
+                  LEFT JOIN latest_pl lp   ON lp.flock_id = af.id
+                  LEFT JOIN fallback_pl fp ON fp.flock_id = af.id
+                ),
+                farm_window AS (
+                  -- Window aggregate for the farm in the period
+                  SELECT
+                    SUM(pl.day_mortality_count + pl.night_mortality_count) AS period_mortalities,
+                    SUM(pl.day_feed_consumed + pl.night_feed_consumed)/1000     AS period_feed_kg,
+                    SUM(pl.day_water_consumed + pl.night_water_consumed)   AS period_water_l
+                  FROM production_logs pl
+                  JOIN flocks f   ON f.id = pl.flock_id
+                  JOIN sheds  s   ON s.id = f.shed_id
+                  WHERE s.farm_id = {$filters['farm_id']}
+                    AND pl.production_log_date BETWEEN '2025-05-30' AND '2025-07-14'
+                ),
+                fcr_pef AS (
+                  -- FCR/PEF via weight_logs (latest per flock within window)
+                  SELECT
+                    AVG(wl.feed_conversion_ratio)                  AS avg_fcr,
+                    AVG(wl.adjusted_feed_conversion_ratio)         AS avg_adj_fcr,
+                    AVG(wl.production_efficiency_factor)           AS avg_pef
+                  FROM weight_logs wl
+                  JOIN production_logs pl ON pl.id = wl.production_log_id
+                  JOIN flocks f ON f.id = wl.flock_id
+                  JOIN sheds  s ON s.id = f.shed_id
+                  WHERE s.farm_id = {$filters['farm_id']}
+                    AND pl.production_log_date BETWEEN '2025-05-30' AND '2025-07-14'
+                )
+                SELECT
+                  (SELECT COUNT(*) FROM active_flocks)                             AS active_flocks,
+                  COALESCE(SUM(ch.net_count), 0)                                   AS total_birds_current,
+                  -- Mortality rate over window relative to (sum of latest net_count or stocked birds if you prefer)
+                  COALESCE((SELECT period_mortalities FROM farm_window),0)         AS total_mortalities_window,
+                  CASE
+                    WHEN COALESCE(SUM(ch.net_count),0) > 0
+                    THEN ROUND((SELECT period_mortalities FROM farm_window) * 100.0 / SUM(ch.net_count), 2)
+                    ELSE 0
+                  END                                                              AS mortality_rate_pct,
+                  ROUND(AVG(ch.livability),2)                                      AS avg_livability_pct,
+                  ROUND(COALESCE((SELECT avg_fcr FROM fcr_pef),0), 3)              AS avg_fcr,
+                  ROUND(COALESCE((SELECT avg_adj_fcr FROM fcr_pef),0), 3)          AS avg_adj_fcr,
+                  ROUND(COALESCE((SELECT avg_pef FROM fcr_pef),0), 1)              AS avg_pef,
+                  ROUND(COALESCE((SELECT period_feed_kg FROM farm_window),0), 2)   AS feed_kg_window,
+                  ROUND(COALESCE((SELECT period_water_l FROM farm_window),0), 2)   AS water_l_window
+                FROM chosen_pl ch";
+        return DB::select($sql);
+    }
+}

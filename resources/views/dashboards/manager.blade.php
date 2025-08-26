@@ -21,24 +21,105 @@
                 </li>
             </ul>
         </div>
-        <!-- Welcome Wrap -->
-        <div class="welcome-wrap mb-4">
-            <div class=" d-flex align-items-center justify-content-between flex-wrap">
-                <div class="mb-3">
-                    <h2 class="mb-1 text-white">Welcome Back, Adrian</h2>
-                    <p class="text-light">14 New Companies Subscribed Today !!!</p>
-                </div>
-                <div class="d-flex align-items-center flex-wrap mb-1">
-                    <a href="companies.html" class="btn btn-dark btn-md me-2 mb-2">Companies</a>
-                    <a href="packages.html" class="btn btn-light btn-md mb-2">All Packages</a>
+
+        <div class="row">
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/company-icon-131.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1">$<span class="counters" data-count="307144.00">0</span></h5>
+                            <p class="mb-0">Total Sheds</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="welcome-bg">
-                <img src="{{ asset('assets/img/welcome-bg-02.svg') }}" alt="img" class="welcome-bg-01">
-                <img src="{{ asset('assets/img/welcome-bg-01.svg') }}" alt="img" class="welcome-bg-03">
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget dash1 w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/dash2.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1">$<span class="counters" data-count="4385.00">$4,385.00</span></h5>
+                            <p class="mb-0">Total Sales Due</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget dash2 w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/dash3.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1">$<span class="counters" data-count="385656.50">$385,656.50</span></h5>
+                            <p class="mb-0">Total Sale Amount</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget dash3 w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/dash4.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1">$<span class="counters" data-count="40000.00">$400.00</span></h5>
+                            <p class="mb-0">Total Expense Amount</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="dash-count bg-primary">
+                    <div class="dash-counts">
+                        <h4 class="mb-1">100</h4>
+                        <p class="text-white mb-0">Customers</p>
+                    </div>
+                    <div class="dash-imgs">
+                        <i data-feather="user"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="dash-count das1 bg-cyan-900">
+                    <div class="dash-counts">
+                        <h4 class="mb-1">110</h4>
+                        <p class="text-white mb-0">Suppliers</p>
+                    </div>
+                    <div class="dash-imgs">
+                        <i data-feather="user-check"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="dash-count das2 bg-dark">
+                    <div class="dash-counts">
+                        <h4 class="mb-1">150</h4>
+                        <p class="text-white mb-0">Purchase Invoice</p>
+                    </div>
+                    <div class="dash-imgs">
+                        <img src="assets/img/icons/file-text-icon-01.svg" class="img-fluid" alt="icon">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="dash-count das3 bg-success">
+                    <div class="dash-counts">
+                        <h4 class="mb-1">170</h4>
+                        <p class="text-white mb-0">Sales Invoice</p>
+                    </div>
+                    <div class="dash-imgs">
+                        <i data-feather="file"></i>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- /Welcome Wrap -->
 
         <div class="row">
 
