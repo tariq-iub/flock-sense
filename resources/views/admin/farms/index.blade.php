@@ -27,32 +27,32 @@
         <div class="container-fluid">
             <div class="row mb-3">
                 @if (session('success'))
-                <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
-                    <div>
-                        <i class="feather-check-circle flex-shrink-0 me-2"></i>
-                        {{ session('success') }}
+                    <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
+                        <div>
+                            <i class="feather-check-circle flex-shrink-0 me-2"></i>
+                            {{ session('success') }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="fas fa-xmark"></i>
+                        </button>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <i class="fas fa-xmark"></i>
-                    </button>
-                </div>
                 @endif
 
                 @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>
-                                <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
-                                There were some errors with your submission:
-                            </strong>
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                                <i class="fas fa-xmark"></i>
-                            </button>
-                        </div>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>
+                            <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
+                            There were some errors with your submission:
+                        </strong>
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>
                 @endif
             </div>
         </div>
@@ -110,7 +110,7 @@
                                 </td>
                                 <td>
                                     @forelse($farm->sheds as $shed)
-                                        <span class="p-1 pe-2 rounded-1 text-primary bg-info-transparent fs-10">{{ $shed->name }}</span>
+                                        <span class="badge bg-soft-info">{{ $shed->name }}</span>
                                     @empty
                                         <span class='text-danger fs-10'>No Shed Attached</span>
                                     @endforelse
@@ -579,7 +579,7 @@
                 fetch(`/api/v1/cities/${districtId}`)
                     .then(res => res.json())
                     .then(data => {
-                        populateSelect(city, data, 'Select Province', selectedId);
+                        populateSelect(city, data, 'Select City', selectedId);
                     });
             }
 
@@ -593,17 +593,16 @@
                     fetch(`/admin/farms/${farmId}`)
                         .then(res => res.json())
                         .then(data => {
+                            document.getElementById('editFarmForm').action = `/admin/farms/${data.id}`;
+
                             // Populate modal fields
                             document.getElementById('editFarmModalLabel').innerText = `Edit Farm - ${farmName}`;
                             document.getElementById('edit_farm_id').value = data.id;
                             document.getElementById('edit_name').value = data.name;
+                            document.getElementById('edit_owner_id').value = data.owner_id;
                             document.getElementById('edit_address').value = data.address;
                             document.getElementById('edit_latitude').value = data.latitude || '';
                             document.getElementById('edit_longitude').value = data.longitude || '';
-                            document.getElementById('edit_owner_id').value = data.owner_id;
-
-                            // Set form action dynamically
-                            document.getElementById('editFarmForm').action = `/admin/farms/${data.id}`;
 
                             loadOwners(data.owner_id);
                             loadProvinces(data.province_id);

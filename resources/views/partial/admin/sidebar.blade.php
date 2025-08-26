@@ -28,6 +28,7 @@
                                 <i class="ti ti-home fs-16 me-2"></i><span>Dashboard</span>
                             </a>
                         </li>
+                        @admin
                         <li class="submenu">
                             <a href="javascript:void(0);"
                                class="{{ Route::is('charts.*') ||
@@ -158,6 +159,7 @@
                                 </li>
                             </ul>
                         </li>
+                        @endadmin
                     </ul>
                 </li>
                 @admin
@@ -170,9 +172,21 @@
                                 <span>System Settings</span>
                             </a>
                         </li>
-                        <li><a href="#"><i data-feather="box"></i><span>Subscriptions</span></a></li>
-                        <li><a href="#"><i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span></a></li>
-                        <li><a href="#"><i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span></a></li>
+                        <li>
+                            <a href="#">
+                                <i data-feather="box"></i><span>Subscriptions</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 @endadmin
@@ -250,18 +264,6 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    <i class="ti ti-settings-automation fs-16 me-2"></i>
-                                    <span>System Settings</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#"><i data-feather="box"></i><span>Subscriptions</span></a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="ti ti-table-plus fs-16 me-2"></i><span>Complaints / Requests</span></a>
                             </li>
                         </ul>
                     </li>

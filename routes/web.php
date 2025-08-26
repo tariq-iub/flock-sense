@@ -74,21 +74,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    // Daily Reports
-    Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
-    Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
-});
+    // Productions Logs
+    Route::prefix('productions')->controller(ProductionLogController::class)->group(function () {
+        Route::get('/', 'index')->name('productions.index');
+        Route::get('/export/excel', 'exportExcel')->name('productions.export.excel');
+    });
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
-    // Register routes (GET and POST)
-    //    Route::get('/register', [AuthController::class, 'register'])->name('register');
-    //    Route::post('/register', [AuthController::class, 'register'])->name('register');
-
-    Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
-    Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');
     Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
     Route::get('/iot/export/excel', [LogsController::class, 'exportExcel'])->name('iot.export.excel');
-    Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
 
     // Daily Reports
     Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
@@ -96,7 +89,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
 
     // Settings
     Route::get('/setting/personal', [SettingController::class, 'personal'])->name('setting.personal');
-    Route::get('/setting/general', [SettingController::class, 'general'])->name('setting.general');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -120,6 +112,33 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
             ->get();
     });
 
+    // Client
+    Route::prefix('clients')->controller(ClientController::class)->group(function () {
+        Route::get('/{user}', 'show')->name('clients.show');
+        Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
+    });
+    // Reports
+    Route::prefix('reports')->controller(ReportsController::class)->group(function () {
+        Route::get('/income', 'income')->name('reports.income');
+        Route::get('/expenses', 'expenses')->name('reports.expenses');
+        Route::get('/tax', 'tax')->name('reports.tax');
+        Route::get('/devices-sold', 'devices_sales')->name('reports.devices.sales');
+        Route::get('/annual', 'annual')->name('reports.annual');
+    });
+});
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
+    // Register routes (GET and POST)
+    //    Route::get('/register', [AuthController::class, 'register'])->name('register');
+    //    Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+    Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
+    Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');
+    Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
+
+    // Settings
+    Route::get('/setting/general', [SettingController::class, 'general'])->name('setting.general');
+
     // Resource routes for clients and charts
     Route::resources([
         'breeding' => BreedController::class,
@@ -131,11 +150,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::prefix('clients')->controller(ClientController::class)->group(function () {
         Route::get('/', 'index')->name('clients.index');
         Route::post('/', 'store')->name('clients.store');
-        Route::get('/{user}', 'show')->name('clients.show');
         Route::get('/{user}/edit', 'edit')->name('clients.edit');
         Route::put('/{user}', 'update')->name('clients.update');
         Route::delete('/{user}', 'destroy')->name('clients.destroy');
-        Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
     });
 
     // Farms
@@ -228,23 +245,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
 
     // Productions Logs
     Route::prefix('productions')->controller(ProductionLogController::class)->group(function () {
-        Route::get('/', 'index')->name('productions.index');
         Route::get('/create', 'create')->name('productions.create');
         Route::post('/', 'store')->name('productions.store');
         Route::get('/{productionLog}', 'show')->name('productions.show');
         Route::get('/{productionLog}/edit', 'edit')->name('productions.edit');
         Route::put('/{productionLog}', 'update')->name('productions.update');
         Route::delete('/{productionLog}', 'destroy')->name('productions.destroy');
-        Route::get('/export/excel', 'exportExcel')->name('productions.export.excel');
     });
-
-    // Reports
-    Route::prefix('reports')->controller(ReportsController::class)->group(function () {
-        Route::get('/income', 'income')->name('reports.income');
-        Route::get('/expenses', 'expenses')->name('reports.expenses');
-        Route::get('/tax', 'tax')->name('reports.tax');
-        Route::get('/devices-sold', 'devices_sales')->name('reports.devices.sales');
-        Route::get('/annual', 'annual')->name('reports.annual');
-    });
-
 });

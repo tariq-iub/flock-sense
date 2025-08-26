@@ -20,11 +20,11 @@ class DashboardController extends Controller
         }
 
         if ($user->hasRole('admin')) {
-            return view('dashboards.admin');
+            return view('dashboards.admin', compact('user'));
         } elseif ($user->hasRole('owner')) {
-            return view('dashboards.owner');
+            return view('dashboards.owner', compact('user'));
         } elseif ($user->hasRole('manager')) {
-            return view('dashboards.manager');
+            return view('dashboards.manager', compact('user'));
         }
 
         return abort(403, 'Unauthorized access: No appropriate role found.');

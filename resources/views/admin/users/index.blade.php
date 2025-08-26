@@ -127,24 +127,29 @@
                                 <td>{{ $user->phone }}</td>
                                 <td>
                                     @foreach($user->getRoleNames() as $role)
-                                    <span class="p-1 pe-2 rounded-1 text-primary bg-info-transparent fs-10">{{ ucfirst($role) }}</span>
+                                    <span class="badge bg-danger-transparent">{{ ucfirst($role) }}</span>
                                     @endforeach
                                 </td>
                                 <td>
                                 @forelse($user->farms as $farm)
-                                    <span class="p-1 pe-2 rounded-1 text-primary bg-info-transparent fs-10">{{ $farm->name }}</span>
+                                    <span class="badge bg-success-transparent">{{ $farm->name }}</span>
                                 @empty
-                                    <p class="text-danger fs-10">No Farm Registered</p>
+                                    @if($user->managedFarms->Count() > 0)
+                                       <span class="badge bg-success-transparent">{{ $user->managedFarms->first()->name }}</span>
+                                    @else
+                                       <span class="text-danger fs-10">No Farm Attached</span>
+                                    @endif
+
                                 @endforelse
                                 </td>
                                 <td>
                                     @if($user->is_active)
-                                    <span class="p-1 pe-2 rounded-1 text-primary bg-success-transparent fs-10">
-                                        <i class="ti ti-check me-1 fs-11"></i> Active
+                                    <span class="badge bg-success">
+                                        Active
                                     </span>
                                     @else
-                                    <span class="p-1 pe-2 rounded-1 text-danger bg-danger-transparent fs-10">
-                                        <i class="ti ti-ban me-1 fs-11"></i> Blocked
+                                    <span class="badge bg-danger">
+                                        Blocked
                                     </span>
                                     @endif
                                 </td>
@@ -181,8 +186,8 @@
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('clients.store') }}" class="needs-validation" novalidate
-                      method="POST" enctype="multipart/form-data">
+                <form action="{{ route('clients.store') }}" method="POST"
+                      enctype="multipart/form-data" class="needs-validation" novalidate>
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="addUserModalLabel">
@@ -222,13 +227,13 @@
                                 <div class="mb-3">
                                     <label class="form-label">Role<span class="text-danger ms-1">*</span></label>
                                     <select class="select"  id="role" name="role" required>
-                                        <option>Select Role</option>
+                                        <option value="" disabled selected>Select Role</option>
                                         @foreach($roles as $role)
                                             <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
-                                        Role has been assigned to user.
+                                        Role needs to be selected to assign.
                                     </div>
                                 </div>
 
@@ -325,13 +330,13 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Role<span class="text-danger ms-1">*</span></label>
-                                    <select class="select" id="edit-role" name="role" required>
+                                    <select class="form-select edit-select" id="edit-role" name="role" required>
                                         @foreach($roles as $role)
                                             <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">
-                                        Role has been assigned to user.
+                                        Role needs to be selected to assign.
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -491,10 +496,6 @@
                     document.getElementById('edit-email').value = user.email ?? '';
                     document.getElementById('edit-phone').value = user.phone ?? '';
 
-                    // Handle roles array
-                    let roleName = (user.roles && user.roles.length > 0) ? user.roles[0].name : '';
-                    document.getElementById('edit-role').value = roleName;
-
                     // Profile image preview (handle if media array is empty)
                     if (user.media && user.media.length > 0 && user.media[0].file_name) {
                         // Always use the correct absolute path
@@ -505,8 +506,10 @@
                         document.getElementById('editProfilePicPlaceholder').classList.add('d-none');
                     }
 
-                    // Set form action
-                    document.getElementById('editUserForm').action = '/admin/clients/' + user.id;
+                    const roleName = (user.roles && user.roles[0]) ? user.roles[0].name : null; // use id
+                    $('#edit-role').val(roleName).trigger('change');
+
+                    $('#editUserForm').attr('action', '/admin/clients/' + user.id);
                     $('#editUserModal').modal('show');
                 });
         }
@@ -548,6 +551,11 @@
                 if (deleteUserId) {
                     document.getElementById('delete' + deleteUserId).submit();
                 }
+            });
+
+            $('.edit-select').select2({
+                dropdownParent: $('#editUserModal'), // ensures it works inside Bootstrap modal
+                width: '100%'
             });
         });
     </script>

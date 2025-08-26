@@ -5,20 +5,19 @@
     <div class="content">
         <div class="d-lg-flex align-items-center justify-content-between mb-4">
             <div>
-                <h2 class="mb-1">Welcome, Admin</h3>
-                    <p>You have <span class="text-primary fw-bold">200+</span> Orders, Today</p>
+                <h2 class="mb-1">Welcome, {{ $user->name }}</h3>
+                    <p>You are <span class="text-primary fw-bold">Farm Manager</span> | {{ $user->phone }}</p>
             </div>
             <ul class="table-top-head">
                 <li>
-                    <div class="input-icon-start position-relative">
-									<span class="input-icon-addon fs-16 text-gray-9">
-										<i class="ti ti-calendar"></i>
-									</span>
-                        <input type="text" class="form-control date-range bookingrange" placeholder="Search Product">
-                    </div>
+                    <a data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Refresh" data-bs-original-title="Refresh">
+                        <i class="ti ti-refresh"></i>
+                    </a>
                 </li>
                 <li>
-                    <a data-bs-toggle="tooltip" data-bs-placement="top" id="collapse-header" aria-label="Collapse" data-bs-original-title="Collapse" class=""><i data-feather="chevron-up" class="feather-16"></i></a>
+                    <a data-bs-toggle="tooltip" data-bs-placement="top" id="collapse-header" aria-label="Collapse" data-bs-original-title="Collapse" class="">
+                        <i data-feather="chevron-up" class="feather-16"></i>
+                    </a>
                 </li>
             </ul>
         </div>

@@ -27,7 +27,6 @@ class UserController extends ApiController
             ->allowedSorts(['id', 'name'])
             ->get();
 
-//        return $users;
         return UserResource::collection($users);
     }
 
@@ -39,13 +38,12 @@ class UserController extends ApiController
         return UserResource::make(
             User::with([
                 'farms.sheds.flocks',
-                'farms' => fn($query) => $query->withCount('sheds'),
+                'farms' => fn ($query) => $query->withCount('sheds'),
             ])
                 ->withCount('farms')
                 ->findOrFail($user->id)
         );
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -80,7 +78,7 @@ class UserController extends ApiController
                 // Try input() method
                 $inputData = $request->input();
 
-                if (!empty($inputData)) {
+                if (! empty($inputData)) {
                     $requestData = $inputData;
                 } else {
                     // Manual parsing of multipart form data
@@ -109,7 +107,7 @@ class UserController extends ApiController
                                 if ($valueStart !== false) {
                                     $value = substr($part, $valueStart + 4);
                                     $value = trim($value);
-                                    if (!empty($value)) {
+                                    if (! empty($value)) {
                                         $manualData[$fieldName] = $value;
                                     }
                                 }
@@ -133,7 +131,7 @@ class UserController extends ApiController
                 $manualData['password'] = $requestData['password'];
             }
 
-            if (!empty($manualData)) {
+            if (! empty($manualData)) {
                 $validated = $manualData;
             }
         }
@@ -159,7 +157,7 @@ class UserController extends ApiController
         }
 
         // For multipart form data, also check if we manually parsed a file
-        if ($isMultipart && !$avatarFile && isset($manualData['avatar'])) {
+        if ($isMultipart && ! $avatarFile && isset($manualData['avatar'])) {
             // Try to get the file from the request files
             $allFiles = $request->allFiles();
 
@@ -172,7 +170,7 @@ class UserController extends ApiController
         }
 
         // If still no file, try manual extraction from multipart data
-        if ($isMultipart && !$avatarFile) {
+        if ($isMultipart && ! $avatarFile) {
             $rawContent = $request->getContent();
             $boundary = null;
 
@@ -191,7 +189,7 @@ class UserController extends ApiController
                             $fileContent = substr($part, $fileStart + 4);
                             $fileContent = trim($fileContent);
 
-                            if (!empty($fileContent)) {
+                            if (! empty($fileContent)) {
                                 // Create a temporary file
                                 $tempPath = tempnam(sys_get_temp_dir(), 'avatar_');
                                 file_put_contents($tempPath, $fileContent);
@@ -212,18 +210,18 @@ class UserController extends ApiController
             }
         }
 
-//        if ($avatarFile) {
-//            // Delete existing avatar if any
-//            $existingAvatar = $user->media()->first();
-//            if ($existingAvatar) {
-//                $user->deleteMedia($existingAvatar->id);
-//            }
-//
-//            $user->addMedia($avatarFile, 'avatars');
-//        }
+        //        if ($avatarFile) {
+        //            // Delete existing avatar if any
+        //            $existingAvatar = $user->media()->first();
+        //            if ($existingAvatar) {
+        //                $user->deleteMedia($existingAvatar->id);
+        //            }
+        //
+        //            $user->addMedia($avatarFile, 'avatars');
+        //        }
 
         if ($avatarFile) {
-            $filename = time() . '_' . $avatarFile->getClientOriginalName();
+            $filename = time().'_'.$avatarFile->getClientOriginalName();
             $path = $avatarFile->storeAs('avatars', $filename, 'public'); // Save to public disk
             $existingAvatar = $user->media()->first();
 

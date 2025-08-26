@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasMedia;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -74,13 +75,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Farm::class, 'owner_id');
     }
 
-    public function managedFarms()
+    public function managedFarms(): BelongsToMany
     {
         return $this->belongsToMany(Farm::class, 'farm_managers', 'manager_id', 'farm_id')
             ->withPivot('link_date');
     }
 
-    public function staffFarms()
+    public function staffFarms(): BelongsToMany
     {
         return $this->belongsToMany(Farm::class, 'farm_staff', 'worker_id', 'farm_id')
             ->withPivot('link_date');

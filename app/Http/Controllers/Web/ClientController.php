@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Web;
 
-use App\Models\Province;
 use App\Http\Controllers\Controller;
+use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +16,11 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $users = User::with(['media', 'farms'])->get();
+        $users = User::with([
+            'media',
+            'farms',
+            'managedFarms',
+        ])->get();
         $roles = Role::all();
 
         return view(
