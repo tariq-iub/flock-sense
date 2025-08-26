@@ -29,13 +29,16 @@ class FarmService
             $totalAllTimeMortality = 0;
 
             foreach ($farm->sheds as $shed) {
-                foreach ($shed->flocks as $flock) {
+                // ✅ Only take the latest flock in this shed
+                $flock = $shed->flocks->sortByDesc('id')->first();
+
+                if ($flock) {
                     $initialBirdCount = $flock->chicken_count;
 
                     // Get mortality data for this flock
-                    $dailyMortality = $this->getMortality($flock, 1);  // Last 1 day
-                    $weeklyMortality = $this->getMortality($flock, 7);  // Last 7 days
-                    $allTimeMortality = $this->getMortality($flock, 'all');  // All-time mortality
+                    $dailyMortality = $this->getMortality($flock, 1);
+                    $weeklyMortality = $this->getMortality($flock, 7);
+                    $allTimeMortality = $this->getMortality($flock, 'all');
 
                     // Add the mortalities to the totals
                     $totalDailyMortality += $dailyMortality;
@@ -45,10 +48,10 @@ class FarmService
                     // Calculate the live bird count for this flock
                     $liveBirdCount = $initialBirdCount - $allTimeMortality;
 
-                    // Add the live bird count of this flock to the total for the farm
+                    // Add to farm totals
                     $totalLiveBirdCount += $liveBirdCount;
 
-                    // Add live bird count and mortalities to the flock for reference
+                    // Attach values to flock
                     $flock->live_bird_count = $liveBirdCount;
                     $flock->daily_mortality = $dailyMortality;
                     $flock->weekly_mortality = $weeklyMortality;
@@ -56,7 +59,7 @@ class FarmService
                 }
             }
 
-            // Add total live bird count and total mortalities to the farm object
+            // Attach totals to farm
             $farm->total_live_bird_count = $totalLiveBirdCount;
             $farm->total_daily_mortality = $totalDailyMortality;
             $farm->total_weekly_mortality = $totalWeeklyMortality;
@@ -114,8 +117,10 @@ class FarmService
     {
         foreach ($farms as $farm) {
             foreach ($farm->sheds as $shed) {
-                foreach ($shed->flocks as $flock) {
+                // ✅ Only latest flock
+                $flock = $shed->flocks->sortByDesc('id')->first();
 
+                if ($flock) {
                     $latestWeightLog = WeightLog::where('flock_id', $flock->id)
                         ->orderByDesc('created_at')
                         ->select([
@@ -127,7 +132,6 @@ class FarmService
                         ])
                         ->first();
 
-                    // Inject only the required fields into the flock
                     $flock->latest_weight_log = $latestWeightLog
                         ? [
                             'avg_weight' => $latestWeightLog->avg_weight,
