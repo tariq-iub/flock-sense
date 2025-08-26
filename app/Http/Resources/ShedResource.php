@@ -31,27 +31,11 @@ class ShedResource extends JsonResource
                 'updated_at' => $this->updated_at ? Carbon::parse($this->updated_at)->format('Y-m-d H:i:s') : null,
 
                 'flocks' => $this->whenLoaded('flocks', function () {
-                    return $this->flocks->map(function ($flock) {
-                        return [
-                            'id' => $flock->id,
-                            'name' => $flock->name,
-                            'start_date' => isset($flock->start_date) && $flock->start_date ? Carbon::parse($flock->start_date)->format('Y-m-d') : null,
-                            'end_date' => isset($flock->end_date) && $flock->end_date ? Carbon::parse($flock->end_date)->format('Y-m-d') : null,
-                            'chicken_count' => $flock->chicken_count,
-                            'status' => $flock->status,
-                            'live_bird_count' => $flock->live_bird_count,
-                            'daily_mortality' => $flock->daily_mortality,
-                            'weekly_mortality' => $flock->weekly_mortality,
-                            'all_time_mortality' => $flock->all_time_mortality,
+                    $latestFlock = $this->flocks
+                        ->sortByDesc(fn($flock) => $flock->created_at ?? $flock->id)
+                        ->first();
 
-                            'weight' => [
-                                'avg_weight' => $flock->latest_weight_log['avg_weight'] ?? 0,
-                                'daily_gain' => $flock->latest_weight_log['avg_weight_gain'] ?? 0,
-                                'fcr' => $flock->latest_weight_log['feed_conversion_ratio'] ?? 0,
-                                'record_time' => $flock->latest_weight_log['created_at'] ?? null,
-                            ],
-                        ];
-                    });
+                    return $latestFlock ? FlockResource::collection([$latestFlock]) : [];
                 }),
 
                 $this->mergeWhen($this->relationLoaded('farm'), [
