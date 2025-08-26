@@ -21,27 +21,248 @@
                 </li>
             </ul>
         </div>
-        <!-- Welcome Wrap -->
-        <div class="welcome-wrap mb-4">
-            <div class=" d-flex align-items-center justify-content-between flex-wrap">
-                <div class="mb-3">
-                    <h2 class="mb-1 text-white">Welcome Back, Adrian</h2>
-                    <p class="text-light">14 New Companies Subscribed Today !!!</p>
-                </div>
-                <div class="d-flex align-items-center flex-wrap mb-1">
-                    <a href="companies.html" class="btn btn-dark btn-md me-2 mb-2">Companies</a>
-                    <a href="packages.html" class="btn btn-light btn-md mb-2">All Packages</a>
-                </div>
-            </div>
-            <div class="welcome-bg">
-                <img src="{{ asset('assets/img/welcome-bg-02.svg') }}" alt="img" class="welcome-bg-01">
-                <img src="{{ asset('assets/img/welcome-bg-01.svg') }}" alt="img" class="welcome-bg-03">
-            </div>
-        </div>
-        <!-- /Welcome Wrap -->
 
         <div class="row">
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/shed-icon.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1"><span class="counters" data-count="{{ $farm->sheds->count() }}">0</span></h5>
+                            <p class="mb-0">Total Sheds</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget dash1 w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/hen-icon.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->active_flocks }}">0</span></h5>
+                            <p class="mb-0">Active Flocks</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget dash2 w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/dash3.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_birds_current }}">0</span></h5>
+                            <div class="mb-0">
+                                Total Live Birds
+                                <span class="badge bg-soft-info ms-5">{{ $data->avg_livability_pct }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget dash3 w-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="dash-widgetimg">
+                            <span><img src="{{ asset('assets/img/icons/dash4.svg') }}" alt="img"></span>
+                        </div>
+                        <div class="dash-widgetcontent">
+                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_mortalities_window }}">0</span></h5>
+                            <p class="mb-0">
+                                Total Mortalities
+                                <span class="badge bg-soft-danger ms-5">{{ $data->mortality_rate_pct }}%</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-xxl-8 col-xl-7 col-sm-12 col-12 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="d-inline-flex align-items-center">
+                            <span class="title-icon bg-soft-primary fs-16 me-2"><i class="ti ti-chart-bar"></i></span>
+                            <h5 class="card-title mb-0">Daily Mortality Rate</h5>
+                        </div>
+                    </div>
+                    <div class="card-body pb-0">
+                        <canvas id="mortalityChart" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Selling Products -->
+            <div class="col-xxl-4 col-xl-5 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <div class="d-inline-flex align-items-center">
+                            <span class="title-icon bg-soft-info fs-16 me-2"><i class="ti ti-info-circle"></i></span>
+                            <h5 class="card-title mb-0">Overall Information</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="info-item border bg-light p-3 text-center">
+                                    <div class="mb-2 text-info fs-24">
+                                        <i class="ti ti-user-check"></i>
+                                    </div>
+                                    <p class="mb-1">Suppliers</p>
+                                    <h5>6987</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-item border bg-light p-3 text-center">
+                                    <div class="mb-2 text-orange fs-24">
+                                        <i class="ti ti-users"></i>
+                                    </div>
+                                    <p class="mb-1">Customer</p>
+                                    <h5>4896</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-item border bg-light p-3 text-center">
+                                    <div class="mb-2 text-teal fs-24">
+                                        <i class="ti ti-shopping-cart"></i>
+                                    </div>
+                                    <p class="mb-1">Orders</p>
+                                    <h5>487</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer pb-sm-0">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <h5>Customers Overview</h5>
+                            <div class="dropdown dropdown-wraper">
+                                <a href="javascript:void(0);" class="dropdown-toggle btn btn-sm btn-white" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="ti ti-calendar me-1"></i>Today
+                                </a>
+                                <ul class="dropdown-menu p-3">
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item">Today</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item">Weekly</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:void(0);" class="dropdown-item">Monthly</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-sm-5">
+                                <div id="customer-chart" style="min-height: 145px;"><div id="apexchartsp42rsisn" class="apexcharts-canvas apexchartsp42rsisn apexcharts-theme-" style="width: 142px; height: 145px;"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" class="apexcharts-svg" xmlns:data="ApexChartsNS" transform="translate(0, 0)" width="142" height="145"><foreignObject x="0" y="0" width="142" height="145"><div class="apexcharts-legend" xmlns="http://www.w3.org/1999/xhtml"></div><style type="text/css">
+                                                    .apexcharts-flip-y {
+                                                        transform: scaleY(-1) translateY(-100%);
+                                                        transform-origin: top;
+                                                        transform-box: fill-box;
+                                                    }
+                                                    .apexcharts-flip-x {
+                                                        transform: scaleX(-1);
+                                                        transform-origin: center;
+                                                        transform-box: fill-box;
+                                                    }
+                                                    .apexcharts-legend {
+                                                        display: flex;
+                                                        overflow: auto;
+                                                        padding: 0 10px;
+                                                    }
+                                                    .apexcharts-legend.apexcharts-legend-group-horizontal {
+                                                        flex-direction: column;
+                                                    }
+                                                    .apexcharts-legend-group {
+                                                        display: flex;
+                                                    }
+                                                    .apexcharts-legend-group-vertical {
+                                                        flex-direction: column-reverse;
+                                                    }
+                                                    .apexcharts-legend.apx-legend-position-bottom, .apexcharts-legend.apx-legend-position-top {
+                                                        flex-wrap: wrap
+                                                    }
+                                                    .apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {
+                                                        flex-direction: column;
+                                                        bottom: 0;
+                                                    }
+                                                    .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-left, .apexcharts-legend.apx-legend-position-top.apexcharts-align-left, .apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {
+                                                        justify-content: flex-start;
+                                                        align-items: flex-start;
+                                                    }
+                                                    .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, .apexcharts-legend.apx-legend-position-top.apexcharts-align-center {
+                                                        justify-content: center;
+                                                        align-items: center;
+                                                    }
+                                                    .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-right, .apexcharts-legend.apx-legend-position-top.apexcharts-align-right {
+                                                        justify-content: flex-end;
+                                                        align-items: flex-end;
+                                                    }
+                                                    .apexcharts-legend-series {
+                                                        cursor: pointer;
+                                                        line-height: normal;
+                                                        display: flex;
+                                                        align-items: center;
+                                                    }
+                                                    .apexcharts-legend-text {
+                                                        position: relative;
+                                                        font-size: 14px;
+                                                    }
+                                                    .apexcharts-legend-text *, .apexcharts-legend-marker * {
+                                                        pointer-events: none;
+                                                    }
+                                                    .apexcharts-legend-marker {
+                                                        position: relative;
+                                                        display: flex;
+                                                        align-items: center;
+                                                        justify-content: center;
+                                                        cursor: pointer;
+                                                        margin-right: 1px;
+                                                    }
+
+                                                    .apexcharts-legend-series.apexcharts-no-click {
+                                                        cursor: auto;
+                                                    }
+                                                    .apexcharts-legend .apexcharts-hidden-zero-series, .apexcharts-legend .apexcharts-hidden-null-series {
+                                                        display: none !important;
+                                                    }
+                                                    .apexcharts-inactive-legend {
+                                                        opacity: 0.45;
+                                                    }
+
+                                                </style></foreignObject><g class="apexcharts-inner apexcharts-graphical" transform="translate(0.15625, 0)"><defs><clipPath id="gridRectMaskp42rsisn"><rect width="141.6875" height="150" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectBarMaskp42rsisn"><rect width="147.6875" height="156" x="-3" y="-3" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectMarkerMaskp42rsisn"><rect width="141.6875" height="150" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="forecastMaskp42rsisn"></clipPath><clipPath id="nonForecastMaskp42rsisn"></clipPath></defs><g class="apexcharts-radialbar"><g><g class="apexcharts-tracks"><g class="apexcharts-radialbar-track apexcharts-track" rel="1"><path d="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 70.836153401258 27.318445784879515 " fill="none" fill-opacity="1" stroke="rgba(230,234,237,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area" id="apexcharts-radialbarTrack-0" data:pathOrig="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 70.836153401258 27.318445784879515 "></path></g><g class="apexcharts-radialbar-track apexcharts-track" rel="2"><path d="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 70.83872375331023 42.04547808089919 " fill="none" fill-opacity="1" stroke="rgba(230,234,237,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area" id="apexcharts-radialbarTrack-1" data:pathOrig="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 70.83872375331023 42.04547808089919 "></path></g></g><g><g class="apexcharts-series apexcharts-radial-series" seriesName="FirstxTime" rel="1" data:realIndex="0"><path d="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 29.44872517199847 84.29380889266788 " fill="none" fill-opacity="0.85" stroke="rgba(224,79,22,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-0" data:angle="252" data:value="70" index="0" j="0" data:pathOrig="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 29.44872517199847 84.29380889266788 "></path></g><g class="apexcharts-series apexcharts-radial-series" seriesName="Return" rel="2" data:realIndex="1"><path d="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 43.45496541614439 79.74290556717487 " fill="none" fill-opacity="0.85" stroke="rgba(14,147,132,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-1" data:angle="252" data:value="70" index="0" j="1" data:pathOrig="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 43.45496541614439 79.74290556717487 "></path></g><circle r="13.934756097560975" cx="70.84375" cy="70.84375" class="apexcharts-radialbar-hollow" fill="transparent"></circle><g class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)" style="opacity: 0;"><text x="70.84375" y="65.84375" text-anchor="middle" dominant-baseline="auto" font-size="16px" font-family="Helvetica, Arial, sans-serif" font-weight="600" fill="#e04f16" class="apexcharts-text apexcharts-datalabel-label" style="font-family: Helvetica, Arial, sans-serif;"></text><text x="70.84375" y="91.84375" text-anchor="middle" dominant-baseline="auto" font-size="14px" font-family="Helvetica, Arial, sans-serif" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-datalabel-value" style="font-family: Helvetica, Arial, sans-serif;"></text></g></g></g></g><line x1="0" y1="0" x2="141.6875" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="1" stroke-linecap="butt" class="apexcharts-ycrosshairs"></line><line x1="0" y1="0" x2="141.6875" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="0" stroke-linecap="butt" class="apexcharts-ycrosshairs-hidden"></line></g><g class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)"></g></svg></div></div>
+                            </div>
+                            <div class="col-sm-7">
+                                <div class="row gx-0">
+                                    <div class="col-sm-6">
+                                        <div class="text-center border-end">
+                                            <h2 class="mb-1">5.5K</h2>
+                                            <p class="text-orange mb-2">First Time</p>
+                                            <span class="badge badge-success badge-xs d-inline-flex align-items-center"><i class="ti ti-arrow-up-left me-1"></i>25%</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="text-center">
+                                            <h2 class="mb-1">3.5K</h2>
+                                            <p class="text-teal mb-2">Return</p>
+                                            <span class="badge badge-success badge-xs d-inline-flex align-items-center"><i class="ti ti-arrow-up-left me-1"></i>21%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
             <!-- Total Companies -->
             <div class="col-xl-3 col-sm-6 d-flex">
                 <div class="card flex-fill">
@@ -141,119 +362,6 @@
         </div>
 
         <div class="row">
-
-            <!-- Companies -->
-            <div class="col-xxl-3 col-lg-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Companies</h5>
-                        <div class="dropdown mb-2">
-                            <a href="javascript:void(0);" class="btn btn-white border btn-sm d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                                <i class="ti ti-calendar me-1"></i>This Week
-                            </a>
-                            <ul class="dropdown-menu  dropdown-menu-end p-3">
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">This Month</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">This Week</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">Today</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="company-chart"></div>
-                        <p class="f-13 d-inline-flex align-items-center"><span class="badge badge-success me-1">+6%</span> 5 Companies  from last month</p>
-                    </div>
-                </div>
-            </div>
-            <!-- /Companies -->
-
-            <!-- Revenue -->
-            <div class="col-lg-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Revenue</h5>
-                        <div class="dropdown mb-2">
-                            <a href="javascript:void(0);" class="btn btn-white border btn-sm d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                                <i class="ti ti-calendar me-1"></i>2025
-                            </a>
-                            <ul class="dropdown-menu  dropdown-menu-end p-3">
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">2024</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">2025</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">2023</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-body pb-0">
-                        <div class="d-flex align-items-center justify-content-between flex-wrap">
-                            <div class="mb-1">
-                                <h5 class="mb-1">$45787</h5>
-                                <p><span class="text-success fw-bold">+40%</span> increased from last year</p>
-                            </div>
-                            <p class="fs-13 text-gray-9 d-flex align-items-center mb-1"><i class="ti ti-circle-filled me-1 fs-6 text-primary"></i>Revenue</p>
-                        </div>
-                        <div id="revenue-income"></div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Revenue -->
-
-            <!-- Top Plans -->
-            <div class="col-xxl-3 col-xl-12 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Top Plans</h5>
-                        <div class="dropdown mb-2">
-                            <a href="javascript:void(0);" class="btn btn-white border btn-sm d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                                <i class="ti ti-calendar me-1"></i>This Month
-                            </a>
-                            <ul class="dropdown-menu  dropdown-menu-end p-3">
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">This Month</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">This Week</a>
-                                </li>
-                                <li>
-                                    <a href="javascript:void(0);" class="dropdown-item rounded-1">Today</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div id="plan-overview"></div>
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <p class="f-13 mb-0"><i class="ti ti-circle-filled text-primary me-1"></i>Basic </p>
-                            <p class="f-13 fw-medium text-gray-9">60%</p>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <p class="f-13 mb-0"><i class="ti ti-circle-filled text-warning me-1"></i>Premium</p>
-                            <p class="f-13 fw-medium text-gray-9">20%</p>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between mb-0">
-                            <p class="f-13 mb-0"><i class="ti ti-circle-filled text-info me-1"></i>Enterprise</p>
-                            <p class="f-13 fw-medium text-gray-9">20%</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Top Plans -->
-
-        </div>
-
-        <div class="row">
-
-            <!-- Recent Transactions -->
             <div class="col-xxl-4 col-xl-12 d-flex">
                 <div class="card flex-fill">
                     <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
@@ -511,3 +619,64 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+    <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
+    {{-- adapter NOT needed now since we’re not using a time scale --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Normalize datasets: object -> array
+            const raw = @json($datasets ?? []);
+            const datasetsArr = Array.isArray(raw) ? raw : Object.values(raw);
+
+            // Prepare series: ensure numbers + {x,y} parsing disabled
+            const prepared = datasetsArr.map((ds, i) => ({
+                label: ds.label ?? `Series ${i+1}`,
+                data: (Array.isArray(ds.data) ? ds.data : []).map(p => ({
+                    x: Number(p.x),           // age in days (number)
+                    y: Number(p.y)            // already in percent (see note below)
+                })),
+                parsing: false,             // IMPORTANT for {x,y} objects
+                borderWidth: 2,
+                pointRadius: 2,
+                tension: 0.2
+            }));
+
+            const el = document.getElementById('mortalityChart');
+            if (!el) return;
+
+            new Chart(el, {
+                type: 'line',
+                data: { datasets: prepared },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'nearest', intersect: false },
+                    scales: {
+                        x: {
+                            type: 'linear',               // <-- key change: age is numeric
+                            title: { display: true, text: 'Age (days)' },
+                            ticks: { precision: 0 }       // whole-day ticks
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Mortality Rate (%)' },
+                            ticks: { callback: v => v + '%' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: (c) => `${c.dataset.label}: ${(c.parsed.y ?? 0).toFixed(2)}% (Day ${c.parsed.x})`
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+@endpush
+
+
+
