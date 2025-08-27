@@ -216,6 +216,12 @@
                                             IoT Logs
                                         </a>
                                     </li>
+                                    <li>
+                                        <a href="#"
+                                           class="">
+                                            Sheds Performance
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="submenu">

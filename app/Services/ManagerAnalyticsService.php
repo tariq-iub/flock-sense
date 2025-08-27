@@ -106,6 +106,7 @@ class ManagerAnalyticsService
                   SELECT
                     pl.flock_id,
                     f.NAME AS flock_name,
+                    s.name AS shed_name,
                     DATE(pl.production_log_date) AS d,
                     pl.age,
                     (pl.day_mortality_count + pl.night_mortality_count) AS deaths,
@@ -128,6 +129,7 @@ class ManagerAnalyticsService
                 ) SELECT
                   x.flock_id,
                   x.flock_name,
+                  x.shed_name,
                   x.d,
                   x.age,
                   CASE
@@ -149,7 +151,7 @@ class ManagerAnalyticsService
             $key = $r->flock_id;
             if (! isset($seriesByFlock[$key])) {
                 $seriesByFlock[$key] = [
-                    'label' => "{$r->flock_name} (#{$r->flock_id})",
+                    'label' => "{$r->flock_name} ({$r->shed_name})",
                     'data' => [],
                 ];
             }
@@ -161,5 +163,113 @@ class ManagerAnalyticsService
         }
 
         return array_values($seriesByFlock);
+    }
+
+    public function adgData(array $filters = []): array
+    {
+        $start_date = $filters['start_date'] ?: now()->subDays(30)->toDateString();
+        $end_date = $filters['end_date'] ?: now()->toDateString();
+
+        $sql = "SELECT
+                  w.flock_id,
+                  f.name AS flock_name,
+                  s.name AS shed_name,
+                  DATE(p.production_log_date) AS d,
+                  p.age,
+                  AVG(w.avg_weight_gain) AS adg_g_per_bird
+                FROM weight_logs w
+                JOIN production_logs p ON p.id = w.production_log_id
+                JOIN flocks f          ON f.id = w.flock_id
+                JOIN sheds  s          ON s.id = f.shed_id
+                WHERE p.production_log_date BETWEEN '{$start_date}' AND '{$end_date}'
+                AND s.farm_id = {$filters['farm_id']}
+                GROUP BY w.flock_id, f.name, DATE(p.production_log_date), p.age
+                ORDER BY w.flock_id, p.age";
+
+        $rows = DB::select($sql);
+
+        // ---- Build labels (ages) and datasets (one per flock) ----
+        $ageSet = [];
+        $flockSeries = [];  // [flock_id => ['label'=>..., 'points'=>[age => value]]]
+
+        foreach ($rows as $r) {
+            $age = (int) $r->age;
+            $ageSet[$age] = true;
+
+            if (!isset($flockSeries[$r->flock_id])) {
+                $flockSeries[$r->flock_id] = [
+                    'label'  => "{$r->flock_name} ({$r->shed_name})",
+                    'points' => [],
+                ];
+            }
+            // store the ADG (grams per bird) for this age
+            $flockSeries[$r->flock_id]['points'][$age] = round((float) $r->adg_g_per_bird, 0);
+        }
+
+        // Sorted unique ages as x-axis labels
+        $labels = array_keys($ageSet);
+        sort($labels, SORT_NUMERIC);
+
+        // Align each dataset’s data array to the labels (null where missing)
+        $datasets = [];
+        foreach ($flockSeries as $series) {
+            $data = [];
+            foreach ($labels as $age) {
+                $data[] = $series['points'][$age] ?? null;
+            }
+            $datasets[] = [
+                'label' => $series['label'],
+                'data'  => $data,  // aligned to $labels by index
+            ];
+        }
+
+        return [
+            'labels' => $labels,
+            'datasets' => $datasets
+        ];
+    }
+
+    public function environmentData(array $filters = []): array
+    {
+        $start_date = $filters['start_date'] ?: now()->subDays(30)->toDateString();
+        $end_date = $filters['end_date'] ?: now()->toDateString();
+        $co2_limit = 3000;
+        $nh3_limit = 25;
+
+        $sql = "WITH last_param AS (
+                  SELECT l.*
+                  FROM iot_data_logs l
+                  JOIN (
+                    SELECT shed_id, parameter, MAX(record_time) AS mx
+                    FROM iot_data_logs
+                    GROUP BY shed_id, parameter
+                  ) x ON x.shed_id = l.shed_id AND x.parameter = l.parameter AND x.mx = l.record_time
+                )
+                SELECT
+                  s.id AS shed_id,
+                  s.name AS shed_name,
+                  MAX(CASE WHEN lp.parameter='temp1' THEN lp.avg_value END) AS shed_temperature_c,
+                  MAX(CASE WHEN lp.parameter='temp2' THEN lp.avg_value END) AS brooder_temperature_c,
+                  MAX(CASE WHEN lp.parameter='humidity'    THEN lp.avg_value END) AS humidity_pct,
+                  MAX(CASE WHEN lp.parameter='co2'         THEN lp.avg_value END) AS co2_ppm,
+                  MAX(CASE WHEN lp.parameter='nh3'         THEN lp.avg_value END) AS nh3_ppm,
+                  MAX(lp.record_time) AS last_reading,
+                  CASE
+                    -- WHEN MAX(CASE WHEN lp.parameter='temp1' THEN lp.avg_value END) IS NULL THEN 'NO DATA'
+                    -- WHEN MAX(CASE WHEN lp.parameter='temp2' THEN lp.avg_value END) IS NULL THEN 'NO DATA'
+                    WHEN MAX(CASE WHEN lp.parameter='temp1' THEN lp.avg_value END) NOT BETWEEN 20 AND 25
+                      OR MAX(CASE WHEN lp.parameter='temp2' THEN lp.avg_value END) NOT BETWEEN 29 AND 33
+                      OR MAX(CASE WHEN lp.parameter='humidity'    THEN lp.avg_value END) NOT BETWEEN 0.6 AND 0.7
+                      OR COALESCE(MAX(CASE WHEN lp.parameter='co2' THEN lp.avg_value END),0) > $co2_limit
+                      OR COALESCE(MAX(CASE WHEN lp.parameter='nh3' THEN lp.avg_value END),0) > $nh3_limit
+                    THEN 'ALERT' ELSE 'OK'
+                  END AS status
+                FROM sheds s
+                LEFT JOIN last_param lp ON lp.shed_id = s.id
+                WHERE s.farm_id = {$filters['farm_id']}
+                GROUP BY s.id, s.name
+                ORDER BY s.name";
+
+        return DB::select($sql);
     }
 }

@@ -88,7 +88,7 @@
                 <div class="card flex-fill">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div class="d-inline-flex align-items-center">
-                            <span class="title-icon bg-soft-primary fs-16 me-2"><i class="ti ti-chart-bar"></i></span>
+                            <span class="title-icon bg-soft-info fs-16 me-2"><i class="ti ti-info-circle"></i></span>
                             <h5 class="card-title mb-0">Daily Mortality Rate</h5>
                         </div>
                     </div>
@@ -98,269 +98,70 @@
                 </div>
             </div>
 
-            <!-- Top Selling Products -->
             <div class="col-xxl-4 col-xl-5 d-flex">
                 <div class="card flex-fill">
                     <div class="card-header">
                         <div class="d-inline-flex align-items-center">
-                            <span class="title-icon bg-soft-info fs-16 me-2"><i class="ti ti-info-circle"></i></span>
-                            <h5 class="card-title mb-0">Overall Information</h5>
+                            <span class="title-icon bg-soft-warning fs-16 me-2"><i class="ti ti-chart-bar"></i></span>
+                            <h5 class="card-title mb-0">Weight Gain Trends</h5>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="info-item border bg-light p-3 text-center">
-                                    <div class="mb-2 text-info fs-24">
-                                        <i class="ti ti-user-check"></i>
-                                    </div>
-                                    <p class="mb-1">Suppliers</p>
-                                    <h5>6987</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="info-item border bg-light p-3 text-center">
-                                    <div class="mb-2 text-orange fs-24">
-                                        <i class="ti ti-users"></i>
-                                    </div>
-                                    <p class="mb-1">Customer</p>
-                                    <h5>4896</h5>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="info-item border bg-light p-3 text-center">
-                                    <div class="mb-2 text-teal fs-24">
-                                        <i class="ti ti-shopping-cart"></i>
-                                    </div>
-                                    <p class="mb-1">Orders</p>
-                                    <h5>487</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer pb-sm-0">
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                            <h5>Customers Overview</h5>
-                            <div class="dropdown dropdown-wraper">
-                                <a href="javascript:void(0);" class="dropdown-toggle btn btn-sm btn-white" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="ti ti-calendar me-1"></i>Today
-                                </a>
-                                <ul class="dropdown-menu p-3">
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item">Today</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item">Weekly</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript:void(0);" class="dropdown-item">Monthly</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="row align-items-center">
-                            <div class="col-sm-5">
-                                <div id="customer-chart" style="min-height: 145px;"><div id="apexchartsp42rsisn" class="apexcharts-canvas apexchartsp42rsisn apexcharts-theme-" style="width: 142px; height: 145px;"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" class="apexcharts-svg" xmlns:data="ApexChartsNS" transform="translate(0, 0)" width="142" height="145"><foreignObject x="0" y="0" width="142" height="145"><div class="apexcharts-legend" xmlns="http://www.w3.org/1999/xhtml"></div><style type="text/css">
-                                                    .apexcharts-flip-y {
-                                                        transform: scaleY(-1) translateY(-100%);
-                                                        transform-origin: top;
-                                                        transform-box: fill-box;
-                                                    }
-                                                    .apexcharts-flip-x {
-                                                        transform: scaleX(-1);
-                                                        transform-origin: center;
-                                                        transform-box: fill-box;
-                                                    }
-                                                    .apexcharts-legend {
-                                                        display: flex;
-                                                        overflow: auto;
-                                                        padding: 0 10px;
-                                                    }
-                                                    .apexcharts-legend.apexcharts-legend-group-horizontal {
-                                                        flex-direction: column;
-                                                    }
-                                                    .apexcharts-legend-group {
-                                                        display: flex;
-                                                    }
-                                                    .apexcharts-legend-group-vertical {
-                                                        flex-direction: column-reverse;
-                                                    }
-                                                    .apexcharts-legend.apx-legend-position-bottom, .apexcharts-legend.apx-legend-position-top {
-                                                        flex-wrap: wrap
-                                                    }
-                                                    .apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {
-                                                        flex-direction: column;
-                                                        bottom: 0;
-                                                    }
-                                                    .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-left, .apexcharts-legend.apx-legend-position-top.apexcharts-align-left, .apexcharts-legend.apx-legend-position-right, .apexcharts-legend.apx-legend-position-left {
-                                                        justify-content: flex-start;
-                                                        align-items: flex-start;
-                                                    }
-                                                    .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-center, .apexcharts-legend.apx-legend-position-top.apexcharts-align-center {
-                                                        justify-content: center;
-                                                        align-items: center;
-                                                    }
-                                                    .apexcharts-legend.apx-legend-position-bottom.apexcharts-align-right, .apexcharts-legend.apx-legend-position-top.apexcharts-align-right {
-                                                        justify-content: flex-end;
-                                                        align-items: flex-end;
-                                                    }
-                                                    .apexcharts-legend-series {
-                                                        cursor: pointer;
-                                                        line-height: normal;
-                                                        display: flex;
-                                                        align-items: center;
-                                                    }
-                                                    .apexcharts-legend-text {
-                                                        position: relative;
-                                                        font-size: 14px;
-                                                    }
-                                                    .apexcharts-legend-text *, .apexcharts-legend-marker * {
-                                                        pointer-events: none;
-                                                    }
-                                                    .apexcharts-legend-marker {
-                                                        position: relative;
-                                                        display: flex;
-                                                        align-items: center;
-                                                        justify-content: center;
-                                                        cursor: pointer;
-                                                        margin-right: 1px;
-                                                    }
-
-                                                    .apexcharts-legend-series.apexcharts-no-click {
-                                                        cursor: auto;
-                                                    }
-                                                    .apexcharts-legend .apexcharts-hidden-zero-series, .apexcharts-legend .apexcharts-hidden-null-series {
-                                                        display: none !important;
-                                                    }
-                                                    .apexcharts-inactive-legend {
-                                                        opacity: 0.45;
-                                                    }
-
-                                                </style></foreignObject><g class="apexcharts-inner apexcharts-graphical" transform="translate(0.15625, 0)"><defs><clipPath id="gridRectMaskp42rsisn"><rect width="141.6875" height="150" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectBarMaskp42rsisn"><rect width="147.6875" height="156" x="-3" y="-3" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectMarkerMaskp42rsisn"><rect width="141.6875" height="150" x="0" y="0" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="forecastMaskp42rsisn"></clipPath><clipPath id="nonForecastMaskp42rsisn"></clipPath></defs><g class="apexcharts-radialbar"><g><g class="apexcharts-tracks"><g class="apexcharts-radialbar-track apexcharts-track" rel="1"><path d="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 70.836153401258 27.318445784879515 " fill="none" fill-opacity="1" stroke="rgba(230,234,237,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area" id="apexcharts-radialbarTrack-0" data:pathOrig="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 70.836153401258 27.318445784879515 "></path></g><g class="apexcharts-radialbar-track apexcharts-track" rel="2"><path d="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 70.83872375331023 42.04547808089919 " fill="none" fill-opacity="1" stroke="rgba(230,234,237,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area" id="apexcharts-radialbarTrack-1" data:pathOrig="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 70.83872375331023 42.04547808089919 "></path></g></g><g><g class="apexcharts-series apexcharts-radial-series" seriesName="FirstxTime" rel="1" data:realIndex="0"><path d="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 29.44872517199847 84.29380889266788 " fill="none" fill-opacity="0.85" stroke="rgba(224,79,22,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-0" data:angle="252" data:value="70" index="0" j="0" data:pathOrig="M 70.84375 27.318445121951214 A 43.525304878048786 43.525304878048786 0 1 1 29.44872517199847 84.29380889266788 "></path></g><g class="apexcharts-series apexcharts-radial-series" seriesName="Return" rel="2" data:realIndex="1"><path d="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 43.45496541614439 79.74290556717487 " fill="none" fill-opacity="0.85" stroke="rgba(14,147,132,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="9.727032520325205" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-1" data:angle="252" data:value="70" index="0" j="1" data:pathOrig="M 70.84375 42.04547764227642 A 28.798272357723583 28.798272357723583 0 1 1 43.45496541614439 79.74290556717487 "></path></g><circle r="13.934756097560975" cx="70.84375" cy="70.84375" class="apexcharts-radialbar-hollow" fill="transparent"></circle><g class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)" style="opacity: 0;"><text x="70.84375" y="65.84375" text-anchor="middle" dominant-baseline="auto" font-size="16px" font-family="Helvetica, Arial, sans-serif" font-weight="600" fill="#e04f16" class="apexcharts-text apexcharts-datalabel-label" style="font-family: Helvetica, Arial, sans-serif;"></text><text x="70.84375" y="91.84375" text-anchor="middle" dominant-baseline="auto" font-size="14px" font-family="Helvetica, Arial, sans-serif" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-datalabel-value" style="font-family: Helvetica, Arial, sans-serif;"></text></g></g></g></g><line x1="0" y1="0" x2="141.6875" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="1" stroke-linecap="butt" class="apexcharts-ycrosshairs"></line><line x1="0" y1="0" x2="141.6875" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="0" stroke-linecap="butt" class="apexcharts-ycrosshairs-hidden"></line></g><g class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)"></g></svg></div></div>
-                            </div>
-                            <div class="col-sm-7">
-                                <div class="row gx-0">
-                                    <div class="col-sm-6">
-                                        <div class="text-center border-end">
-                                            <h2 class="mb-1">5.5K</h2>
-                                            <p class="text-orange mb-2">First Time</p>
-                                            <span class="badge badge-success badge-xs d-inline-flex align-items-center"><i class="ti ti-arrow-up-left me-1"></i>25%</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="text-center">
-                                            <h2 class="mb-1">3.5K</h2>
-                                            <p class="text-teal mb-2">Return</p>
-                                            <span class="badge badge-success badge-xs d-inline-flex align-items-center"><i class="ti ti-arrow-up-left me-1"></i>21%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="card-body pb-0" style="height: 420px;">
+                        <canvas id="adgChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <!-- Total Companies -->
-            <div class="col-xl-3 col-sm-6 d-flex">
+            <div class="col-12">
                 <div class="card flex-fill">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between">
-									<span class="avatar avatar-md bg-dark mb-3">
-										<i class="ti ti-building fs-16"></i>
-									</span>
-                            <span class="badge bg-success fw-normal mb-3">
-										+19.01%
-									</span>
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap">
+                        <div class="d-inline-flex">
+                            <span class="title-icon bg-soft-danger fs-16 me-2"><i class="ti ti-table"></i></span>
+                            <h5 class="card-title mt-2">Environment & IoT Snapshot</h5>
                         </div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h2 class="mb-1">5468</h2>
-                                <p class="fs-13">Total Companies</p>
-                            </div>
-                            <div class="company-bar1">5,10,7,5,10,7,5</div>
+                        <a href="javascript:void(0);" class="btn btn-light btn-sm mt-2">Refresh</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Shed Name</th>
+                                    <th class="text-center">Shed Temperature</th>
+                                    <th class="text-center">Brooder Temperature</th>
+                                    <th class="text-center">Humidity (%)</th>
+                                    <th class="text-center">CO<sub>2</sub> (ppm)</th>
+                                    <th class="text-center">NH<sub>3</sub> (ppm)</th>
+                                    <th class="text-center">Last Reading</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @forelse($environment as $row)
+                                    <tr>
+                                        <td>{{ $row->shed_name }}</td>
+                                        <td class="text-center">{{ $row->shed_temperature_c }}</td>
+                                        <td class="text-center">{{ $row->brooder_temperature_c }}</td>
+                                        <td class="text-center">{{ $row->humidity_pct }}</td>
+                                        <td class="text-center">{{ $row->co2_ppm }}</td>
+                                        <td class="text-center">{{ $row->nh3_ppm }}</td>
+                                        <td class="text-center">{{ $row->last_reading }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-soft-{{ ($row->status == "OK") ? 'success' : 'danger' }}">{{ $row->status }}</span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <span class="text-bg-danger">No data available.</span>
+                                @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- /Total Companies -->
-
-            <!-- Active Companies -->
-            <div class="col-xl-3 col-sm-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between">
-									<span class="avatar avatar-md bg-dark mb-3">
-										<i class="ti ti-carousel-vertical fs-16"></i>
-									</span>
-                            <span class="badge bg-danger fw-normal mb-3">
-										-12%
-									</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h2 class="mb-1">4598</h2>
-                                <p class="fs-13">Active Companies</p>
-                            </div>
-                            <div class="company-bar2">5,3,7,6,3,10,5</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Active Companies -->
-
-            <!-- Total Subscribers -->
-            <div class="col-xl-3 col-sm-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between">
-									<span class="avatar avatar-md bg-dark mb-3">
-										<i class="ti ti-chalkboard-off fs-16"></i>
-									</span>
-                            <span class="badge bg-success fw-normal mb-3">
-										+6%
-									</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h2 class="mb-1">3698</h2>
-                                <p class="fs-13">Total Subscribers</p>
-                            </div>
-                            <div class="company-bar3">8,10,10,8,8,10,8</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Total Subscribers -->
-
-            <!-- Total Earnings -->
-            <div class="col-xl-3 col-sm-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between">
-									<span class="avatar avatar-md bg-dark mb-3">
-										<i class="ti ti-businessplan fs-16"></i>
-									</span>
-                            <span class="badge bg-danger fw-normal mb-3">
-										-16%
-									</span>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h2 class="mb-1">$89,878,58</h2>
-                                <p class="fs-13">Total Earnings</p>
-                            </div>
-                            <div class="company-bar4">5,10,7,5,10,7,5</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Total Earnings -->
-
         </div>
-
         <div class="row">
             <div class="col-xxl-4 col-xl-12 d-flex">
                 <div class="card flex-fill">
@@ -622,7 +423,7 @@
 
 @push('js')
     <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
-    {{-- adapter NOT needed now since we’re not using a time scale --}}
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Normalize datasets: object -> array
@@ -633,10 +434,10 @@
             const prepared = datasetsArr.map((ds, i) => ({
                 label: ds.label ?? `Series ${i+1}`,
                 data: (Array.isArray(ds.data) ? ds.data : []).map(p => ({
-                    x: Number(p.x),           // age in days (number)
-                    y: Number(p.y)            // already in percent (see note below)
+                    x: Number(p.x),
+                    y: Number(p.y)
                 })),
-                parsing: false,             // IMPORTANT for {x,y} objects
+                parsing: false,
                 borderWidth: 2,
                 pointRadius: 2,
                 tension: 0.2
@@ -670,6 +471,63 @@
                             callbacks: {
                                 label: (c) => `${c.dataset.label}: ${(c.parsed.y ?? 0).toFixed(2)}% (Day ${c.parsed.x})`
                             }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const labels   = @json($adgData['labels'] ?? []);
+            const datasets = @json($adgData['datasets'] ?? []);
+            console.log(labels);
+            console.log(datasets);
+            // Prepare datasets for grouped bars
+            const prepared = (Array.isArray(datasets) ? datasets : []).map((ds, i) => ({
+                type: 'bar',
+                label: ds.label ?? `Flock ${i+1}`,
+                data: ds.data?.map(v => (v === null ? null : Number(v))) ?? [],
+                // Optional styling (kept minimal; Chart.js can auto-color):
+                borderWidth: 1,
+                // barThickness: 18, // uncomment if you want fixed width bars
+            }));
+
+            const el = document.getElementById('adgChart');
+            if (!el) return;
+
+            new Chart(el, {
+                data: {
+                    labels: labels.map(n => Number(n)), // category labels (ages)
+                    datasets: prepared
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: false, text: 'Average Daily Gain by Age (g/bird/day)' },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => `Age: ${items?.[0]?.label} days`,
+                                label: (ctx) => {
+                                    const v = ctx.parsed.y ?? 0;
+                                    return `${ctx.dataset.label}: ${v} g`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',     // grouped bars per Age
+                            title: { display: true, text: 'Age (days)' },
+                            ticks: { precision: 0 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'ADG (g/bird/day)' }
                         }
                     }
                 }
