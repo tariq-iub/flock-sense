@@ -139,7 +139,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @forelse($shedEnvironment as $row)
+                                @foreach($shedEnvironment as $row)
                                     <tr>
                                         <td>{{ $row->shed_name }}</td>
                                         <td class="text-center">{{ $row->shed_temperature_c }}</td>
@@ -152,9 +152,7 @@
                                             <span class="badge bg-soft-{{ ($row->status == "OK") ? 'success' : 'danger' }}">{{ $row->status }}</span>
                                         </td>
                                     </tr>
-                                @empty
-                                    <span class="text-bg-danger">No data available.</span>
-                                @endforelse
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -188,7 +186,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @forelse($environmentAlerts as $row)
+                                @foreach($environmentAlerts as $row)
                                     <tr>
                                         <td>{{ $row->shed_name }}</td>
                                         <td>{{ $row->flock_name }}</td>
@@ -198,9 +196,7 @@
                                         <td class="text-center">{{ $row->threshold }}</td>
                                         <td class="text-center">{{ \Carbon\Carbon::parse($row->alert_time)->format('d-m-Y h:i A') }}</td>
                                     </tr>
-                                @empty
-                                    <span class="text-bg-danger">No data available.</span>
-                                @endforelse
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
