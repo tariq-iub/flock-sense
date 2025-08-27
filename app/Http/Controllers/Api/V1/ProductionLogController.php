@@ -16,7 +16,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductionLogController extends ApiController
 {
-    public function __construct(private DailyReportService $dailyReportService) {}
+    public function __construct(private DailyReportService $dailyReportService)
+    {
+    }
 
     public function index(Request $request)
     {
@@ -90,9 +92,9 @@ class ProductionLogController extends ApiController
 
         // Optionally: Only create weight log if provided and valid
         if (
-            ! empty($validated['with_weight_log']) &&
-            ! empty($validated['weighted_chickens_count']) &&
-            ! empty($validated['total_weight'])
+            !empty($validated['with_weight_log']) &&
+            !empty($validated['weighted_chickens_count']) &&
+            !empty($validated['total_weight'])
         ) {
             app(WeightLogService::class)->createOrUpdateWeightLog(
                 $productionLog,
@@ -148,7 +150,7 @@ class ProductionLogController extends ApiController
     {
         if ($shedId) {
             $shed = Shed::with('latestFlock.productionLogs')->find($shedId);
-            if (! $shed) {
+            if (!$shed) {
                 return response()->json(['message' => 'Shed not found'], 404);
             }
 
@@ -175,9 +177,9 @@ class ProductionLogController extends ApiController
 
         try {
             $payload = $this->dailyReportService->build(
-                (int) $request->input('shed_id'),
-                (string) $request->input('date'),
-                (string) $version
+                (int)$request->input('shed_id'),
+                (string)$request->input('date'),
+                (string)$version
             );
 
             return response()->json($payload, 200);
@@ -351,6 +353,93 @@ class ProductionLogController extends ApiController
             'total_records' => $logs->count(),
             'range' => $range,
             'history' => $formatted,
+        ], 200);
+    }
+
+    public function latestHistory(Request $request)
+    {
+        $request->validate([
+            'shed_id' => 'required|integer|exists:sheds,id',
+        ]);
+
+        $shedId = $request->input('shed_id');
+
+        // ✅ Find the latest flock for this shed
+        $latestFlock = Flock::where('shed_id', $shedId)
+            ->latest('start_date') // adjust if different column
+            ->first();
+
+        if (!$latestFlock) {
+            return response()->json(['message' => 'No flock found for this shed.'], 404);
+        }
+
+        // ✅ Fetch the latest production log for this flock
+        $latestLog = ProductionLog::where('shed_id', $shedId)
+            ->where('flock_id', $latestFlock->id)
+            ->latest('production_log_date')
+            ->first();
+
+        if (!$latestLog) {
+            return response()->json(['message' => 'No production data found for the latest flock.'], 404);
+        }
+
+        // ------------------------------
+        // 🔹 Consumption Aggregates
+        // ------------------------------
+        $consumption = function ($days = null) use ($latestFlock, $shedId) {
+            $query = ProductionLog::where('shed_id', $shedId)
+                ->where('flock_id', $latestFlock->id);
+
+            if ($days) {
+                $query->where('production_log_date', '>=', now()->subDays($days));
+            }
+
+            $logs = $query->get();
+
+            return [
+                'feed' => round(($logs->sum('day_feed_consumed') + $logs->sum('night_feed_consumed')) / 1000, 2) . ' Kg',
+                'water' => round(($logs->sum('day_water_consumed') + $logs->sum('night_water_consumed')) / 1000, 2) . ' L',
+            ];
+        };
+
+        $last24h = $consumption(1);
+        $last7d = $consumption(7);
+        $last30d = $consumption(30);
+        $allTime = $consumption(null);
+
+        // ------------------------------
+        // 🔹 Format Latest Log Response
+        // ------------------------------
+        $formatted = [
+            'date' => $latestLog->production_log_date->format('d-m-Y'),
+            'age' => $latestLog->age . ' Days',
+            'day_mortality_count' => $latestLog->day_mortality_count,
+            'night_mortality_count' => $latestLog->night_mortality_count,
+            'net_count' => $latestLog->net_count,
+            'livability' => $latestLog->livability . ' %',
+            'day_feed_consumed' => round($latestLog->day_feed_consumed / 1000, 2) . ' Kg',
+            'night_feed_consumed' => round($latestLog->night_feed_consumed / 1000, 2) . ' Kg',
+            'avg_feed_consumed' => round($latestLog->avg_feed_consumed / 1000, 2) . ' Kg',
+            'day_water_consumed' => round($latestLog->day_water_consumed / 1000, 2) . ' L',
+            'night_water_consumed' => round($latestLog->night_water_consumed / 1000, 2) . ' L',
+            'avg_water_consumed' => round($latestLog->avg_water_consumed / 1000, 2) . ' L',
+            'is_vaccinated' => ($latestLog->is_vaccinated ? 'Yes' : 'No'),
+            'day_medicine' => $latestLog->day_medicine ?? '',
+            'night_medicine' => $latestLog->night_medicine ?? '',
+            'submit_at' => $latestLog->created_at->diffForHumans(),
+        ];
+
+        return response()->json([
+            'shed_id' => $shedId,
+            'flock_id' => $latestFlock->id,
+            'flock_name' => $latestFlock->name ?? null,
+            'latest_history' => $formatted,
+            'consumption_summary' => [
+                'last_24h' => $last24h,
+                'last_7_days' => $last7d,
+                'last_30_days' => $last30d,
+                'all_time' => $allTime,
+            ]
         ], 200);
     }
 }
