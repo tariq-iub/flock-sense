@@ -173,7 +173,7 @@ class ManagerAnalyticsService
         $sql = "WITH base AS (
                   SELECT
                     w.flock_id,
-                    f.NAME AS flock_name,
+                    f.name AS flock_name,
                     s.name AS shed_name,
                     DATE(p.production_log_date) AS d,
                     p.age,
@@ -190,7 +190,8 @@ class ManagerAnalyticsService
                     AND ('{$end_date}' IS NULL OR p.production_log_date < '{$end_date}' + INTERVAL 1 DAY)
                   GROUP BY
                     w.flock_id,
-                    f.NAME,
+                    f.name,
+                    s.name,
                     DATE(p.production_log_date),
                     p.age
                 ),
