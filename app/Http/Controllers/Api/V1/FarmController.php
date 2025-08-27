@@ -46,6 +46,8 @@ class FarmController extends ApiController
             $query->whereHas('staff', function ($q) use ($user) {
                 $q->where('worker_id', $user->id);
             });
+        } else {
+            $query->where('owner_id', $user->id);
         }
 
         $farms = $query->get();
