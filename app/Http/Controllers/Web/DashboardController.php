@@ -45,6 +45,8 @@ class DashboardController extends Controller
 
             $data = $this->managerAnalyticsService->getAnalyticsData($filters)[0];
             $mortality_data = $this->managerAnalyticsService->getMortalityRateData($filters);
+            $adgData = $this->managerAnalyticsService->adgData($filters);
+            $environment_data = $this->managerAnalyticsService->environmentData($filters);
 
             return view(
                 'dashboards.manager',
@@ -53,6 +55,8 @@ class DashboardController extends Controller
                     'farm' => $farm,
                     'data' => $data,
                     'datasets' => $mortality_data,
+                    'adgData' => $adgData,
+                    'environment' => $environment_data,
                 ]);
         }
 
