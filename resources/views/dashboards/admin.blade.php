@@ -25,7 +25,7 @@
         <div class="welcome-wrap mb-4">
             <div class=" d-flex align-items-center justify-content-between flex-wrap">
                 <div class="mb-3">
-                    <h2 class="mb-1 text-white">Welcome Back, Adrian</h2>
+                    <h2 class="mb-1 text-white">Welcome Back, {{ $user->name }}</h2>
                     <p class="text-light">14 New Companies Subscribed Today !!!</p>
                 </div>
                 <div class="d-flex align-items-center flex-wrap mb-1">

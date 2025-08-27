@@ -107,7 +107,7 @@
                         </div>
                     </div>
                     <div class="card-body pb-0" style="height: 420px;">
-                        <canvas id="adgChart"></canvas>
+                        <canvas id="adgFeedChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -118,7 +118,7 @@
                 <div class="card flex-fill">
                     <div class="card-header d-flex align-items-center justify-content-between flex-wrap">
                         <div class="d-inline-flex">
-                            <span class="title-icon bg-soft-danger fs-16 me-2"><i class="ti ti-table"></i></span>
+                            <span class="title-icon bg-soft-primary fs-16 me-2"><i class="ti ti-building"></i></span>
                             <h5 class="card-title mt-2">Environment & IoT Snapshot</h5>
                         </div>
                         <a href="javascript:void(0);" class="btn btn-light btn-sm mt-2">Refresh</a>
@@ -139,7 +139,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @forelse($environment as $row)
+                                @forelse($shedEnvironment as $row)
                                     <tr>
                                         <td>{{ $row->shed_name }}</td>
                                         <td class="text-center">{{ $row->shed_temperature_c }}</td>
@@ -162,261 +162,51 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
-            <div class="col-xxl-4 col-xl-12 d-flex">
+            <div class="col-12">
                 <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Recent Transactions</h5>
-                        <a href="purchase-transaction.html" class="btn btn-light btn-sm mb-2">View All</a>
+                    <div class="card-header d-flex align-items-center justify-content-between flex-wrap">
+                        <div class="d-inline-flex">
+                            <span class="title-icon bg-soft-danger fs-16 me-2"><i class="ti ti-haze"></i></span>
+                            <h5 class="card-title mt-2">Environment Alerts</h5>
+                        </div>
+                        <a href="javascript:void(0);" class="btn btn-light btn-sm mt-2">Refresh</a>
                     </div>
-                    <div class="card-body pb-2">
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/company/company-02.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Stellar Dynamics</a></h6>
-                                    <p class="fs-13 d-inline-flex align-items-center"><span class="text-info">#12457</span><i class="ti ti-circle-filled fs-6 text-primary mx-1"></i>14 Jan 2025</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6 class="mb-1">+$245</h6>
-                                <p class="fs-13">Basic</p>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/company/company-03.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Quantum Nexus</a></h6>
-                                    <p class="fs-13 d-inline-flex align-items-center"><span class="text-info">#65974</span><i class="ti ti-circle-filled fs-6 text-primary mx-1"></i>14 Jan 2025</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6 class="mb-1">+$395</h6>
-                                <p class="fs-13">Enterprise</p>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/company/company-05.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Aurora Technologies</a></h6>
-                                    <p class="fs-13 d-inline-flex align-items-center"><span class="text-info">#22457</span><i class="ti ti-circle-filled fs-6 text-primary mx-1"></i>14 Jan 2025</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6 class="mb-1">+$145</h6>
-                                <p class="fs-13">Advanced</p>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/company/company-07.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">TerraFusion Energy</a></h6>
-                                    <p class="fs-13 d-inline-flex align-items-center"><span class="text-info">#43412</span><i class="ti ti-circle-filled fs-6 text-primary mx-1"></i>14 Jan 2025</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6 class="mb-1">+$145</h6>
-                                <p class="fs-13">Enterprise</p>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-1">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/company/company-08.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Epicurean Delights</a></h6>
-                                    <p class="fs-13 d-inline-flex align-items-center"><span class="text-info">#43567</span><i class="ti ti-circle-filled fs-6 text-primary mx-1"></i>14 Jan 2025</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6 class="mb-1">+$977</h6>
-                                <p class="fs-13">Premium</p>
-                            </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Shed Name</th>
+                                    <th>Flock</th>
+                                    <th class="text-center">Alert Type</th>
+                                    <th class="text-center">Parameter</th>
+                                    <th class="text-center">Value</th>
+                                    <th class="text-center">Threshold</th>
+                                    <th class="text-center">Alert Time</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @forelse($environmentAlerts as $row)
+                                    <tr>
+                                        <td>{{ $row->shed_name }}</td>
+                                        <td>{{ $row->flock_name }}</td>
+                                        <td class="text-center">{{ $row->alert_type }}</td>
+                                        <td class="text-center">{{ $row->parameter }}</td>
+                                        <td class="text-center">{{ $row->avg_value }}</td>
+                                        <td class="text-center">{{ $row->threshold }}</td>
+                                        <td class="text-center">{{ \Carbon\Carbon::parse($row->alert_time)->format('d-m-Y h:i A') }}</td>
+                                    </tr>
+                                @empty
+                                    <span class="text-bg-danger">No data available.</span>
+                                @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- /Recent Transactions -->
-
-            <!-- Recently Registered -->
-            <div class="col-xxl-4 col-xl-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Recently Registered</h5>
-                        <a href="purchase-transaction.html" class="btn btn-light btn-sm mb-2">View All</a>
-                    </div>
-                    <div class="card-body pb-2">
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/icons/company-icon-11.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Pitch</a></h6>
-                                    <p class="fs-13">Basic (Monthly)</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6>150 Users</h6>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/icons/company-icon-12.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Initech</a></h6>
-                                    <p class="fs-13">Enterprise (Yearly)</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6>200 Users</h6>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/icons/company-icon-13.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Umbrella Corp</a></h6>
-                                    <p class="fs-13">Advanced (Monthly)</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6>129 Users</h6>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/icons/company-icon-14.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Capital Partners</a></h6>
-                                    <p class="fs-13">Enterprise (Monthly)</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6>103 Users</h6>
-                            </div>
-                        </div>
-                        <div class="d-sm-flex justify-content-between flex-wrap mb-1">
-                            <div class="d-flex align-items-center mb-2">
-                                <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                    <img src="assets/img/icons/company-icon-15.svg" class="img-fluid w-auto h-auto" alt="img">
-                                </a>
-                                <div class="ms-2 flex-fill">
-                                    <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Massive Dynamic</a></h6>
-                                    <p class="fs-13">Premium (Yearly)</p>
-                                </div>
-                            </div>
-                            <div class="text-sm-end mb-2">
-                                <h6>108 Users</h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Recent Registered -->
-
-            <!-- Recent Plan Expired -->
-            <div class="col-xxl-4 col-xl-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Recent Plan Expired</h5>
-                        <a href="purchase-transaction.html" class="btn btn-light btn-sm mb-2">View All</a>
-                    </div>
-                    <div class="card-body pb-2">
-                        <div>
-                            <div class="d-sm-flex align-items-center justify-content-between flex-wrap mb-3">
-                                <div class="d-flex align-items-center mb-2">
-                                    <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                        <img src="assets/img/icons/company-icon-16.svg" class="img-fluid w-auto h-auto" alt="img">
-                                    </a>
-                                    <div class="ms-2 flex-fill">
-                                        <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Silicon Corp</a></h6>
-                                        <p class="fs-13">Expired : 10 Apr 2025</p>
-                                    </div>
-                                </div>
-                                <div class="text-sm-end mb-2">
-                                    <a href="javascript:void(0);" class="link-info text-decoration-underline d-block mb-1">Send Reminder</a>
-                                </div>
-                            </div>
-                            <div class="d-sm-flex align-items-center justify-content-between flex-wrap mb-3">
-                                <div class="d-flex align-items-center mb-2">
-                                    <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                        <img src="assets/img/icons/company-icon-14.svg" class="img-fluid w-auto h-auto" alt="img">
-                                    </a>
-                                    <div class="ms-2 flex-fill">
-                                        <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Hubspot</a></h6>
-                                        <p class="fs-13">Expired : 12 Jun 2025</p>
-                                    </div>
-                                </div>
-                                <div class="text-sm-end mb-2">
-                                    <a href="javascript:void(0);" class="link-info text-decoration-underline d-block mb-1">Send Reminder</a>
-                                </div>
-                            </div>
-                            <div class="d-sm-flex align-items-center justify-content-between flex-wrap mb-3">
-                                <div class="d-flex align-items-center mb-2">
-                                    <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                        <img src="assets/img/icons/company-icon-18.svg" class="img-fluid w-auto h-auto" alt="img">
-                                    </a>
-                                    <div class="ms-2 flex-fill">
-                                        <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Licon Industries</a></h6>
-                                        <p class="fs-13">Expired : 16 Jun 2025</p>
-                                    </div>
-                                </div>
-                                <div class="text-sm-end mb-2">
-                                    <a href="javascript:void(0);" class="link-info text-decoration-underline d-block mb-1">Send Reminder</a>
-                                </div>
-                            </div>
-                            <div class="d-sm-flex align-items-center justify-content-between flex-wrap mb-3">
-                                <div class="d-flex align-items-center mb-2">
-                                    <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                        <img src="assets/img/company/company-07.svg" class="img-fluid w-auto h-auto" alt="img">
-                                    </a>
-                                    <div class="ms-2 flex-fill">
-                                        <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">TerraFusion Energy</a></h6>
-                                        <p class="fs-13">Expired : 12 May 2025</p>
-                                    </div>
-                                </div>
-                                <div class="text-sm-end mb-2">
-                                    <a href="javascript:void(0);" class="link-info text-decoration-underline d-block mb-1">Send Reminder</a>
-                                </div>
-                            </div>
-                            <div class="d-sm-flex align-items-center justify-content-between flex-wrap mb-1">
-                                <div class="d-flex align-items-center mb-2">
-                                    <a href="javscript:void(0);" class="avatar bg-gray-100 rounded-circle flex-shrink-0">
-                                        <img src="assets/img/company/company-08.svg" class="img-fluid w-auto h-auto" alt="img">
-                                    </a>
-                                    <div class="ms-2 flex-fill">
-                                        <h6 class="fs-medium text-truncate mb-1"><a href="javscript:void(0);">Epicurean Delights</a></h6>
-                                        <p class="fs-13">Expired : 15 May 2025</p>
-                                    </div>
-                                </div>
-                                <div class="text-sm-end mb-2">
-                                    <a href="javascript:void(0);" class="link-info text-decoration-underline d-block mb-1">Send Reminder</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Recent Plan Expired -->
         </div>
     </div>
 @endsection
@@ -477,7 +267,63 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const labels   = @json($adgData['labels'] ?? []);
+            const datasets = @json($adgData['datasets'] ?? []);
 
+            const el = document.getElementById('adgFeedChart');
+            if (!el) return;
+
+            new Chart(el, {
+                data: {
+                    labels: labels.map(n => Number(n)), // Age (days)
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'ADG (bars) vs Cumulative Feed (line)' },
+                        tooltip: {
+                            callbacks: {
+                                title: items => `Age: ${items?.[0]?.label} days`,
+                                label: (ctx) => {
+                                    const y = ctx.parsed.y ?? 0;
+                                    if (ctx.dataset.yAxisID === 'yFeed') {
+                                        return `${ctx.dataset.label}: ${y} kg`;
+                                    }
+                                    return `${ctx.dataset.label}: ${y} g`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: { display: true, text: 'Age (days)' },
+                            ticks: { precision: 0 }
+                        },
+                        yAdg: {
+                            type: 'linear',
+                            position: 'left',
+                            beginAtZero: true,
+                            title: { display: true, text: 'ADG (g/bird/day)' }
+                        },
+                        yFeed: {
+                            type: 'linear',
+                            position: 'right',
+                            beginAtZero: true,
+                            title: { display: true, text: 'Cumulative Feed (kg)' },
+                            grid: { drawOnChartArea: false } // keep grids readable
+                        }
+                    }
+                }
+            });
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const labels   = @json($adgData['labels'] ?? []);

@@ -26,7 +26,39 @@ class DashboardController extends Controller
         if ($user->hasRole('admin')) {
             return view('dashboards.admin', compact('user'));
         } elseif ($user->hasRole('owner')) {
-            return view('dashboards.owner', compact('user'));
+            $farm = $user->managedFarms()
+                ->first()
+                ->load('sheds.latestFlock');
+
+            $filters['farm_id'] = $farm->id;
+            $flocks = $farm->sheds->pluck('latestFlock')->toArray();
+
+            foreach ($flocks as $flock) {
+                if ($flock == null) {
+                    continue;
+                }
+                $filters['start_date'] = Carbon::parse($flock['start_date'])->format('Y-m-d');
+                $filters['end_date'] = Carbon::parse($flock['end_date'])->format('Y-m-d');
+            }
+
+            $data = $this->managerAnalyticsService->getAnalyticsData($filters)[0];
+            $mortality_data = $this->managerAnalyticsService->getMortalityRateData($filters);
+            $adgData = $this->managerAnalyticsService->adgData($filters);
+            $shedEnvironment = $this->managerAnalyticsService->shedEnvironmentData($filters);
+            $environmentAlerts = $this->managerAnalyticsService->environmentAlerts($filters);
+
+            return view(
+                'dashboards.owner',
+                [
+                    'user' => $user,
+                    'farm' => $farm,
+                    'data' => $data,
+                    'datasets' => $mortality_data,
+                    'adgData' => $adgData,
+                    'shedEnvironment' => $shedEnvironment,
+                    'environmentAlerts' => $environmentAlerts,
+                ]
+            );
         } elseif ($user->hasRole('manager')) {
             $farm = $user->managedFarms()
                 ->first()
@@ -46,7 +78,8 @@ class DashboardController extends Controller
             $data = $this->managerAnalyticsService->getAnalyticsData($filters)[0];
             $mortality_data = $this->managerAnalyticsService->getMortalityRateData($filters);
             $adgData = $this->managerAnalyticsService->adgData($filters);
-            $environment_data = $this->managerAnalyticsService->environmentData($filters);
+            $shedEnvironment = $this->managerAnalyticsService->shedEnvironmentData($filters);
+            $environmentAlerts = $this->managerAnalyticsService->environmentAlerts($filters);
 
             return view(
                 'dashboards.manager',
@@ -56,8 +89,10 @@ class DashboardController extends Controller
                     'data' => $data,
                     'datasets' => $mortality_data,
                     'adgData' => $adgData,
-                    'environment' => $environment_data,
-                ]);
+                    'shedEnvironment' => $shedEnvironment,
+                    'environmentAlerts' => $environmentAlerts,
+                ]
+            );
         }
 
         return abort(403, 'Unauthorized access: No appropriate role found.');

@@ -170,40 +170,78 @@ class ManagerAnalyticsService
         $start_date = $filters['start_date'] ?: now()->subDays(30)->toDateString();
         $end_date = $filters['end_date'] ?: now()->toDateString();
 
-        $sql = "SELECT
-                  w.flock_id,
-                  f.name AS flock_name,
-                  s.name AS shed_name,
-                  DATE(p.production_log_date) AS d,
-                  p.age,
-                  AVG(w.avg_weight_gain) AS adg_g_per_bird
-                FROM weight_logs w
-                JOIN production_logs p ON p.id = w.production_log_id
-                JOIN flocks f          ON f.id = w.flock_id
-                JOIN sheds  s          ON s.id = f.shed_id
-                WHERE p.production_log_date BETWEEN '{$start_date}' AND '{$end_date}'
-                AND s.farm_id = {$filters['farm_id']}
-                GROUP BY w.flock_id, f.name, DATE(p.production_log_date), p.age
-                ORDER BY w.flock_id, p.age";
+        $sql = "WITH base AS (
+                  SELECT
+                    w.flock_id,
+                    f.NAME AS flock_name,
+                    s.name AS shed_name,
+                    DATE(p.production_log_date) AS d,
+                    p.age,
+                    AVG(w.avg_weight_gain) AS adg_g_per_bird,
+                    SUM(p.day_feed_consumed + p.night_feed_consumed) / 1000 AS feed_kg_day
+                  FROM
+                    weight_logs AS w
+                    JOIN production_logs p ON p.id = w.production_log_id
+                    JOIN flocks f ON f.id = w.flock_id
+                    JOIN sheds s ON s.id = f.shed_id
+                  WHERE
+                    ({$filters['farm_id']} IS NULL OR s.farm_id = {$filters['farm_id']})
+                    AND ('{$start_date}' IS NULL OR p.production_log_date >= '{$start_date}')
+                    AND ('{$end_date}' IS NULL OR p.production_log_date < '{$end_date}' + INTERVAL 1 DAY)
+                  GROUP BY
+                    w.flock_id,
+                    f.NAME,
+                    DATE(p.production_log_date),
+                    p.age
+                ),
+                cum_feed AS (
+                  SELECT
+                    b.*,
+                    SUM(b.feed_kg_day) OVER (PARTITION BY b.flock_id ORDER BY b.d ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS feed_kg_cum
+                  FROM
+                    base b
+                ) SELECT
+                  flock_id,
+                  flock_name,
+                  shed_name,
+                  d,
+                  age,
+                  ROUND(adg_g_per_bird, 0) AS adg_g_per_bird,
+                  ROUND(feed_kg_cum, 2) AS feed_kg_cum
+                FROM
+                  cum_feed
+                ORDER BY
+                  flock_id,
+                  d";
 
         $rows = DB::select($sql);
 
         // ---- Build labels (ages) and datasets (one per flock) ----
         $ageSet = [];
-        $flockSeries = [];  // [flock_id => ['label'=>..., 'points'=>[age => value]]]
+        $flocks = [];
+        $palette  = [
+            // pair colors (barColor, lineColor)
+            ['#fb9a99', '#e31a1c'], // light red/pink bars, strong red line
+            ['#a6cee3', '#1f78b4'], // light blue bars, dark blue line
+            ['#b2df8a', '#33a02c'], // light green bars, dark green line
+            ['#fdbf6f', '#ff7f00'], // soft orange bars, deep orange line
+            ['#cab2d6', '#6a3d9a'], // lavender bars, dark purple line
+            ['#ffff99', '#b15928'], // yellow bars, brown line
+        ];
 
         foreach ($rows as $r) {
             $age = (int) $r->age;
             $ageSet[$age] = true;
 
-            if (!isset($flockSeries[$r->flock_id])) {
-                $flockSeries[$r->flock_id] = [
-                    'label'  => "{$r->flock_name} ({$r->shed_name})",
-                    'points' => [],
+            if (! isset($flocks[$r->flock_id])) {
+                $flocks[$r->flock_id] = [
+                    'label' => "{$r->flock_name} ({$r->shed_name})",
+                    'adg' => [],
+                    'feed' => [],
                 ];
             }
-            // store the ADG (grams per bird) for this age
-            $flockSeries[$r->flock_id]['points'][$age] = round((float) $r->adg_g_per_bird, 0);
+            $flocks[$r->flock_id]['adg'][(int)$r->age]  = (float)$r->adg_g_per_bird;
+            $flocks[$r->flock_id]['feed'][(int)$r->age] = (float)$r->feed_kg_cum;
         }
 
         // Sorted unique ages as x-axis labels
@@ -212,24 +250,67 @@ class ManagerAnalyticsService
 
         // Align each dataset’s data array to the labels (null where missing)
         $datasets = [];
-        foreach ($flockSeries as $series) {
-            $data = [];
+        $i = 0;
+        foreach ($flocks as $flockId => $series) {
+            $colors = $palette[$i % count($palette)];
+            $i++;
+
+            // Data aligned to labels (ages)
+            $adgData  = [];
+            $feedData = [];
             foreach ($labels as $age) {
-                $data[] = $series['points'][$age] ?? null;
+                $adgData[]  = $series['adg'][$age]  ?? null; // null -> skip bar for that age
+                $feedData[] = $series['feed'][$age] ?? null; // null -> skip line for that age
             }
+
             $datasets[] = [
-                'label' => $series['label'],
-                'data'  => $data,  // aligned to $labels by index
+                'type' => 'bar',
+                'label' => 'ADG',
+                'data' => $adgData,
+                'yAxisID' => 'yAdg',
+                'borderWidth' => 1,
+                'backgroundColor' => $this->hexToRgba($colors[0], 0.5),
+                'borderColor' => $colors[0],
+                'order' => 1,  // bars drawn first
+            ];
+
+            $datasets[] = [
+                'type' => 'line',
+                'label' => 'Feed (cum)',
+                'data' => $feedData,
+                'yAxisID' => 'yFeed',
+                'borderWidth' => 2,
+                'pointRadius' => 2,
+                'tension' => 0.2,
+                'borderColor' => $colors[1],
+                'fill' => false,
+                'spanGaps' => true, // connect across nulls (if desired)
+                'order' => 2,  // bars drawn first
             ];
         }
 
         return [
             'labels' => $labels,
-            'datasets' => $datasets
+            'datasets' => $datasets,
         ];
     }
 
-    public function environmentData(array $filters = []): array
+    function hexToRgba($hex, $alpha = 1) {
+        $hex = str_replace('#', '', $hex);
+
+        if(strlen($hex) == 3) {
+            $r = hexdec(substr($hex, 0, 1).substr($hex, 0, 1));
+            $g = hexdec(substr($hex, 1, 1).substr($hex, 1, 1));
+            $b = hexdec(substr($hex, 2, 1).substr($hex, 2, 1));
+        } else {
+            $r = hexdec(substr($hex, 0, 2));
+            $g = hexdec(substr($hex, 2, 2));
+            $b = hexdec(substr($hex, 4, 2));
+        }
+        return "rgba($r, $g, $b, $alpha)";
+    }
+
+    public function shedEnvironmentData(array $filters = []): array
     {
         $start_date = $filters['start_date'] ?: now()->subDays(30)->toDateString();
         $end_date = $filters['end_date'] ?: now()->toDateString();
@@ -269,6 +350,79 @@ class ManagerAnalyticsService
                 WHERE s.farm_id = {$filters['farm_id']}
                 GROUP BY s.id, s.name
                 ORDER BY s.name";
+
+        return DB::select($sql);
+    }
+
+    public function environmentAlerts(array $filters = []): array
+    {
+        $start_date = $filters['start_date'] ?: now()->subDays(30)->toDateString();
+        $end_date = $filters['end_date'] ?: now()->toDateString();
+        $co2_limit = 3000;
+        $nh3_limit = 25;
+        $mortality_pct_alert = 0.274;
+
+        $sql = "WITH env_last AS (
+                  SELECT l.*
+                  FROM iot_data_logs l
+                  JOIN (
+                    SELECT shed_id, parameter, MAX(record_time) AS mx
+                    FROM iot_data_logs
+                    GROUP BY shed_id, parameter
+                  ) x ON x.shed_id = l.shed_id AND x.parameter = l.parameter AND x.mx = l.record_time
+                ),
+                env_alerts AS (
+                  SELECT
+                    s.farm_id, s.id AS shed_id, s.name AS shed_name,
+                    NULL AS flock_id, NULL AS flock_name,
+                    'ENV' AS alert_type,
+                    el.parameter,
+                    el.avg_value,
+                    CASE el.parameter
+                      WHEN 'temp1' THEN CONCAT(20,'-',25)
+                      WHEN 'temp2' THEN CONCAT(29,'-',33)
+                      WHEN 'humidity'    THEN CONCAT(0.6,'-',0.7)
+                      WHEN 'co2'         THEN CONCAT('<=', $co2_limit)
+                      WHEN 'nh3'         THEN CONCAT('<=', $nh3_limit)
+                      ELSE ''
+                    END AS threshold,
+                    el.record_time AS alert_time
+                  FROM env_last el
+                  JOIN sheds s ON s.id = el.shed_id
+                  WHERE s.farm_id = {$filters['farm_id']}
+                    AND (
+                      (el.parameter='temp1' AND (el.avg_value < 20 OR el.avg_value > 25)) OR
+                      (el.parameter='temp2' AND (el.avg_value < 29 OR el.avg_value > 33)) OR
+                      (el.parameter='humidity'    AND (el.avg_value < 0.6 OR el.avg_value > 0.7)) OR
+                      (el.parameter='co2'         AND el.avg_value > $co2_limit) OR
+                      (el.parameter='nh3'         AND el.avg_value > $nh3_limit)
+                    )
+                ),
+                mortality_alerts AS (
+                  SELECT
+                    s.farm_id, s.id AS shed_id, s.name AS shed_name,
+                    f.id AS flock_id, f.name AS flock_name,
+                    'MORTALITY' AS alert_type,
+                    'Daily Mortality Rate (%)' AS parameter,
+                    CASE
+                      WHEN COALESCE(LAG(pl.net_count) OVER (PARTITION BY pl.flock_id ORDER BY pl.production_log_date), pl.net_count + (pl.day_mortality_count + pl.night_mortality_count)) = 0
+                      THEN 0
+                      ELSE (pl.day_mortality_count + pl.night_mortality_count) * 100.0 /
+                           COALESCE(LAG(pl.net_count) OVER (PARTITION BY pl.flock_id ORDER BY pl.production_log_date), pl.net_count + (pl.day_mortality_count + pl.night_mortality_count))
+                    END AS value,
+                    CONCAT('>=', $mortality_pct_alert) AS threshold,
+                    pl.production_log_date AS alert_time
+                  FROM production_logs pl
+                  JOIN flocks f ON f.id = pl.flock_id
+                  JOIN sheds  s ON s.id = f.shed_id
+                  WHERE s.farm_id = {$filters['farm_id']}
+                    AND (pl.production_log_date BETWEEN '{$start_date}' AND '{$end_date}')
+                )
+                SELECT * FROM env_alerts
+                UNION ALL
+                SELECT * FROM mortality_alerts
+                WHERE value >= $mortality_pct_alert
+                ORDER BY alert_time DESC";
 
         return DB::select($sql);
     }
