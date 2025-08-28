@@ -17,6 +17,7 @@ class FlockResource extends JsonResource
                 'name' => $this->name,
                 'start_date' => $this->start_date ? Carbon::parse($this->start_date)->format('Y-m-d') : null,
                 'end_date' => $this->end_date ? Carbon::parse($this->end_date)->format('Y-m-d') : null,
+                'age' => $this->age,
                 'chicken_count' => $this->chicken_count,
                 'status' => $this->status,
                 'live_bird_count' => $this->live_bird_count,
