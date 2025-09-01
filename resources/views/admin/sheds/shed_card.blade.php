@@ -11,15 +11,15 @@
     <div class="card-body">
         <div class="d-flex justify-content-between mb-3">
             <div class="text-info">
-                <i class="ti ti-map-pin me-2"></i>{{ $shed->farm->address }} | {{ $shed->farm->city->name }}<br>
+                <i class="ti ti-map-pin me-2"></i>{{ $shed->farm?->address }} | {{ $shed->farm?->city?->name }}<br>
                 <i class="ti ti-calculator me-2"></i>Capacity: {{ number_format($shed->capacity, 0) }}<br>
                 <i class="ti ti-brand-abstract me-2"></i>Shed Type: {{ ucwords($shed->type) }}
             </div>
             <div class="text-info">
                 @if($shed->latestFlock?->count() > 0)
-                    <strong>{{ $shed->latestFlock->name }}</strong><br>
-                    Start Date: {{ $shed->latestFlock->start_date->format('d-m-Y') }}<br>
-                    Flock Age: {{ $shed->latestFlock->age }} Days
+                    <strong>{{ $shed->latestFlock?->name }}</strong><br>
+                    Start Date: {{ $shed->latestFlock?->start_date->format('d-m-Y') }}<br>
+                    Flock Age: {{ $shed->latestFlock?->age }} Days
                 @else
                     <span class="badge bg-soft-danger">No Flock Cycled</span>
                 @endif

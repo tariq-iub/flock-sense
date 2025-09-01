@@ -166,6 +166,25 @@ class ProductionLogController extends ApiController
         }
     }
 
+    public function productionDatesByFlock($flockId)
+    {
+        if ($flockId) {
+            $flock = Flock::with('shed')->findOrFail($flockId);
+            $productionLogDates = ProductionLog::where('flock_id', $flockId)
+                ->pluck('production_log_date');
+
+            return response()->json([
+                'shed_id' => $flock->shed->id,
+                'shed_name' => $flock->shed->name,
+                'flock_id' => $flockId,
+                'flock_name' => $flock->name,
+                'production_log_dates' => $productionLogDates,
+            ], 200);
+        } else {
+            return response()->json(['message' => 'Flock id is not provided.'], 404);
+        }
+    }
+
     public function dailyReport(Request $request, $version = 'en')
     {
         $request->validate([
