@@ -86,6 +86,7 @@ Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceControl
 Route::get('production/report/headers/{id}', [ProductionLogController::class, 'dailyReportHeaders'])->name('productions.report.headers');
 Route::get('production/report/dates/{id}', [ProductionLogController::class, 'productionDatesByFlock'])->name('productions.report.dates');
 Route::get('production/report/history', [ProductionLogController::class, 'history'])->name('productions.report.history');
+Route::get('production/report/latest', [ProductionLogController::class, 'latestHistory'])->name('productions.report.latest');
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
 
 Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
