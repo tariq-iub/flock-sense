@@ -19,6 +19,7 @@ use App\Models\District;
 use App\Models\Province;
 use App\Models\Tehsil;
 use App\Http\Controllers\Api\V1\WeightLogController;
+use App\Http\Controllers\Api\V1\GraphDataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -90,6 +91,13 @@ Route::get('production/report/latest', [ProductionLogController::class, 'latestH
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
 
 Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
+
+Route::get('/mortality-rate', [GraphDataController::class, 'mortalityRate']);
+Route::get('/adg-weight', [GraphDataController::class, 'adgAndWeight']);
+Route::get('/feed-weight-cumulative', [GraphDataController::class, 'feedWeightCumulative']);
+Route::get('/fcr', [GraphDataController::class, 'fcr']);
+Route::get('/water-feed', [GraphDataController::class, 'waterToFeedRatio']);
+Route::get('/uniformity', [GraphDataController::class, 'uniformity']);
 
 // Address Credentials
 Route::get('provinces', function () {
