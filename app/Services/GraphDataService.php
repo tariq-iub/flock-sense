@@ -60,7 +60,7 @@ class GraphDataService
               w.flock_id,
               DATE(p.production_log_date),
               p.age
-        ";
+            ";
 
         return DB::select($sql, ['flockId' => $flockId]);
     }
