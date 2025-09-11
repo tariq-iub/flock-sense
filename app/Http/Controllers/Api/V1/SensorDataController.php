@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\ApiController;
 use App\Http\Resources\SensorDataResource;
 use App\Models\Device;
+use App\Models\DeviceAppliance;
 use App\Models\Shed;
 use App\Models\ShedDevice;
 use App\Services\DynamoDbService;
@@ -149,6 +150,79 @@ class SensorDataController extends ApiController
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Update all appliance statuses & store sensor data
+     */
+    public function syncDeviceData(Request $request)
+    {
+        // ✅ Validate request
+        $validated = $request->validate([
+            'device_serial' => 'required|string',
+            'appliances' => 'required|array',
+            'appliances.*' => 'required|boolean',
+        ]);
+
+        // 🔍 Get device
+        $device = Device::where('serial_no', $validated['device_serial'])->firstOrFail();
+
+        $updatedAppliances = [];
+
+        // 🔄 Update or create appliances
+        foreach ($validated['appliances'] as $key => $status) {
+            $appliance = DeviceAppliance::firstOrNew([
+                'device_id' => $device->id,
+                'key' => $key,
+            ]);
+
+            if (!$appliance->exists) {
+                $type = $this->getApplianceTypeFromKey($key);
+                $appliance->fill([
+                    'type' => $type,
+                    'name' => ucfirst($type) . ' ' . strtoupper($key),
+                ]);
+            }
+
+            $appliance->status = $status;
+            $appliance->status_updated_at = now();
+            $appliance->save();
+
+            $updatedAppliances[] = $appliance;
+        }
+
+        // 📦 Prepare DynamoDB payload
+        $sensorData = array_merge(
+            [
+                'device_id' => $device->id,
+                'timestamp' => Carbon::now()->timestamp,
+            ],
+            collect($request->except(['device_serial']))->toArray()
+        );
+
+        // 💾 Store in DynamoDB
+        $this->dynamoDbService->putSensorData($sensorData);
+
+        return response()->json([
+            'message' => 'Device appliances updated and sensor data stored successfully.',
+        ], 201);
+    }
+
+    /**
+     * Helper: Infer type from key
+     */
+    private function getApplianceTypeFromKey(string $key): string
+    {
+        $firstChar = strtolower(substr($key, 0, 1));
+        return match ($firstChar) {
+            'f' => 'fan',
+            'b' => 'brooder',
+            'c' => 'cooling_pad',
+            'l' => 'light',
+            'e' => 'exhaust',
+            'h' => 'heater',
+            default => 'appliance'
+        };
     }
 
     private function getTimeRange(string $range): ?int
