@@ -41,7 +41,8 @@ class DeviceApplianceController extends ApiController
         }
 
         $appliance = DeviceAppliance::create($validated);
-        return new DeviceApplianceResource($appliance);
+
+        return response()->json(['message' => 'Controller data stored successfully.'], 201);
     }
 
     /**
@@ -72,7 +73,7 @@ class DeviceApplianceController extends ApiController
         }
 
         $deviceAppliance->update($validated);
-        return new DeviceApplianceResource($deviceAppliance);
+        return response()->json(['message' => 'Controller data updated successfully.'], 201);
     }
 
     /**
@@ -158,7 +159,7 @@ class DeviceApplianceController extends ApiController
             );
         }
 
-        return new DeviceApplianceResource($appliance);
+        return response()->json(['message' => 'Controller data updated successfully.'], 201);
     }
 
     /**
@@ -202,9 +203,7 @@ class DeviceApplianceController extends ApiController
             $updatedAppliances[] = $appliance;
         }
 
-        return response()->json([
-            'message' => 'Statuses updated successfully',
-        ]);
+        return response()->json(['message' => 'Controller data updated successfully.'], 201);
     }
 
     /**
