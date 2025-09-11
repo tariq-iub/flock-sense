@@ -67,6 +67,9 @@ Route::middleware('auth:sanctum')->group(function () {
 // Public sensor data store route (no auth required)
 Route::post('sensor-data', [SensorDataController::class, 'store']);
 
+// Push Sensor Data and Device Appliance Data
+Route::post('device/sync-data', [SensorDataController::class, 'syncDeviceData']);
+
 // Resource routes
 Route::apiResource('device-appliances', DeviceApplianceController::class);
 
