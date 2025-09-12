@@ -208,6 +208,125 @@ class SensorDataController extends ApiController
         ], 201);
     }
 
+    public function storeWithTimestamp(Request $request)
+    {
+        $validated = $request->validate([
+            'device_serial' => 'required|string',
+            'timestamp' => 'required|integer', // Allow timestamp from client
+        ]);
+
+        $device = Device::where('serial_no', $validated['device_serial'])->first();
+
+        if (!$device) {
+            return response()->json(['message' => 'Device not found.'], 404);
+        }
+
+        $validated['device_id'] = $device->id;
+        unset($validated['device_serial']);
+
+        // 👇 Merge dynamic sensor fields
+        $sensorData = array_merge(
+            $validated,
+            collect($request->except(['device_serial'])) // Keep everything else
+            ->reject(fn($value) => is_null($value))
+                ->toArray()
+        );
+
+        // ✅ Store in DynamoDB
+        $this->dynamoDbService->putSensorData($sensorData);
+
+        return response()->json(['message' => 'Sensor data stored successfully.'], 201);
+    }
+
+    public function storeMultiple(Request $request)
+    {
+        $validated = $request->validate([
+            'device_serial' => 'required|string',
+            'records' => 'required|array',              // Expect multiple records
+            'records.*.timestamp' => 'nullable|integer', // Optional timestamp
+        ]);
+
+        foreach ($validated['records'] as $record) {
+            $device = Device::where('serial_no', $record['device_serial'])->first();
+
+            if (!$device) {
+                // Skip or handle errors per record
+                Log::warning("Device not found for serial: {$record['device_serial']}");
+                continue;
+            }
+
+            $record['device_id'] = $device->id;
+            $record['timestamp'] = $record['timestamp'] ?? Carbon::now()->timestamp;
+            unset($record['device_serial']);
+
+            $sensorData = array_merge(
+                $record,
+                collect($record)->except(['device_serial'])->toArray()
+            );
+
+            $this->dynamoDbService->putSensorData($sensorData);
+        }
+
+        return response()->json(['message' => 'All sensor data records processed successfully.'], 201);
+    }
+
+    /**
+     * Update all appliance statuses & store sensor data (with timestamp)
+     */
+    public function syncDeviceDataWithTimestamp(Request $request)
+    {
+        // ✅ Validate request
+        $validated = $request->validate([
+            'device_serial' => 'required|string',
+            'timestamp' => 'nullable|integer',       // <-- NEW FIELD
+            'appliances' => 'required|array',
+            'appliances.*' => 'required|boolean',
+        ]);
+
+        // 🔍 Get device
+        $device = Device::where('serial_no', $validated['device_serial'])->firstOrFail();
+
+        $updatedAppliances = [];
+
+        // 🔄 Update or create appliances
+        foreach ($validated['appliances'] as $key => $status) {
+            $appliance = DeviceAppliance::firstOrNew([
+                'device_id' => $device->id,
+                'key' => $key,
+            ]);
+
+            if (!$appliance->exists) {
+                $type = $this->getApplianceTypeFromKey($key);
+                $appliance->fill([
+                    'type' => $type,
+                    'name' => ucfirst($type) . ' ' . strtoupper($key),
+                ]);
+            }
+
+            $appliance->status = $status;
+            $appliance->status_updated_at = now();
+            $appliance->save();
+
+            $updatedAppliances[] = $appliance;
+        }
+
+        // 📦 Prepare DynamoDB payload with timestamp
+        $sensorData = array_merge(
+            [
+                'device_id' => $device->id,
+                'timestamp' => $validated['timestamp'] ?? Carbon::now()->timestamp,
+            ],
+            collect($request->except(['device_serial']))->toArray()
+        );
+
+        // 💾 Store in DynamoDB
+        $this->dynamoDbService->putSensorData($sensorData);
+
+        return response()->json([
+            'message' => 'Device appliances updated and sensor data stored successfully.',
+        ], 201);
+    }
+
     /**
      * Helper: Infer type from key
      */
