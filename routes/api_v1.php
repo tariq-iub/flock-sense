@@ -70,6 +70,13 @@ Route::post('sensor-data', [SensorDataController::class, 'store']);
 // Push Sensor Data and Device Appliance Data
 Route::post('device/sync-data', [SensorDataController::class, 'syncDeviceData']);
 
+// Public sensor data store routes (with timestamp + multiple records)
+Route::post('sensor-data/with-timestamp', [SensorDataController::class, 'storeWithTimestamp']);
+Route::post('sensor-data/multiple', [SensorDataController::class, 'storeMultiple']);
+
+// Device data sync with timestamp
+Route::post('device/sync-data-with-timestamp', [SensorDataController::class, 'syncDeviceDataWithTimestamp']);
+
 // Resource routes
 Route::apiResource('device-appliances', DeviceApplianceController::class);
 
