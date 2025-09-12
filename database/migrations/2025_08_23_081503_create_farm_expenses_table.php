@@ -38,7 +38,7 @@ return new class extends Migration
             $table->foreign('flock_id')->references('id')->on('flocks')->nullOnDelete();
             $table->foreign('expense_id')->references('id')->on('expenses')->nullOnDelete();
             $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
-            $table->foreign('vendor_id')->references('id')->on('vendors')->nullOnDelete();
+//            $table->foreign('vendor_id')->references('id')->on('vendors')->nullOnDelete();
 
             $table->index(['farm_id', 'expense_date']);
             $table->index(['shed_id', 'expense_date']);
