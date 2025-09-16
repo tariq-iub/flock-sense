@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\NotificationTriggered;
 use App\Http\Controllers\ApiController;
 use App\Models\Flock;
 use App\Models\ProductionLog;
@@ -89,6 +90,25 @@ class ProductionLogController extends ApiController
             'night_medicine' => $validated['night_medicine'],
             'user_id' => Auth::id(),
         ]);
+
+        // Trigger notification for farm owner
+        $farm = $productionLog->shed->farm;
+        if ($farm && $farm->owner) {
+            event(new NotificationTriggered(
+                type: 'report_submitted',
+                notifiable: $productionLog,
+                userId: $farm->owner->id,
+                farmId: $farm->id,
+                title: 'New Daily Report Submitted',
+                message: "A new daily report for Shed '{$productionLog->shed->name}' in Flock '{$productionLog->flock->name}' has been submitted by {$productionLog->user->name}.",
+                data: [
+                    'shed_id' => $productionLog->shed_id,
+                    'flock_id' => $productionLog->flock_id,
+                    'production_log_id' => $productionLog->id,
+                    'submitter_id' => $productionLog->user_id,
+                ]
+            ));
+        }
 
         // Optionally: Only create weight log if provided and valid
         if (

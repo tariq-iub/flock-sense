@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\NotificationTriggered;
+use App\Listeners\CreateGenericNotification;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -39,6 +41,11 @@ class EventServiceProvider extends ServiceProvider
         Event::listen(
             PasswordReset::class,
             SendPasswordResetSuccessNotification::class,
+        );
+
+        Event::listen(
+            NotificationTriggered::class,
+            CreateGenericNotification::class
         );
     }
 }

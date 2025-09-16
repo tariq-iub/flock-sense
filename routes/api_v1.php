@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\FarmManagerController;
 use App\Http\Controllers\Api\V1\FarmStaffController;
 use App\Http\Controllers\Api\V1\FlockController;
 use App\Http\Controllers\Api\V1\MedicineController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\ProductionLogController;
 use App\Http\Controllers\Api\V1\SensorDataController;
 use App\Http\Controllers\Api\V1\ShedController;
@@ -62,6 +63,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::put('/settings/{user}', [UserSettingsController::class, 'update']);
+
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::patch('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 });
 
 // Public sensor data store route (no auth required)
