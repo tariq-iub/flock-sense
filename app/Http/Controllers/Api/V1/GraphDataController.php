@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\ApiController;
-use App\Http\Controllers\Controller;
 use App\Services\GraphDataService;
 use Illuminate\Http\Request;
 
@@ -79,8 +78,12 @@ class GraphDataController extends ApiController
         ]);
 
         $data = $this->graphDataService->getDailyFcr($request->flock_id);
+        $latestRow = collect($data)->last();
 
-        return response()->json(['data' => $data]);
+        return response()->json([
+            'data' => $data,
+            'latestRow' => $latestRow,
+        ]);
     }
 
     /**
@@ -91,7 +94,9 @@ class GraphDataController extends ApiController
     {
         $data = $this->graphDataService->getWaterToFeedRatio();
 
-        return response()->json(['data' => $data]);
+        return response()->json([
+            'data' => $data,
+        ]);
     }
 
     /**

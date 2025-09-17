@@ -140,22 +140,35 @@ class GraphDataService
     public function getDailyFcr(int $flockId)
     {
         $sql = "
+            WITH daily AS (
+              SELECT
+                w.flock_id,
+                DATE(p.production_log_date) AS d,
+                p.age,
+                AVG(w.feed_conversion_ratio)             AS fcr_daily,
+                AVG(w.adjusted_feed_conversion_ratio)    AS adj_fcr_daily
+              FROM weight_logs AS w
+              JOIN production_logs AS p
+                ON p.id = w.production_log_id
+              WHERE w.flock_id = :flockId
+              GROUP BY
+                w.flock_id,
+                DATE(p.production_log_date),
+                p.age
+            )
             SELECT
-              w.flock_id,
-              DATE(p.production_log_date) AS d,
-              p.age,
-              AVG(w.feed_conversion_ratio) AS fcr_daily,
-              AVG(w.adjusted_feed_conversion_ratio) AS adj_fcr_daily
-            FROM
-              weight_logs AS w
-              JOIN production_logs AS p ON p.id = w.production_log_id
-            WHERE
-              w.flock_id = :flockId
-            GROUP BY
-              w.flock_id,
-              DATE(p.production_log_date),
-              p.age
-        ";
+              flock_id,
+              d,
+              age,
+              fcr_daily,
+              adj_fcr_daily,
+              /* fcr(n) - fcr(n-1); if previous doesn't exist, treat it as 0 */
+              ROUND(fcr_daily - COALESCE(
+                LAG(fcr_daily) OVER (PARTITION BY flock_id ORDER BY d, age),
+                0
+              ) * 100 / fcr_daily, 3) AS fcr_difference
+            FROM daily
+            ORDER BY d, age";
 
         return DB::select($sql, ['flockId' => $flockId]);
     }
