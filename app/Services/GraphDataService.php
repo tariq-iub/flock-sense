@@ -163,10 +163,10 @@ class GraphDataService
               fcr_daily,
               adj_fcr_daily,
               /* fcr(n) - fcr(n-1); if previous doesn't exist, treat it as 0 */
-              ROUND(fcr_daily - COALESCE(
+              ROUND((fcr_daily - COALESCE(
                 LAG(fcr_daily) OVER (PARTITION BY flock_id ORDER BY d, age),
                 0
-              ) * 100 / fcr_daily, 3) AS fcr_difference
+              )) * 100 / fcr_daily, 3) AS fcr_difference
             FROM daily
             ORDER BY d, age";
 
