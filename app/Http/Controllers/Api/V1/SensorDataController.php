@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Resources\SensorDataResource;
 use App\Models\Device;
 use App\Models\DeviceAppliance;
+use App\Models\IotDataLog;
 use App\Models\Shed;
 use App\Models\ShedDevice;
 use App\Services\DynamoDbService;
@@ -48,108 +49,6 @@ class SensorDataController extends ApiController
         $this->dynamoDbService->putSensorData($sensorData);
 
         return response()->json(['message' => 'Sensor data stored successfully.'], 201);
-    }
-
-    public function fetchByShed(Request $request, int $shedId)
-    {
-        $validated = $request->validate([
-            'range' => 'nullable|in:latest,last_hour,last_12_hours,day,week,month,custom',
-            'from' => 'required_if:range,custom|date_format:Y-m-d H:i:s',
-            'to' => 'required_if:range,custom|date_format:Y-m-d H:i:s|after_or_equal:from',
-        ]);
-
-        $deviceIds = ShedDevice::where('shed_id', $shedId)->pluck('device_id')->toArray();
-        if (empty($deviceIds)) {
-            return response()->json(['data' => []], 200);
-        }
-
-        $fromTimestamp = null;
-        $toTimestamp = null;
-        $latest = false;
-
-        if (($validated['range'] ?? null) === 'custom') {
-            $fromTimestamp = Carbon::parse($validated['from'])->timestamp;
-            $toTimestamp = Carbon::parse($validated['to'])->timestamp;
-        } elseif (($validated['range'] ?? null) === 'latest') {
-            $latest = true;
-        } elseif (!empty($validated['range'])) {
-            $fromTimestamp = $this->getTimeRange($validated['range']);
-        }
-
-        $results = $this->dynamoDbService->getSensorData(
-            $deviceIds,
-            $fromTimestamp,
-            $toTimestamp,
-            $latest
-        );
-
-        // 🔥 Remove device_id from each record
-        $cleaned = collect($results)->map(function ($record) {
-            unset($record['device_id']);
-            return $record;
-        })->values();
-
-        return response()->json(['data' => $cleaned], 200);
-    }
-
-    public function fetchByFarm(Request $request, int $farmId)
-    {
-        try {
-            $validated = $request->validate([
-                'range' => 'nullable|in:latest,last_hour,last_12_hours,day,week,month,custom',
-                'from' => 'required_if:range,custom|date_format:Y-m-d H:i:s',
-                'to' => 'required_if:range,custom|date_format:Y-m-d H:i:s|after_or_equal:from',
-            ]);
-
-            $shedIds = Shed::where('farm_id', $farmId)->pluck('id')->toArray();
-            if (empty($shedIds)) {
-                return response()->json(['data' => []], 200);
-            }
-
-            $deviceIds = ShedDevice::whereIn('shed_id', $shedIds)->pluck('device_id')->toArray();
-            if (empty($deviceIds)) {
-                return response()->json(['data' => []], 200);
-            }
-
-            $fromTimestamp = null;
-            $toTimestamp = null;
-            $latest = false;
-
-            if (($validated['range'] ?? null) === 'custom') {
-                $fromTimestamp = Carbon::parse($validated['from'])->timestamp;
-                $toTimestamp = Carbon::parse($validated['to'])->timestamp;
-            } elseif (($validated['range'] ?? null) === 'latest') {
-                $latest = true;
-            } elseif (!empty($validated['range'])) {
-                $fromTimestamp = $this->getTimeRange($validated['range']);
-            }
-
-            $results = $this->dynamoDbService->getSensorData(
-                $deviceIds,
-                $fromTimestamp,
-                $toTimestamp,
-                $latest
-            );
-
-            // 🔥 Remove device_id from each record
-            $cleaned = collect($results)->map(function ($record) {
-                unset($record['device_id']);
-                return $record;
-            })->values();
-
-            return response()->json(['data' => $cleaned], 200);
-
-        } catch (\Throwable $e) {
-            Log::error('Error in fetchByFarm', [
-                'farm_id' => $farmId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'message' => 'Error fetching farm sensor data',
-                'error' => $e->getMessage()
-            ], 500);
-        }
     }
 
     /**
@@ -325,6 +224,107 @@ class SensorDataController extends ApiController
         return response()->json([
             'message' => 'Device appliances updated and sensor data stored successfully.',
         ], 201);
+    }
+
+    public function fetchByShed(Request $request, int $shedId)
+    {
+        $validated = $request->validate([
+            'range' => 'nullable|in:latest,last_hour,last_12_hours,day,week,month,custom',
+            'from' => 'required_if:range,custom|date_format:Y-m-d H:i:s',
+            'to' => 'required_if:range,custom|date_format:Y-m-d H:i:s|after_or_equal:from',
+        ]);
+
+        $deviceIds = ShedDevice::where('shed_id', $shedId)->pluck('device_id')->toArray();
+        if (empty($deviceIds)) {
+            return response()->json(['data' => []], 200);
+        }
+
+        $query = IotDataLog::whereIn('device_id', $deviceIds);
+
+        // 🔍 Range filtering
+        if (($validated['range'] ?? null) === 'custom') {
+            $query->whereBetween('record_time', [$validated['from'], $validated['to']]);
+        } elseif (($validated['range'] ?? null) === 'latest') {
+            $query->where('time_window', 'latest');
+        } elseif (!empty($validated['range'])) {
+            $from = Carbon::createFromTimestamp($this->getTimeRange($validated['range']))->toDateTimeString();
+            $query->where('record_time', '>=', $from);
+        }
+
+        $logs = $query->get();
+
+        // 🔄 Group by device + timestamp + window
+        $grouped = $logs->groupBy(fn($log) => $log->device_id . '|' . $log->record_time . '|' . $log->time_window)
+            ->map(function ($rows) {
+                $first = $rows->first();
+                return [
+                    'device_id' => $first->device_id,
+                    'record_time' => $first->record_time,
+                    'time_window' => $first->time_window,
+                    'parameters' => $rows->mapWithKeys(fn($row) => [
+                        $row->parameter => [
+                            'min' => $row->min_value,
+                            'max' => $row->max_value,
+                            'avg' => $row->avg_value,
+                        ]
+                    ]),
+                ];
+            })->values();
+
+        return SensorDataResource::collection($grouped);
+    }
+
+    public function fetchByFarm(Request $request, int $farmId)
+    {
+        $validated = $request->validate([
+            'range' => 'nullable|in:latest,last_hour,last_12_hours,day,week,month,custom',
+            'from' => 'required_if:range,custom|date_format:Y-m-d H:i:s',
+            'to' => 'required_if:range,custom|date_format:Y-m-d H:i:s|after_or_equal:from',
+        ]);
+
+        $shedIds = Shed::where('farm_id', $farmId)->pluck('id')->toArray();
+        if (empty($shedIds)) {
+            return response()->json(['data' => []], 200);
+        }
+
+        $deviceIds = ShedDevice::whereIn('shed_id', $shedIds)->pluck('device_id')->toArray();
+        if (empty($deviceIds)) {
+            return response()->json(['data' => []], 200);
+        }
+
+        $query = IotDataLog::whereIn('device_id', $deviceIds);
+
+        // 🔍 Range filtering
+        if (($validated['range'] ?? null) === 'custom') {
+            $query->whereBetween('record_time', [$validated['from'], $validated['to']]);
+        } elseif (($validated['range'] ?? null) === 'latest') {
+            $query->where('time_window', 'latest');
+        } elseif (!empty($validated['range'])) {
+            $from = Carbon::createFromTimestamp($this->getTimeRange($validated['range']))->toDateTimeString();
+            $query->where('record_time', '>=', $from);
+        }
+
+        $logs = $query->get();
+
+        // 🔄 Group by device + timestamp + window
+        $grouped = $logs->groupBy(fn($log) => $log->device_id . '|' . $log->record_time . '|' . $log->time_window)
+            ->map(function ($rows) {
+                $first = $rows->first();
+                return [
+                    'device_id' => $first->device_id,
+                    'record_time' => $first->record_time,
+                    'time_window' => $first->time_window,
+                    'parameters' => $rows->mapWithKeys(fn($row) => [
+                        $row->parameter => [
+                            'min' => $row->min_value,
+                            'max' => $row->max_value,
+                            'avg' => $row->avg_value,
+                        ]
+                    ]),
+                ];
+            })->values();
+
+        return SensorDataResource::collection($grouped);
     }
 
     /**
