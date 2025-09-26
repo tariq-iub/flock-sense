@@ -47,9 +47,7 @@ class ShedResource extends JsonResource
                 ]),
 
                 'sensor_data' => isset($this->devices) ? $this->devices->map(function ($device) {
-                    return $device->latest_sensor_data
-                        ? new SensorDataResource((object)$device->latest_sensor_data)
-                        : null;
+                    return $device->latest_sensor_data;
                 })->filter()->values() : [],
 
                 // Flattened appliances from all devices in this shed
