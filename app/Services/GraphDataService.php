@@ -217,4 +217,69 @@ class GraphDataService
 
         return DB::select($sql);
     }
+
+    /**
+     * Get Vaccination History
+     */
+    public function getVaccinationHistory(int $flockId)
+    {
+        $sql = "
+        SELECT
+          flock_id,
+          DATE(production_log_date) AS d,
+          age,
+          day_medicine,
+          night_medicine
+        FROM production_logs
+        WHERE flock_id = :flockId
+          AND is_vaccinated = 1
+        ORDER BY d
+    ";
+
+        return DB::select($sql, ['flockId' => $flockId]);
+    }
+
+    /**
+     * Get Feed Consumption History
+     */
+    public function getFeedConsumptionHistory(int $flockId)
+    {
+        $sql = "
+        SELECT
+          flock_id,
+          DATE(production_log_date) AS d,
+          age,
+          day_feed_consumed,
+          night_feed_consumed,
+          (day_feed_consumed + night_feed_consumed) AS total_feed,
+          avg_feed_consumed
+        FROM production_logs
+        WHERE flock_id = :flockId
+        ORDER BY d
+    ";
+
+        return DB::select($sql, ['flockId' => $flockId]);
+    }
+
+    /**
+     * Get Water Consumption History
+     */
+    public function getWaterConsumptionHistory(int $flockId)
+    {
+        $sql = "
+        SELECT
+          flock_id,
+          DATE(production_log_date) AS d,
+          age,
+          day_water_consumed,
+          night_water_consumed,
+          (day_water_consumed + night_water_consumed) AS total_water,
+          avg_water_consumed
+        FROM production_logs
+        WHERE flock_id = :flockId
+        ORDER BY d
+    ";
+
+        return DB::select($sql, ['flockId' => $flockId]);
+    }
 }

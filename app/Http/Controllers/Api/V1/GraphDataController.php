@@ -109,4 +109,49 @@ class GraphDataController extends ApiController
 
         return response()->json(['data' => $data]);
     }
+
+    /**
+     * 7. Vaccination History
+     * Params: flock_id (required)
+     */
+    public function vaccinationHistory(Request $request)
+    {
+        $request->validate([
+            'flock_id' => 'required|integer|exists:flocks,id',
+        ]);
+
+        $data = $this->graphDataService->getVaccinationHistory($request->flock_id);
+
+        return response()->json(['data' => $data]);
+    }
+
+    /**
+     * 8. Feed Consumption History
+     * Params: flock_id (required)
+     */
+    public function feedConsumptionHistory(Request $request)
+    {
+        $request->validate([
+            'flock_id' => 'required|integer|exists:flocks,id',
+        ]);
+
+        $data = $this->graphDataService->getFeedConsumptionHistory($request->flock_id);
+
+        return response()->json(['data' => $data]);
+    }
+
+    /**
+     * 9. Water Consumption History
+     * Params: flock_id (required)
+     */
+    public function waterConsumptionHistory(Request $request)
+    {
+        $request->validate([
+            'flock_id' => 'required|integer|exists:flocks,id',
+        ]);
+
+        $data = $this->graphDataService->getWaterConsumptionHistory($request->flock_id);
+
+        return response()->json(['data' => $data]);
+    }
 }

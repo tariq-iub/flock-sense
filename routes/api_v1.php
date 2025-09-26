@@ -114,6 +114,10 @@ Route::get('/feed-weight-cumulative', [GraphDataController::class, 'feedWeightCu
 Route::get('/fcr', [GraphDataController::class, 'fcr']);
 Route::get('/water-feed', [GraphDataController::class, 'waterToFeedRatio']);
 Route::get('/uniformity', [GraphDataController::class, 'uniformity']);
+Route::get('/vaccination-history', [GraphDataController::class, 'vaccinationHistory']);
+Route::get('/feed-consumption-history', [GraphDataController::class, 'feedConsumptionHistory']);
+Route::get('/water-consumption-history', [GraphDataController::class, 'waterConsumptionHistory']);
+
 
 // Address Credentials
 Route::get('provinces', function () {
