@@ -75,7 +75,7 @@ class AuthController extends ApiController
             ], 401);
         }
 
-        $user = $request->user();
+        $user = $request->user()->loadCount('farms');
         $token = $user->createToken('mobile')->plainTextToken;
 
         return response()->json([

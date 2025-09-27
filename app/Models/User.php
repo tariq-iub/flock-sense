@@ -87,9 +87,20 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withPivot('link_date');
     }
 
+    public function getFarmsCountAttribute()
+    {
+        // If relation isn't eager loaded, just run a quick count
+        if (!$this->relationLoaded('farms')) {
+            return $this->farms()->count();
+        }
+
+        // If farms are already loaded, count directly
+        return $this->farms->count();
+    }
+
     public function getShedsCountAttribute()
     {
-        if (! $this->relationLoaded('farms')) {
+        if (!$this->relationLoaded('farms')) {
             return 0;
         }
 
@@ -98,7 +109,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getBirdsCountAttribute()
     {
-        if (! $this->relationLoaded('farms')) {
+        if (!$this->relationLoaded('farms')) {
             return 0;
         }
 
