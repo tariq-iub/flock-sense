@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 // Welcome page
 Route::get('/', function () {
-    return view('welcome');
+    return view('frontend.index');
 });
 
 // Login and forget-password routes (outside admin group)

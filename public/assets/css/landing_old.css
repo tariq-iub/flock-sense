@@ -1,0 +1,241 @@
+@charset "UTF-8";
+/* Utils */
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap");
+
+body {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    color: #334547;
+}
+
+.sticky-top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1020; /* higher than other elements */
+    background-color: #fff; /* or your nav bg */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    /* Inherit from body, redundant but fine for specificity if you want */
+    color: inherit;
+}
+
+.image-frame {
+    position: relative;
+    display: inline-block;
+}
+
+.gray-square {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(180,180,180,0.17);
+    border-radius: 10px;
+    z-index: 0;
+}
+
+.main-img {
+    position: relative;
+    z-index: 1;
+    display: block;
+}
+
+.badge-circle {
+    width: 160px;
+    height: 160px;
+    display: inline-block;
+    z-index: 5;
+}
+
+/* Alternating backgrounds for sections */
+.alt-section:nth-child(even) {
+    background:
+        radial-gradient(circle at 20% 30%, #e7fad9 0%, #f4fce6 70%, transparent 100%),
+        radial-gradient(circle at 80% 20%, #f4fce6 0%, #fcfff8 60%, transparent 100%),
+        radial-gradient(circle at 50% 70%, #d0f5c1 0%, #fafdfe 80%, transparent 100%),
+        radial-gradient(circle at 90% 90%, #f6fcee 0%, #f4fce6 80%, transparent 100%);
+    background-color: #f4fce6;
+}
+.alt-section:nth-child(odd) {
+    background-color: #fbfff4;
+}
+
+.section-padding {
+    padding: 4rem 1rem;
+}
+
+.logo img {
+    height: 35px;
+    margin-right: 10px;
+}
+
+.community {
+    display: flex;
+    align-items: center;
+}
+
+.community img {
+    width: 100px;
+    height: 100px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    margin-right: -20px;
+}
+
+.community-icons i {
+    margin: 0 0.3rem;
+    cursor: pointer;
+}
+
+.login-btn {
+    background: #DCFFAD;
+    color: #334547;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Badge for highlights */
+.badge-custom {
+    background: #DCFFAD;
+    color: #334547;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    flex-direction: column;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+}
+
+/* Footer */
+.footer {
+    background-color: #334547;
+    color: #DCFFAD;
+}
+
+.footer a, p {
+    --bs-text-opacity: 1;
+    color: rgba(255, 255, 255, .5) !important;
+}
+
+/* Scroll to top button */
+.scroll-to-top {
+    position: fixed;
+    bottom: 140px;
+    right: 40px;
+    background-color: #79c37d;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    display: none;
+    cursor: pointer;
+    z-index: 999;
+}
+
+.trusted-section {
+    background: #f4fce6;
+    position: relative;
+    overflow: hidden;
+    min-height: 500px;
+}
+
+.trusted-title {
+    font-size: 4rem;
+    font-weight: 800;
+    color: #334547;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.trusted-badge svg {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.trusted-sub {
+    font-size: 2rem;
+    color: #334547;
+    font-weight: 600;
+}
+
+.trusted-desc {
+    font-size: 1.3rem;
+    color: #556D6F;
+    margin-bottom: 2rem;
+}
+
+.trusted-stats {
+    margin-top: 2.5rem;
+}
+
+.trusted-stat-card {
+    background: #DCFFAD;
+    border-radius: 24px;
+    padding: 1.3rem 0.5rem;
+    min-width: 150px;
+    box-shadow: 0 1px 8px 0 rgba(170,210,140,0.08);
+}
+
+.trusted-stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #33413d;
+    letter-spacing: 1px;
+}
+
+.trusted-stat-label {
+    font-size: 1.08rem;
+    color: #33413d;
+    font-weight: 400;
+}
+
+.trusted-beak-img {
+    top: 0;
+    right: -50px;
+    pointer-events: none;
+    opacity: 0.6;
+    max-height: 500px;
+    z-index: -1;
+}
+
+@media (max-width: 991px) {
+    .trusted-title {
+        font-size: 2.6rem;
+    }
+    .trusted-sub {
+        font-size: 1.2rem;
+    }
+    .trusted-section {
+        padding-bottom: 2rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .trusted-section {
+        min-height: unset;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    .trusted-title {
+        font-size: 2.2rem;
+    }
+    .trusted-badge svg {
+        width: 50px;
+        height: 50px;
+    }
+    .trusted-stats {
+        margin-top: 1.5rem;
+    }
+}
