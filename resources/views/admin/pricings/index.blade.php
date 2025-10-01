@@ -165,7 +165,7 @@
                                            class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
-                                        <form action="{{ route('pricings.destroy', $plan->id) }}" method="POST" id="delete{{ $plan->id }}">
+                                        <form action="{{ route('pricing-plans.destroy', $plan->id) }}" method="POST" id="delete{{ $plan->id }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -254,11 +254,11 @@
                     var pricingName = this.getAttribute('data-pricing-name');
 
                     var form = document.getElementById('editPricingForm');
-                    var updateUrl = '/admin/pricings/' + pricingId;
+                    var updateUrl = '/admin/pricing-plans/' + pricingId;
 
                     document.getElementById('editPricingModalLabel').textContent = "Edit Plan - " + pricingName;
 
-                    $.get('/admin/pricings/' + pricingId, function(plan) {
+                    $.get('/admin/pricing-plans/' + pricingId, function(plan) {
                         // Populate fields
                         fillEditPricingModal(plan, updateUrl);
 

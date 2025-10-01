@@ -2,7 +2,7 @@
 <div class="modal fade" id="addPricingModal" tabindex="-1" aria-labelledby="addPricingModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('pricings.store') }}" class="needs-validation" novalidate method="POST">
+            <form action="{{ route('pricing-plans.store') }}" class="needs-validation" novalidate method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="addPricingModalLabel">Add Pricing Plan</h5>

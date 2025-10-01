@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-3">
-                <img src="assets/img/logo-green.png" alt="FlockSense Logo" class="footer-logo mb-4">
+                <img src="{{ asset('assets/img/logo-green.png') }}" alt="FlockSense Logo" class="footer-logo mb-4">
                 <p class="small">Transforming poultry farming with smart technology and data-driven insights.</p>
                 <div class="d-flex gap-3 mt-3">
                     <a href="#" class="text-secondary fs-5"><i class="text-white fa-brands fa-linkedin-in"></i></a>
@@ -60,6 +60,9 @@
 <script src="{{ asset('assets/js/leaflet.js') }}"></script>
 <!-- Custom JS -->
 <script src="{{ asset('assets/js/landing.js') }}"></script>
+
+@stack('js')
+
 </body>
 
 </html>

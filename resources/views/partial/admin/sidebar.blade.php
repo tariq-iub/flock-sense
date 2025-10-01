@@ -35,7 +35,7 @@
                                          Route::is('breeding.*') ||
                                          Route::is('feeds.*') ||
                                          Route::is('expenses.*') ||
-                                         Route::is('pricings.*') ||
+                                         Route::is('pricing-plans.*') ||
                                          Route::is('admin.farms.*') ||
                                          Route::is('admin.sheds.*') ||
                                          Route::is('admin.flocks.*') ||
@@ -75,8 +75,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('pricings.index') }}"
-                                       class="{{ request()->routeIs('pricings.*') ? 'active' : '' }}">
+                                    <a href="{{ route('pricing-plans.index') }}"
+                                       class="{{ request()->routeIs('pricing-plans.*') ? 'active' : '' }}">
                                         Pricing Plans
                                     </a>
                                 </li>
