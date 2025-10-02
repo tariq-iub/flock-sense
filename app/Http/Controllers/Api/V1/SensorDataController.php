@@ -25,6 +25,7 @@ class SensorDataController extends ApiController
     {
         $validated = $request->validate([
             'device_serial' => 'required|string',
+            'timestamp' => 'nullable|integer', // 👈 allow optional timestamp
         ]);
 
         $device = Device::where('serial_no', $validated['device_serial'])->first();
@@ -34,14 +35,17 @@ class SensorDataController extends ApiController
         }
 
         $validated['device_id'] = $device->id;
-        $validated['timestamp'] = Carbon::now()->timestamp;
+
+        // 👇 Use request timestamp if provided, otherwise current time
+        $validated['timestamp'] = $validated['timestamp'] ?? Carbon::now()->timestamp;
+
         unset($validated['device_serial']);
 
         // 👇 Merge dynamic sensor fields back into validated array
         $sensorData = array_merge(
             $validated,
-            collect($request->except(['device_serial']))  // All except serial_no
-            ->reject(fn($value) => is_null($value)) // Optional: skip nulls
+            collect($request->except(['device_serial']))  // all except serial
+            ->reject(fn($value) => is_null($value))   // skip nulls
             ->toArray()
         );
 
@@ -60,7 +64,7 @@ class SensorDataController extends ApiController
         $validated = $request->validate([
             'device_serial' => 'required|string',
             'appliances' => 'required|array',
-            'appliances.*' => 'required|boolean',
+            'appliances.*' => 'boolean',
         ]);
 
         // 🔍 Get device
@@ -94,10 +98,11 @@ class SensorDataController extends ApiController
         $sensorData = array_merge(
             [
                 'device_id' => $device->id,
-                'timestamp' => Carbon::now()->timestamp,
+                'timestamp' => $validated['timestamp'] ?? Carbon::now()->timestamp,
             ],
-            collect($request->except(['device_serial']))->toArray()
+            collect($request->except(['device_serial', 'appliances']))->toArray() // 👈 exclude appliances
         );
+
 
         // 💾 Store in DynamoDB
         $this->dynamoDbService->putSensorData($sensorData);
