@@ -24,16 +24,28 @@ use App\Models\Flock;
 use App\Models\Shed;
 use Illuminate\Support\Facades\Route;
 
-// Welcome page
+// Frontend Routes
 Route::get('/', function () {
-    return view('welcome');
+    return view('frontend.index');
 });
+
+Route::get('/pricing', function () {
+    return view('frontend.pricing');
+})->name('pricing');
+
+Route::get('/about', function () {
+    return view('frontend.about');
+})->name('about');
 
 // Login and forget-password routes (outside admin group)
 Route::get('/login', function () {
-    return view('auth.login');
+    return view('frontend.login');
 });
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+Route::get('/register', function () {
+    return view('frontend.register');
+});
 
 // Force Reset Password
 Route::get('/required-reset/{user}', function ($user) {
@@ -43,7 +55,7 @@ Route::get('/required-reset/{user}', function ($user) {
 Route::put('/force-reset/{user}', [AuthController::class, 'forceReset'])->name('force.reset');
 
 Route::get('/forget-password', function () {
-    return view('auth.forget');
+    return view('frontend.forgot');
 });
 Route::post('/forget-password', [AuthController::class, 'forgotPassword'])->name('forget');
 
@@ -51,7 +63,7 @@ Route::post('/forget-password', [AuthController::class, 'forgotPassword'])->name
 Route::get('/reset-password/{token}', function ($token) {
     $email = request('email');
 
-    return view('auth.reset', compact('token', 'email'));
+    return view('frontend.reset', compact('token', 'email'));
 })->name('password.reset');
 
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
@@ -143,7 +155,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::resources([
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
-        'pricings' => PricingController::class,
+        'pricing-plans' => PricingController::class,
     ]);
 
     // Users and Clients
