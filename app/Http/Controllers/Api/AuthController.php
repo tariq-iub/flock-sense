@@ -44,8 +44,6 @@ class AuthController extends ApiController
             'password' => Hash::make($request->password),
         ]);
 
-        event(new Registered($user));
-
         return response()->json([
             'message' => 'User registered successfully. Please check your email for verification.',
             'user' => $user
