@@ -44,6 +44,9 @@ class AuthController extends ApiController
             'password' => Hash::make($request->password),
         ]);
 
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+
         return response()->json([
             'message' => 'User registered successfully. Please check your email for verification.',
             'user' => $user
