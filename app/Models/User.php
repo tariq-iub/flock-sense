@@ -89,14 +89,29 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getFarmsCountAttribute()
     {
-        // If relation isn't eager loaded, just run a quick count
+        $count = 0;
+
         if (!$this->relationLoaded('farms')) {
-            return $this->farms()->count();
+            $count += $this->farms()->count();
+        } else {
+            $count += $this->farms->count();
         }
 
-        // If farms are already loaded, count directly
-        return $this->farms->count();
+        if (!$this->relationLoaded('managedFarms')) {
+            $count += $this->managedFarms()->count();
+        } else {
+            $count += $this->managedFarms->count();
+        }
+
+        if (!$this->relationLoaded('staffFarms')) {
+            $count += $this->staffFarms()->count();
+        } else {
+            $count += $this->staffFarms->count();
+        }
+
+        return $count;
     }
+
 
     public function getShedsCountAttribute()
     {
