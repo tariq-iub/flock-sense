@@ -130,7 +130,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return $this->farms->sum(function ($farm) {
             return $farm->sheds->sum(function ($shed) {
-                return $shed->flocks->sum('chicken_count');
+                return $shed->latestFlock->chicken_count;
             });
         });
     }
