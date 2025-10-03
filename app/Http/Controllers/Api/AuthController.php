@@ -75,7 +75,7 @@ class AuthController extends ApiController
             ], 401);
         }
 
-        $user = $request->user()->loadCount('farms');
+        $user = $request->user();
         $token = $user->createToken('mobile')->plainTextToken;
 
         return response()->json([
@@ -350,6 +350,7 @@ class AuthController extends ApiController
     public function validateSession(Request $request): JsonResponse
     {
         $user = $request->user();
+
 
         if ($user) {
             return response()->json([
