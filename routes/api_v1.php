@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\SubscriptionPlanController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserSettingsController;
+use App\Http\Controllers\Api\V1\IoTDeviceDataController;
 use App\Models\District;
 use App\Models\Province;
 use App\Models\Tehsil;
@@ -118,6 +119,25 @@ Route::get('/vaccination-history', [GraphDataController::class, 'vaccinationHist
 Route::get('/feed-consumption-history', [GraphDataController::class, 'feedConsumptionHistory']);
 Route::get('/water-consumption-history', [GraphDataController::class, 'waterConsumptionHistory']);
 
+Route::prefix('iot')->group(function () {
+    // 1. Store sensor data (single record)
+    Route::post('/sensor', [IoTDeviceDataController::class, 'storeSensor']);
+
+    // 2. Store multiple sensor data records
+    Route::post('/sensors', [IoTDeviceDataController::class, 'storeMultipleSensor']);
+
+    // 3. Update appliance data (single snapshot)
+    Route::post('/appliances', [IoTDeviceDataController::class, 'updateAppliance']);
+
+    // 4. Update multiple appliance records
+    Route::post('/appliances/multiple', [IoTDeviceDataController::class, 'updateMultipleAppliances']);
+
+    // 5. Sync device data (appliances + sensors, single record)
+    Route::post('/sync', [IoTDeviceDataController::class, 'syncDeviceData']);
+
+    // 6. Sync multiple device data records
+    Route::post('/sync/multiple', [IoTDeviceDataController::class, 'syncMultipleDeviceData']);
+});
 
 // Address Credentials
 Route::get('provinces', function () {
