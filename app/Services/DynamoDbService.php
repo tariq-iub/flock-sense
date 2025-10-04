@@ -61,7 +61,7 @@ class DynamoDbService
      */
     public function putSensorData(array $data): void
     {
-        if (empty($data['device_id']) || empty($data['timestamp'])) {
+        if (empty($data['device_id'])) {
             Log::error('[DynamoDbService] Missing device_id or timestamp for sensor data', ['data' => $data]);
             return;
         }
@@ -92,7 +92,7 @@ class DynamoDbService
      */
     public function putApplianceData(array $data): void
     {
-        if (empty($data['device_id']) || empty($data['timestamp']) || empty($data['appliance_key'])) {
+        if (empty($data['device_id'])) {
             Log::error('[DynamoDbService] Missing required fields for appliance status', ['data' => $data]);
             return;
         }
