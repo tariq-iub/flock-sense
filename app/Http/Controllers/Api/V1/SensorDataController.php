@@ -144,34 +144,103 @@ class SensorDataController extends ApiController
 
     public function storeMultiple(Request $request)
     {
-        $validated = $request->validate([
+        // ✅ Only validate envelope + appliance structure
+        $request->validate([
             'device_serial' => 'required|string',
-            'records' => 'required|array',              // Expect multiple records
-            'records.*.timestamp' => 'nullable|integer', // Optional timestamp
+            'records' => 'required|array',
+            'records.*.timestamp' => 'nullable|integer',
+            'records.*.appliances' => 'nullable|array',
+            'records.*.appliances.*' => 'boolean',
         ]);
 
-        foreach ($validated['records'] as $record) {
-            $device = Device::where('serial_no', $record['device_serial'])->first();
+        // ✅ Get the device
+        $device = Device::where('serial_no', $request->input('device_serial'))->firstOrFail();
 
-            if (!$device) {
-                // Skip or handle errors per record
-                Log::warning("Device not found for serial: {$record['device_serial']}");
-                continue;
+        // ✅ Use raw records to preserve dynamic sensor fields
+        $rawRecords = $request->input('records', []);
+
+        $latestRecord = null;
+        $allProcessed = [];
+
+        foreach ($rawRecords as $idx => $record) {
+            $timestamp = $record['timestamp'] ?? Carbon::now()->timestamp;
+
+            // --- SENSOR DATA ---
+            $sensorFields = collect($record)
+                ->except(['appliances', 'timestamp'])
+                ->filter(fn($v) => $v !== null) // remove only nulls
+                ->toArray();
+
+            if (!empty($sensorFields)) {
+                $dynamoSensorData = array_merge([
+                    'device_id' => $device->id,
+                    'timestamp' => $timestamp,
+                ], $sensorFields);
+
+                Log::info("[storeMultiple] Storing sensor data for record #$idx", $dynamoSensorData);
+                $this->dynamoDbService->putSensorData($dynamoSensorData);
+            } else {
+                Log::info("[storeMultiple] No sensor fields in record #$idx");
             }
 
-            $record['device_id'] = $device->id;
-            $record['timestamp'] = $record['timestamp'] ?? Carbon::now()->timestamp;
-            unset($record['device_serial']);
+            // --- APPLIANCE DATA ---
+            $dynamoApplianceData = [
+                'device_id' => $device->id,
+                'timestamp' => $timestamp,
+            ];
 
-            $sensorData = array_merge(
-                $record,
-                collect($record)->except(['device_serial'])->toArray()
-            );
+            if (!empty($record['appliances']) && is_array($record['appliances'])) {
+                foreach ($record['appliances'] as $key => $status) {
+                    $appliance = DeviceAppliance::firstOrNew([
+                        'device_id' => $device->id,
+                        'key' => $key,
+                    ]);
 
-            $this->dynamoDbService->putSensorData($sensorData);
+                    if (!$appliance->exists) {
+                        $type = $this->getApplianceTypeFromKey($key);
+                        $appliance->fill([
+                            'type' => $type,
+                            'name' => ucfirst($type) . ' ' . strtoupper($key),
+                        ]);
+                    }
+
+                    $appliance->status = $status;
+                    $appliance->status_updated_at = Carbon::createFromTimestamp($timestamp);
+                    $appliance->save();
+
+                    $dynamoApplianceData[$key] = [
+                        'status' => (bool)$status,
+                        'metrics' => $appliance->metrics ?? new \stdClass(),
+                        'config' => $appliance->config ?? new \stdClass(),
+                    ];
+                }
+
+                Log::info("[storeMultiple] Storing appliance data for record #$idx", $dynamoApplianceData);
+                $this->dynamoDbService->putApplianceData($dynamoApplianceData);
+            } else {
+                Log::info("[storeMultiple] No appliances in record #$idx");
+            }
+
+            // --- Response + MySQL latest snapshot ---
+            if (!$latestRecord || $timestamp > $latestRecord['timestamp']) {
+                $latestRecord = [
+                    'timestamp' => $timestamp,
+                    'sensors' => $sensorFields,
+                    'appliances' => $record['appliances'] ?? [],
+                ];
+            }
+
+            $allProcessed[] = [
+                'timestamp' => $timestamp,
+                'sensors' => $sensorFields,
+                'appliances' => $record['appliances'] ?? [],
+            ];
         }
 
-        return response()->json(['message' => 'All sensor data records processed successfully.'], 201);
+        return response()->json([
+            'message' => 'All sensor + appliance records processed successfully.',
+            'data' => $allProcessed,
+        ], 201);
     }
 
     /**
