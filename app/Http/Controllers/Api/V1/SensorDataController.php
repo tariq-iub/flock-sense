@@ -220,7 +220,7 @@ class SensorDataController extends ApiController
                 'device_id' => $device->id,
                 'timestamp' => $validated['timestamp'] ?? Carbon::now()->timestamp,
             ],
-            collect($request->except(['device_serial']))->toArray()
+            collect($request->except(['device_serial', 'appliances']))->toArray()
         );
 
         // 💾 Store in DynamoDB
