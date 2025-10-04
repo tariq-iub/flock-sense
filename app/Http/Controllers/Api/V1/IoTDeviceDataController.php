@@ -125,7 +125,6 @@ class IoTDeviceDataController extends ApiController
 
         return response()->json([
             'message' => 'Appliances updated successfully.',
-            'appliances' => $updated,
         ], 201);
     }
 
@@ -199,7 +198,6 @@ class IoTDeviceDataController extends ApiController
 
         return response()->json([
             'message' => 'Multiple appliance records processed successfully.',
-            'data' => $allUpdated,
         ], 201);
     }
 
@@ -347,7 +345,6 @@ class IoTDeviceDataController extends ApiController
 
         return response()->json([
             'message' => 'Multiple device data records processed successfully.',
-            'data' => $allProcessed,
         ], 201);
     }
 
