@@ -90,7 +90,7 @@ class DynamoDbService
      * $data must include: device_id (int), timestamp (int), appliance_key (string), status (bool)
      * optional: metrics (array), source (string), etc.
      */
-    public function putApplianceStatus(array $data): void
+    public function putApplianceData(array $data): void
     {
         if (empty($data['device_id']) || empty($data['timestamp']) || empty($data['appliance_key'])) {
             Log::error('[DynamoDbService] Missing required fields for appliance status', ['data' => $data]);
