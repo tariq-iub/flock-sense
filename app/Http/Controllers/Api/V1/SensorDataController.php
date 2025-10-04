@@ -239,7 +239,6 @@ class SensorDataController extends ApiController
 
         return response()->json([
             'message' => 'All sensor + appliance records processed successfully.',
-            'data' => $allProcessed,
         ], 201);
     }
 
