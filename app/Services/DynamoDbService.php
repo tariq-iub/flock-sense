@@ -112,7 +112,67 @@ class DynamoDbService
      */
     public function getSensorData(array $deviceIds, ?int $fromTimestamp, ?int $toTimestamp = null, bool $latest = false, bool $ascOrder = true): array
     {
-        return $this->queryByDeviceIds($this->sensorTable, $deviceIds, $fromTimestamp, $toTimestamp, $latest, $ascOrder);
+        $results = [];
+
+        if (empty($deviceIds)) {
+            return $results;
+        }
+
+        foreach ($deviceIds as $deviceId) {
+            try {
+                $query = [
+                    'TableName' => 'sensor-data',  // Explicit table name
+                    'KeyConditionExpression' => 'device_id = :device_id',
+                    'ExpressionAttributeValues' => [
+                        ':device_id' => $this->marshaler->marshalValue((int)$deviceId),
+                    ],
+                    'ScanIndexForward' => $ascOrder,
+                ];
+
+                // If latest, get most recent record only
+                if ($latest) {
+                    $query['Limit'] = 1;
+                    $query['ScanIndexForward'] = false;  // Newest first
+                } // Add timestamp range if provided
+                elseif ($fromTimestamp !== null) {
+                    $query['KeyConditionExpression'] .= ' AND #ts >= :from_ts';
+                    $query['ExpressionAttributeNames'] = ['#ts' => 'timestamp'];
+                    $query['ExpressionAttributeValues'][':from_ts'] =
+                        $this->marshaler->marshalValue((int)$fromTimestamp);
+
+                    if ($toTimestamp !== null) {
+                        $query['KeyConditionExpression'] = 'device_id = :device_id AND #ts BETWEEN :from_ts AND :to_ts';
+                        $query['ExpressionAttributeValues'][':to_ts'] =
+                            $this->marshaler->marshalValue((int)$toTimestamp);
+                    }
+                }
+
+                $response = $this->client->query($query);
+
+                if (!empty($response['Items'])) {
+                    $record = $this->marshaler->unmarshalItem($response['Items'][0]);
+
+                    // Normalize numeric strings
+                    array_walk_recursive($record, function (&$v) {
+                        if (is_string($v) && is_numeric($v)) {
+                            $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
+                        }
+                    });
+
+                    $results[$deviceId] = $record;  // ✅ Key by device_id
+                } else {
+                    $results[$deviceId] = null;
+                }
+
+            } catch (Exception $e) {
+                Log::error("[DynamoDbService] Failed to fetch sensor data for device_id {$deviceId}", [
+                    'error' => $e->getMessage(),
+                ]);
+                $results[$deviceId] = null;
+            }
+        }
+
+        return $results;  // Returns [deviceId => record] format
     }
 
     /**
@@ -330,11 +390,11 @@ class DynamoDbService
                         if ($latest) {
                             if (!$filterExpression) {
                                 // we wanted the single newest item only
-                                break 2; // break out of attempts+device loops and use found items
+                                break; // break out of attempts+device loops and use found items
                             } else {
                                 // if we found at least one item matching filter in this attempt, we're done for this device
                                 if (!empty($foundItemsForDevice)) {
-                                    break 2;
+                                    break;
                                 }
                                 // else continue paging if AWS says there are more pages
                             }
@@ -347,8 +407,10 @@ class DynamoDbService
                 } // end attempts
 
                 // append device's found items to overall results
-                foreach ($foundItemsForDevice as $it) {
-                    $results[] = $it;
+                if ($latest) {
+                    $results[$deviceId] = $foundItemsForDevice[0] ?? null;
+                } else {
+                    $results[$deviceId] = $foundItemsForDevice;
                 }
             } catch (\Exception $e) {
                 \Log::error("[DynamoDbService] Failed to fetch data for device_id {$deviceId} from table {$table}", [
