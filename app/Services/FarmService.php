@@ -102,7 +102,6 @@ class FarmService
             foreach ($farm->sheds as $shed) {
                 foreach ($shed->devices as $device) {
                     $data = $this->dynamo->getSensorData([$device->id], null, null, true); // correct argument order
-//                    $data = $this->dynamo->getLatestSensorData([$device->id]); // correct argument order
                     $device->latest_sensor_data = $data[$device->id] ?? null;
                 }
             }
