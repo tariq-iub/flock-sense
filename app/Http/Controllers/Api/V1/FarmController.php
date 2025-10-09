@@ -114,17 +114,7 @@ class FarmController extends ApiController
             }
         }
 
-
-//        $farm->load(array_filter([
-//            in_array('owner', $includes) ? 'owner' : null,
-//            in_array('sheds', $includes) ? 'sheds' : null,
-//            in_array('managers', $includes) ? 'managers' : null,
-//            in_array('staff', $includes) ? 'staff' : null,
-//        ]))->loadCount('sheds');
-//
         return FarmResource::make($farm);
-
-
     }
 
     /**
