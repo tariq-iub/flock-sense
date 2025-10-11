@@ -20,6 +20,7 @@ class DeviceApplianceResource extends JsonResource
             'attributes' => [
                 'type' => $this->type,
                 'name' => $this->name,
+                'key' => $this->key,
                 'channel' => $this->channel,
                 'config' => $this->config,
                 'status' => $this->status,
