@@ -27,14 +27,6 @@ class DeviceApplianceResource extends JsonResource
                 'status_updated_at' => $this->status_updated_at?->format('Y-m-d H:i:s'),
                 'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
                 'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-                $this->mergeWhen($this->relationLoaded('device'), [
-                    'device' => [
-                        'id' => $this->device->id,
-                        'serial_no' => $this->device->serial_no,
-                        'firmware_version' => $this->device->firmware_version,
-                        'capabilities' => json_decode($this->device->capabilities, true),
-                    ],
-                ]),
             ],
         ];
     }
