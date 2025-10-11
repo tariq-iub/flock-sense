@@ -19,7 +19,7 @@
                 <td>{{ $appliance->key ?? '—' }}</td>
                 <td>{{ $appliance->channel ?? '-' }}</td>
                 <td>
-                    @if($appliance->is_active)
+                    @if($appliance->status)
                         <span class="badge bg-success">ON</span>
                     @else
                         <span class="badge bg-danger">OFF</span>
