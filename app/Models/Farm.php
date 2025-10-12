@@ -55,24 +55,40 @@ class Farm extends Model
 
     public function getFlocksCountAttribute(): int
     {
-        if (! $this->relationLoaded('sheds')) {
-            return 0;
+        $count = 0;
+
+        foreach ($this->sheds as $shed) {
+            // Latest flock per shed
+            $latestFlock = $shed->flocks->sortByDesc('id')->first();
+
+            // Count only if active (no end_date)
+            if ($latestFlock && is_null($latestFlock->end_date)) {
+                $count++;
+            }
         }
 
-        return $this->sheds->sum(function ($shed) {
-            return $shed->flocks->count();
-        });
+        return $count;
     }
 
     public function getBirdsCountAttribute(): int
     {
-        if (! $this->relationLoaded('sheds')) {
+        if (!$this->relationLoaded('sheds')) {
             return 0;
         }
 
-        return $this->sheds->sum(function ($shed) {
-            return $shed->flocks->sum('chicken_count');
-        });
+        $totalBirds = 0;
+
+        foreach ($this->sheds as $shed) {
+            // Get the latest flock in this shed
+            $latestFlock = $shed->flocks->sortByDesc('id')->first();
+
+            // Only count if the flock is active (no end_date)
+            if ($latestFlock && is_null($latestFlock->end_date)) {
+                $totalBirds += $latestFlock->chicken_count;
+            }
+        }
+
+        return $totalBirds;
     }
 
     public function province(): BelongsTo
