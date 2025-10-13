@@ -29,15 +29,18 @@ class WeightLogService
      */
     public function createOrUpdateWeightLog(
         ProductionLog $log,
-        int $weighted_chickens_count,
-        float $total_weight,
-        array $options = []
+        int           $weighted_chickens_count,
+        float         $total_weight,
+        array         $options = []
     ): WeightLog
     {
         $flock = $log->flock;
+
         if (!$flock) {
             throw new \Exception('No flock found for this ProductionLog');
         }
+
+        $total_weight = $total_weight * 1000;
 
         // 1. Calculate avg_weight
         $avg_weight = $weighted_chickens_count > 0
@@ -46,7 +49,7 @@ class WeightLogService
 
         // 2. Previous WeightLog for gain calculation (previous for same flock and earlier date)
         $production_log_date = $log->production_log_date ?? Carbon::now();
-        $previousWeightLog = WeightLog::whereHas('productionLog', function($q) use ($flock, $production_log_date) {
+        $previousWeightLog = WeightLog::whereHas('productionLog', function ($q) use ($flock, $production_log_date) {
             $q->where('flock_id', $flock->id)
                 ->whereDate('production_log_date', '<=', $production_log_date->toDateString());
         })
@@ -113,18 +116,18 @@ class WeightLogService
             'production_log_id' => $log->id,
             'flock_id' => $flock->id,
         ], [
-            'weighted_chickens_count'     => $weighted_chickens_count,
-            'total_weight'                => $total_weight,
-            'avg_weight'                  => $avg_weight,
-            'avg_weight_gain'             => $avg_weight_gain,
-            'aggregated_total_weight'     => $aggregated_total_weight,
-            'feed_efficiency'             => $feed_efficiency,
-            'feed_conversion_ratio'       => $feed_conversion_ratio,
+            'weighted_chickens_count' => $weighted_chickens_count,
+            'total_weight' => $total_weight,
+            'avg_weight' => $avg_weight,
+            'avg_weight_gain' => $avg_weight_gain,
+            'aggregated_total_weight' => $aggregated_total_weight,
+            'feed_efficiency' => $feed_efficiency,
+            'feed_conversion_ratio' => $feed_conversion_ratio,
             'adjusted_feed_conversion_ratio' => $adjusted_fcr,
-            'fcr_standard_diff'           => $fcr_standard_diff,
-            'standard_deviation'          => $standard_deviation,
-            'coefficient_of_variation'    => $coefficient_of_variation,
-            'production_efficiency_factor'=> $production_efficiency_factor,
+            'fcr_standard_diff' => $fcr_standard_diff,
+            'standard_deviation' => $standard_deviation,
+            'coefficient_of_variation' => $coefficient_of_variation,
+            'production_efficiency_factor' => $production_efficiency_factor,
         ]);
     }
 }
