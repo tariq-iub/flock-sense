@@ -33,6 +33,7 @@ class ProductionLogSeeder extends Seeder
             // 2. Get related flock and opening count
             $flock_id = (int)$row[2];
             $flock = Flock::find($flock_id);
+
             if (!$flock) continue;
 
             // 3. Find previous log for net_count
@@ -40,6 +41,7 @@ class ProductionLogSeeder extends Seeder
                 ->where('production_log_date', '<', $production_log_date)
                 ->orderByDesc('production_log_date')
                 ->first();
+
             $lastNetCount = $lastLog ? $lastLog->net_count : $flock->chicken_count;
 
             // 4. Calculate net_count and livability
