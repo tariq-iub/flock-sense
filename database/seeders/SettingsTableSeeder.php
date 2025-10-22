@@ -48,6 +48,16 @@ class SettingsTableSeeder extends Seeder
             ],
             [
                 'group' => 'company',
+                'key' => 'mobile-logo',
+                'value' => json_encode('assets/img/mobile_logo.png'),
+                'type' => 'string',
+                'is_encrypted' => 0,
+                'description' => 'Company logo path or URL',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'group' => 'company',
                 'key' => 'slogan',
                 'value' => json_encode('Transforming poultry farming with smart technology and data-driven insights.'),
                 'type' => 'string',
