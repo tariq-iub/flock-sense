@@ -149,7 +149,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
 
     // Settings
-    Route::get('/setting/general', [SettingController::class, 'general'])->name('setting.general');
+    Route::prefix('settings')->group(function () {
+        Route::get('/', [SettingController::class, 'index']);
+        Route::get('/public', [SettingController::class, 'publicSettings']);
+        Route::get('/general', [SettingController::class, 'general'])->name('setting.general');
+        Route::get('/company', [SettingController::class, 'companySettings']);
+        Route::get('/social', [SettingController::class, 'socialSettings']);
+        Route::get('/contact', [SettingController::class, 'contactSettings']);
+        Route::get('/{group}', [SettingController::class, 'byGroup']);
+        Route::get('/{group}/{key}', [SettingController::class, 'show']);
+        Route::post('/', [SettingController::class, 'store']);
+        Route::put('/bulk', [SettingController::class, 'bulkUpdate']);
+        Route::put('/{group}/{key}', [SettingController::class, 'update']);
+        Route::delete('/{group}/{key}', [SettingController::class, 'destroy']);
+    });
 
     // Resource routes for clients and charts
     Route::resources([

@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
             ConnectivitySeeder::class,
             DeviceSeeder::class,
             PakistanTablesSeeder::class,
+            SettingsTableSeeder::class,
         ]);
     }
 }

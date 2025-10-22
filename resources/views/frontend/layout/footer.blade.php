@@ -9,13 +9,14 @@
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-3">
-                <img src="{{ asset('assets/img/logo-green.png') }}" alt="FlockSense Logo" class="footer-logo mb-4">
-                <p class="small">Transforming poultry farming with smart technology and data-driven insights.</p>
+                <img src="{{ asset(settings('company.logo')) }}" alt="FlockSense Logo" class="footer-logo mb-4">
+                <p class="small">{{ settings('company.slogan') }}</p>
                 <div class="d-flex gap-3 mt-3">
-                    <a href="#" class="text-secondary fs-5"><i class="text-white fa-brands fa-linkedin-in"></i></a>
-                    <a href="#" class="text-secondary fs-5"><i class="text-white fa-brands fa-x-twitter"></i></a>
-                    <a href="#" class="text-secondary fs-5"><i class="text-white fa-brands fa-facebook-f"></i></a>
-                    <a href="#" class="text-secondary fs-5"><i class="text-white fa-brands fa-instagram"></i></a>
+                @foreach(settings_group('social') as $row)
+                   <a href="{{ $row['id'] }}" class="text-secondary fs-5">
+                       <i class="text-white fa-brands {{ $row['icon'] }}"></i>
+                   </a>
+                @endforeach
                 </div>
             </div>
             <div class="col-lg-2">
@@ -31,11 +32,14 @@
             <div class="col-lg-4">
                 <h6 class="fw-bold mb-3">Contact</h6>
                 <ul class="list-unstyled small mb-0">
-                    <li class="mb-2"><i class="text-white fa-solid fa-envelope me-2"></i>contact@flocksense.ai</li>
-                    <li class="mb-2"><i class="text-white fa-solid fa-phone me-2"></i>+92 (0) 300 073 0490</li>
-                    <li><i class="text-white fa-solid fa-location-dot me-2"></i>23 Roundtree Cl, Norwich, NR7 8SX
-                        300
-                        Street‑17, G‑15/2, Islamabad</li>
+                    <li class="mb-2"><i class="text-white fa-solid fa-envelope me-2"></i>{{ settings('contact.email') }}</li>
+                    <li class="mb-2"><i class="text-white fa-solid fa-phone me-2"></i>{{ settings('contact.phone') }}</li>
+                    <li>
+                        <i class="text-white fa-solid fa-location-dot me-2"></i>{{ settings('contact.address1') }}
+                    </li>
+                    <li>
+                        <i class="text-white fa-solid fa-location-dot me-2"></i>{{ settings('contact.address2') }}
+                    </li>
                 </ul>
             </div>
             <div class="col-lg-3">
@@ -50,7 +54,7 @@
             </div>
         </div>
         <hr class="border-secondary mt-5">
-        <p class="small text-center mb-0">&copy; 2025 FlockSense. All rights reserved.</p>
+        <p class="small text-center mb-0">&copy; 2025 {{ settings('company.name') }}. All rights reserved.</p>
     </div>
 </footer>
 
