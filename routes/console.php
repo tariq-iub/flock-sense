@@ -10,4 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('weather:fetch')->everyFifteenMinutes();
 
-Schedule::command('iot:aggregate-data')->dailyAt('00:05');
+Schedule::command('iot:aggregate-data')->hourly();
