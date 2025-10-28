@@ -112,7 +112,67 @@ class DynamoDbService
      */
     public function getSensorData(array $deviceIds, ?int $fromTimestamp, ?int $toTimestamp = null, bool $latest = false, bool $ascOrder = true): array
     {
-        return $this->queryByDeviceIds($this->sensorTable, $deviceIds, $fromTimestamp, $toTimestamp, $latest, $ascOrder);
+        $results = [];
+
+        if (empty($deviceIds)) {
+            return $results;
+        }
+
+        foreach ($deviceIds as $deviceId) {
+            try {
+                $query = [
+                    'TableName' => 'sensor-data',  // Explicit table name
+                    'KeyConditionExpression' => 'device_id = :device_id',
+                    'ExpressionAttributeValues' => [
+                        ':device_id' => $this->marshaler->marshalValue((int)$deviceId),
+                    ],
+                    'ScanIndexForward' => $ascOrder,
+                ];
+
+                // If latest, get most recent record only
+                if ($latest) {
+                    $query['Limit'] = 1;
+                    $query['ScanIndexForward'] = false;  // Newest first
+                } // Add timestamp range if provided
+                elseif ($fromTimestamp !== null) {
+                    $query['KeyConditionExpression'] .= ' AND #ts >= :from_ts';
+                    $query['ExpressionAttributeNames'] = ['#ts' => 'timestamp'];
+                    $query['ExpressionAttributeValues'][':from_ts'] =
+                        $this->marshaler->marshalValue((int)$fromTimestamp);
+
+                    if ($toTimestamp !== null) {
+                        $query['KeyConditionExpression'] = 'device_id = :device_id AND #ts BETWEEN :from_ts AND :to_ts';
+                        $query['ExpressionAttributeValues'][':to_ts'] =
+                            $this->marshaler->marshalValue((int)$toTimestamp);
+                    }
+                }
+
+                $response = $this->client->query($query);
+
+                if (!empty($response['Items'])) {
+                    $record = $this->marshaler->unmarshalItem($response['Items'][0]);
+
+                    // Normalize numeric strings
+                    array_walk_recursive($record, function (&$v) {
+                        if (is_string($v) && is_numeric($v)) {
+                            $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
+                        }
+                    });
+
+                    $results[$deviceId] = $record;  // ✅ Key by device_id
+                } else {
+                    $results[$deviceId] = null;
+                }
+
+            } catch (Exception $e) {
+                Log::error("[DynamoDbService] Failed to fetch sensor data for device_id {$deviceId}", [
+                    'error' => $e->getMessage(),
+                ]);
+                $results[$deviceId] = null;
+            }
+        }
+
+        return $results;  // Returns [deviceId => record] format
     }
 
     /**
@@ -129,6 +189,57 @@ class DynamoDbService
     public function getApplianceHistory(array $deviceIds, ?int $fromTimestamp, ?int $toTimestamp = null, bool $latest = false, ?string $applianceKey = null, bool $ascOrder = true): array
     {
         return $this->queryByDeviceIds($this->applianceTable, $deviceIds, $fromTimestamp, $toTimestamp, $latest, $ascOrder, $applianceKey, 'appliance_key');
+    }
+
+    /**
+     * Fetch the latest sensor data record for one or more devices.
+     */
+    public function getLatestSensorData(array $deviceIds): array
+    {
+        $results = [];
+
+        if (empty($deviceIds)) {
+            return $results;
+        }
+
+        foreach ($deviceIds as $deviceId) {
+            try {
+                $query = [
+                    'TableName' => 'sensor-data', // ✅ use correct name here
+                    'KeyConditionExpression' => 'device_id = :device_id',
+                    'ExpressionAttributeValues' => [
+                        ':device_id' => $this->marshaler->marshalValue((int)$deviceId),
+                    ],
+                    'ScanIndexForward' => false, // newest first
+                    'Limit' => 1,
+                ];
+
+                $response = $this->client->query($query);
+
+                if (!empty($response['Items']) && isset($response['Items'][0])) {
+                    $item = $response['Items'][0];
+                    $record = $this->marshaler->unmarshalItem($item);
+
+                    array_walk_recursive($record, function (&$v) {
+                        if (is_string($v) && is_numeric($v)) {
+                            $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
+                        }
+                    });
+
+                    $results[$deviceId] = $record;
+                } else {
+                    $results[$deviceId] = null;
+                }
+
+            } catch (Exception $e) {
+                Log::error("[DynamoDbService] Failed to fetch latest sensor data for device_id {$deviceId}", [
+                    'error' => $e->getMessage(),
+                ]);
+                $results[$deviceId] = null;
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -161,92 +272,153 @@ class DynamoDbService
             return $results;
         }
 
+        // Optional: allow override via config if you have a different pk or index
+        $partitionKeyName = config('aws.dynamo.partition_key', 'device_id');
+        $indexName = config('aws.dynamo.index_name', null); // optional GSI
+        $consistentRead = config('aws.dynamo.consistent_read', false);
+
         foreach ($deviceIds as $deviceId) {
             try {
-                // Build base query params
-                $exprAttrNames = ['#ts' => 'timestamp'];
-                $exprAttrValues = [
-                    ':device_id' => $this->marshaler->marshalValue((int)$deviceId),
+                // Expression attribute names (include pk as placeholder too to be safe)
+                $exprAttrNames = [
+                    '#pk' => $partitionKeyName,
+                    '#ts' => 'timestamp',
                 ];
 
-                // Key condition
+                // Build key condition template
                 if ($latest) {
-                    $keyCondition = 'device_id = :device_id';
+                    $keyCondition = '#pk = :device_id';
                 } elseif ($toTimestamp !== null) {
-                    $keyCondition = 'device_id = :device_id AND #ts BETWEEN :from_ts AND :to_ts';
-                    $exprAttrValues[':from_ts'] = $this->marshaler->marshalValue((int)$fromTimestamp);
-                    $exprAttrValues[':to_ts'] = $this->marshaler->marshalValue((int)$toTimestamp);
+                    $keyCondition = '#pk = :device_id AND #ts BETWEEN :from_ts AND :to_ts';
                 } else {
-                    $keyCondition = 'device_id = :device_id AND #ts >= :from_ts';
-                    $exprAttrValues[':from_ts'] = $this->marshaler->marshalValue((int)$fromTimestamp);
+                    $keyCondition = '#pk = :device_id AND #ts >= :from_ts';
                 }
 
-                // Optional filter expression for attribute (e.g., appliance_key)
+                // Prepare range values if needed (don't cast to int blindly — we'll marshal safely)
+                $rangeValues = [];
+                if (!$latest) {
+                    $rangeValues[':from_ts'] = $this->marshaler->marshalValue((int)$fromTimestamp);
+                    if ($toTimestamp !== null) {
+                        $rangeValues[':to_ts'] = $this->marshaler->marshalValue((int)$toTimestamp);
+                    }
+                }
+
+                // Filter expression (optional)
                 $filterExpression = null;
+                $filterValueMarshalled = null;
                 if (!empty($filterAttributeName) && $filterValue !== null) {
-                    // use ExpressionAttributeNames / Values
                     $exprAttrNames['#filter'] = $filterAttributeName;
-                    $exprAttrValues[':filter_val'] = $this->marshaler->marshalValue($filterValue);
                     $filterExpression = '#filter = :filter_val';
+                    $filterValueMarshalled = $this->marshaler->marshalValue($filterValue);
                 }
 
-                // Query loop for pagination (avoid loading huge pages at once)
-                $lastEvaluatedKey = null;
-                do {
-                    $query = [
-                        'TableName' => $table,
-                        'KeyConditionExpression' => $keyCondition,
-                        'ExpressionAttributeNames' => $exprAttrNames,
-                        'ExpressionAttributeValues' => $exprAttrValues,
-                        'ScanIndexForward' => $ascOrder,
-                    ];
+                // We'll try at most two attempts for partition key types:
+                //  - numeric (N)
+                //  - string (S)
+                $attempts = [
+                    $this->marshaler->marshalValue(is_int($deviceId) ? $deviceId : (int)$deviceId),
+                    $this->marshaler->marshalValue((string)$deviceId),
+                ];
 
-                    if ($latest) {
-                        $query['Limit'] = 1;
-                        $query['ScanIndexForward'] = false; // get newest first
-                    }
+                $foundItemsForDevice = [];
 
-                    if ($filterExpression) {
-                        $query['FilterExpression'] = $filterExpression;
-                    }
+                foreach ($attempts as $attemptIndex => $pkValue) {
+                    $lastEvaluatedKey = null;
 
-                    if ($lastEvaluatedKey) {
-                        $query['ExclusiveStartKey'] = $lastEvaluatedKey;
-                    }
-
-                    $response = $this->client->query($query);
-
-                    if (!empty($response['Items'])) {
-                        foreach ($response['Items'] as $item) {
-                            // Unmarshal to PHP array
-                            $record = $this->marshaler->unmarshalItem($item);
-
-                            // Optionally normalize numeric strings to floats/ints
-                            array_walk_recursive($record, function (&$v) {
-                                if (is_string($v) && is_numeric($v)) {
-                                    // preserve integers if no decimal point
-                                    $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
-                                }
-                            });
-
-                            $results[] = $record;
+                    do {
+                        // Build ExpressionAttributeValues for this page/attempt
+                        $exprAttrValues = $rangeValues + [':device_id' => $pkValue];
+                        if ($filterExpression) {
+                            $exprAttrValues[':filter_val'] = $filterValueMarshalled;
                         }
+
+                        $query = [
+                            'TableName' => $table,
+                            'KeyConditionExpression' => $keyCondition,
+                            'ExpressionAttributeNames' => $exprAttrNames,
+                            'ExpressionAttributeValues' => $exprAttrValues,
+                            'ScanIndexForward' => $ascOrder,
+                            'ConsistentRead' => $consistentRead,
+                        ];
+
+                        if ($indexName) {
+                            $query['IndexName'] = $indexName;
+                        }
+
+                        if ($latest) {
+                            // We want the latest; get newest first. If filter exists we may need to page further.
+                            $query['Limit'] = 1;
+                            $query['ScanIndexForward'] = false;
+                        }
+
+                        if ($filterExpression) {
+                            $query['FilterExpression'] = $filterExpression;
+                        }
+
+                        if ($lastEvaluatedKey) {
+                            $query['ExclusiveStartKey'] = $lastEvaluatedKey;
+                        }
+
+                        // Helpful debug log to inspect what we sent (remove in prod if noisy)
+                        \Log::debug('[DynamoDbService] Querying DynamoDB', [
+                            'table' => $table,
+                            'device' => $deviceId,
+                            'attempt' => $attemptIndex === 0 ? 'numeric' : 'string',
+                            'query' => $query,
+                        ]);
+
+                        $response = $this->client->query($query);
+
+                        if (!empty($response['Items'])) {
+                            foreach ($response['Items'] as $item) {
+                                $record = $this->marshaler->unmarshalItem($item);
+                                // Optional: normalize numeric strings
+                                array_walk_recursive($record, function (&$v) {
+                                    if (is_string($v) && is_numeric($v)) {
+                                        $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
+                                    }
+                                });
+                                $foundItemsForDevice[] = $record;
+                            }
+                        }
+
+                        $lastEvaluatedKey = $response['LastEvaluatedKey'] ?? null;
+
+                        // If latest requested:
+                        // - If no filterExpression: we only needed the first page -> break to next device.
+                        // - If filterExpression: continue paginating until we find a matching item or pages exhausted.
+                        if ($latest) {
+                            if (!$filterExpression) {
+                                // we wanted the single newest item only
+                                break; // break out of attempts+device loops and use found items
+                            } else {
+                                // if we found at least one item matching filter in this attempt, we're done for this device
+                                if (!empty($foundItemsForDevice)) {
+                                    break;
+                                }
+                                // else continue paging if AWS says there are more pages
+                            }
+                        }
+                    } while ($lastEvaluatedKey);
+                    // if items found in this attempt and latest=false, we still append all pages; continue attempts no longer necessary
+                    if (!empty($foundItemsForDevice) && !$latest) {
+                        break; // found data with current attempt, no need to try alternate key type
                     }
+                } // end attempts
 
-                    $lastEvaluatedKey = $response['LastEvaluatedKey'] ?? null;
-
-                    // For latest we only want the most recent item => break after first page
-                    if ($latest) {
-                        break;
-                    }
-                } while ($lastEvaluatedKey);
-
-            } catch (Exception $e) {
-                Log::error("[DynamoDbService] Failed to fetch data for device_id {$deviceId} from table {$table}", [
+                // append device's found items to overall results
+                if ($latest) {
+                    $results[$deviceId] = $foundItemsForDevice[0] ?? null;
+                } else {
+                    $results[$deviceId] = $foundItemsForDevice;
+                }
+            } catch (\Exception $e) {
+                \Log::error("[DynamoDbService] Failed to fetch data for device_id {$deviceId} from table {$table}", [
                     'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
                 ]);
             }
-        }
+        } // end device loop
 
         return $results;
     }

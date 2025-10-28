@@ -20,7 +20,11 @@ class WeightLogService
     /**
      * Calculate and create (or update) a WeightLog.
      *
-     * @param  array  $options  (optionally pass additional info, e.g. custom date, etc)
+     * @param ProductionLog $log
+     * @param int $weighted_chickens_count
+     * @param double $total_weight
+     * @param array $options (optionally pass additional info, e.g. custom date, etc)
+     * @return WeightLog
      */
     public function createOrUpdateWeightLog(
         ProductionLog $log,

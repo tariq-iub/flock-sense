@@ -49,6 +49,11 @@ class SensorDataController extends ApiController
             ->toArray()
         );
 
+        // 👇 New condition: if humidity exists, set it to zero
+        if (array_key_exists('humidity', $sensorData)) {
+            $sensorData['humidity'] = 0;
+        }
+
         // ✅ Store in DynamoDB
         $this->dynamoDbService->putSensorData($sensorData);
 

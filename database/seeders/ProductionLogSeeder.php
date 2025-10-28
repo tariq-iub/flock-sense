@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Flock;
 use App\Models\ProductionLog;
+use App\Models\Shed;
+use App\Models\WeightLog;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,6 +21,9 @@ class ProductionLogSeeder extends Seeder
         $dataRows = Excel::toArray([], public_path('assets/data/ProductionData.xlsx'))[0];
         $timezone = 'Asia/Karachi'; // or your preferred timezone
 
+        $shed_ids = Shed::all()->pluck('id')->toArray();
+        $flock_ids = Flock::all()->pluck('id')->toArray();
+
         foreach ($dataRows as $index => $row) {
             // Optionally skip header
             if ($index == 0) {
@@ -31,17 +36,20 @@ class ProductionLogSeeder extends Seeder
             )->setTimezone($timezone);
 
             // 2. Get related flock and opening count
-            $flock_id = (int) $row[2];
+            $flock_id = (int)$row[2];
+            $shed_id = (int)$row[3];
+
             $flock = Flock::find($flock_id);
-            if (! $flock) {
-                continue;
-            }
+            $shed = Shed::find($shed_id);
+
+            if (!$shed or !$flock) continue;
 
             // 3. Find previous log for net_count
             $lastLog = ProductionLog::where('flock_id', $flock_id)
                 ->where('production_log_date', '<', $production_log_date)
                 ->orderByDesc('production_log_date')
                 ->first();
+
             $lastNetCount = $lastLog ? $lastLog->net_count : $flock->chicken_count;
 
             // 4. Calculate net_count and livability

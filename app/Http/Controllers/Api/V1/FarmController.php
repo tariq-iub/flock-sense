@@ -30,9 +30,15 @@ class FarmController extends ApiController
 
         $query = QueryBuilder::for(Farm::class)
             ->allowedFilters(['id', 'name'])
-            ->allowedIncludes(['sheds'])
+            ->allowedIncludes(['sheds', 'owner', 'managers', 'staff'])
             ->allowedSorts(['id', 'name'])
-            ->with(['sheds.devices.appliances', 'sheds.flocks'])
+            ->with([
+                'owner',
+                'managers',
+                'staff',
+                'sheds.devices.appliances',
+                'sheds.flocks'
+            ])
             ->withCount('sheds');
 
         // Role-based farm access
@@ -106,24 +112,15 @@ class FarmController extends ApiController
         ]))->loadCount('sheds');
 
         $dynamo = app(DynamoDbService::class);
+
         foreach ($farm->sheds as $shed) {
             foreach ($shed->devices as $device) {
-                $data = $dynamo->getSensorData([$device->id], null, null, true);
-                $device->latest_sensor_data = !empty($data) ? (object)$data[0] : null;
+                $data = $dynamo->getSensorData([$device->id], null, null, true); // correct argument order
+                $device->latest_sensor_data = $data[$device->id] ?? null;
             }
         }
 
-
-//        $farm->load(array_filter([
-//            in_array('owner', $includes) ? 'owner' : null,
-//            in_array('sheds', $includes) ? 'sheds' : null,
-//            in_array('managers', $includes) ? 'managers' : null,
-//            in_array('staff', $includes) ? 'staff' : null,
-//        ]))->loadCount('sheds');
-//
         return FarmResource::make($farm);
-
-
     }
 
     /**
