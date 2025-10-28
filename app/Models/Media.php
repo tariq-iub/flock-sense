@@ -13,7 +13,7 @@ class Media extends Model
         'file_path',
     ];
 
-    public function model() : MorphTo
+    public function model(): MorphTo
     {
         return $this->morphTo();
     }

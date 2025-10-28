@@ -29,8 +29,8 @@ class SettingsTableSeeder extends Seeder
             [
                 'group' => 'company',
                 'key' => 'url',
-                'value' => json_encode('flocksense.ai'),
-                'type' => 'string',
+                'value' => json_encode('https://flocksense.ai'),
+                'type' => 'url',
                 'is_encrypted' => 0,
                 'description' => 'Company website URL',
                 'created_at' => $now,
@@ -68,10 +68,21 @@ class SettingsTableSeeder extends Seeder
             ],
             [
                 'group' => 'company',
-                'key' => 'background-video',
+                'key' => 'demo',
+                'value' => json_encode('http://flocksense.cosmosalgos.com/'),
+                'type' => 'url',
+                'is_encrypted' => 0,
+                'description' => 'Demo url',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'group' => 'video',
+                'key' => 'background1',
                 'value' => json_encode([
                     'cover' => 'assets/video/video_cover.webp',
                     'video' => 'assets/video/homepage_background_video.mp4',
+                    'selected' => false,
                 ]),
                 'type' => 'string',
                 'is_encrypted' => 0,
@@ -80,11 +91,12 @@ class SettingsTableSeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'group' => 'company',
-                'key' => 'background-video2',
+                'group' => 'video',
+                'key' => 'background2',
                 'value' => json_encode([
                     'cover' => 'assets/video/video_cover2.webp',
                     'video' => 'assets/video/homepage_background_video2.mp4',
+                    'selected' => true,
                 ]),
                 'type' => 'string',
                 'is_encrypted' => 0,

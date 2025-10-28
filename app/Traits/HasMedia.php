@@ -15,8 +15,8 @@ trait HasMedia
 
     public function addMedia($file)
     {
-        $name = time() . '_media';
-        $filename = $name . '.' . $file->getClientOriginalExtension();
+        $name = time().'_media';
+        $filename = $name.'.'.$file->getClientOriginalExtension();
 
         // Store using 'media' disk
         $file->storeAs('', $filename, 'media'); // no folder prefix needed since disk points to /media

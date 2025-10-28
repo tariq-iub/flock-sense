@@ -39,6 +39,7 @@
                                          Route::is('admin.farms.*') ||
                                          Route::is('admin.sheds.*') ||
                                          Route::is('admin.flocks.*') ||
+                                         Route::is('admin.partners.*') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>System Admin</span><span class="menu-arrow"></span>
@@ -95,6 +96,12 @@
                                 <li>
                                     <a href="{{ route('admin.flocks.index') }}"
                                        class="{{ request()->routeIs('admin.flocks.*') ? 'active' : '' }}">
+                                        Flock Management
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.partners.index') }}"
+                                       class="{{ request()->routeIs('admin.partners.*') ? 'active' : '' }}">
                                         Flock Management
                                     </a>
                                 </li>

@@ -100,8 +100,9 @@
                 </div>
                 <div class="col-md-6 order-1 order-md-1 text-center">
                     <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">
-                        <video src="{{ asset('assets/img/remote_monitoring.mp4') }}" poster="assets/img/remote_monitoring.png" autoplay
-                               muted loop playsinline></video>
+                        <video src="{{ asset('assets/video/remote_monitoring.mp4') }}"
+                               poster="{{ asset('assets/video/remote_monitoring.webp') }}" autoplay muted loop playsinline>
+                        </video>
                     </div>
                 </div>
             </div>

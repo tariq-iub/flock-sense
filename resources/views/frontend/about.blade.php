@@ -54,12 +54,12 @@
 
     <!-- Contact Form -->
     <section class="section-dark py-5">
-        <div class="container">
+        <div class="container" id="contact">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <h2 class="fw-bold mb-3">Contact Us</h2>
                     <p class="mb-4">Send us a message and our team will get back to you shortly.</p>
-                    <form action="mailto:contact@flocksense.ai" method="post" enctype="text/plain">
+                    <form action="mailto:{{ settings('contact.email') }}" method="post" enctype="text/plain">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Full Name</label>

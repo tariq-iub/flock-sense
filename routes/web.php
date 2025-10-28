@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\IotController;
 use App\Http\Controllers\Web\LogsController;
 use App\Http\Controllers\Web\MapController;
 use App\Http\Controllers\Web\MedicineController;
+use App\Http\Controllers\Web\PartnerController;
 use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
@@ -95,10 +96,6 @@ Route::get('/email/verify', function () {
 
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
-Route::get('/demo', function () {
-    return view('frontend.demo');
-})->name('demo');
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
 
@@ -198,7 +195,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
         'pricing-plans' => PricingController::class,
+        'partners' => PartnerController::class,
     ]);
+
+    // Partner Routes
+    Route::prefix('partners')->controller(PartnerController::class)->group(function () {
+        Route::post('/{partner}/add-keyword', 'addKeyword');
+        Route::post('/{partner}/remove-keyword', 'removeKeyword');
+        Route::get('partners-keywords', 'getAllKeywords');
+    });
+
 
     // Users and Clients
     Route::prefix('clients')->controller(ClientController::class)->group(function () {

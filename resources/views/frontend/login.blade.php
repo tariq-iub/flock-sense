@@ -64,9 +64,8 @@
                         </div>
                         <div class="d-grid gap-2">
                             <button class="btn btn-outline-light"><i
-                                    class="fa-brands fa-google me-2"></i>Google</button>
-                            <button class="btn btn-outline-light"><i class="fa-brands fa-microsoft me-2"></i>Microsoft
-                                Azure AD</button>
+                                    class="fa-brands fa-google me-2"></i>Gmail</button>
+                            <button class="btn btn-outline-light"><i class="fa-brands fa-facebook me-2"></i>Facebook</button>
                         </div>
                     </div>
                 </div>
@@ -100,14 +99,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="auth-video-card">
-                        <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">
-                            <iframe src="https://www.youtube.com/embed/uP7pHcX2unY" title="FlockSense overview"
-                                    allowfullscreen></iframe>
-                        </div>
-                        <p class="small text-muted mt-3 mb-0">4-minute tour: from climate automation to financial
-                            snapshots—see how growers stay ahead.</p>
+                <div class="col-md-6 order-1 order-md-1 text-center">
+                    <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow">
+                        <video src="{{ asset('assets/video/remote_monitoring.mp4') }}"
+                               poster="{{ asset('assets/video/remote_monitoring.webp') }}" autoplay muted loop playsinline>
+                        </video>
                     </div>
                 </div>
             </div>
