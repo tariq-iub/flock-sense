@@ -66,6 +66,32 @@ class SettingsTableSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+            [
+                'group' => 'company',
+                'key' => 'background-video',
+                'value' => json_encode([
+                    'cover' => 'assets/video/video_cover.webp',
+                    'video' => 'assets/video/homepage_background_video.mp4',
+                ]),
+                'type' => 'string',
+                'is_encrypted' => 0,
+                'description' => 'Company slogan',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'group' => 'company',
+                'key' => 'background-video2',
+                'value' => json_encode([
+                    'cover' => 'assets/video/video_cover2.webp',
+                    'video' => 'assets/video/homepage_background_video2.mp4',
+                ]),
+                'type' => 'string',
+                'is_encrypted' => 0,
+                'description' => 'Company slogan',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
 
             // Social group
             [
@@ -145,7 +171,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'group' => 'contact',
                 'key' => 'address1',
-                'value' => json_encode('23 Roundtree Cl, Norwich'),
+                'value' => json_encode('23 Roundtree Cl, Norwich, NR7 8SX, UK'),
                 'type' => 'string',
                 'is_encrypted' => 0,
                 'description' => 'Primary address line',
@@ -155,7 +181,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'group' => 'contact',
                 'key' => 'address2',
-                'value' => json_encode('NR7 8SX 300 Street‑17, G‑15/2, Islamabad'),
+                'value' => json_encode('300 Street‑17, G‑15/2, Islamabad, Pakistan'),
                 'type' => 'string',
                 'is_encrypted' => 0,
                 'description' => 'Secondary address line',

@@ -35,13 +35,13 @@
                     <p class="text-muted">Reach out or visit one of our locations. We’d love to connect.</p>
                     <div class="mb-4">
                         <h6 class="fw-semibold mb-1">United Kingdom</h6>
-                        <p class="small mb-2">23 Roundtree Cl, Norwich, NR7 8SX</p>
-                        <p class="small mb-0"><i class="fa-solid fa-envelope me-2"></i>contact@flocksense.ai</p>
+                        <p class="small mb-2">{{ settings('contact.address1') }}</p>
+                        <p class="small mb-0"><i class="fa-solid fa-envelope me-2"></i>{{ settings('contact.email') }}</p>
                     </div>
                     <div class="mb-4">
                         <h6 class="fw-semibold mb-1">Pakistan</h6>
-                        <p class="small mb-2">300 Street-17, G-15/2, Islamabad</p>
-                        <p class="small mb-0"><i class="fa-solid fa-phone me-2"></i>+92 (0) 300 073 0490</p>
+                        <p class="small mb-2">{{ settings('contact.address2') }}</p>
+                        <p class="small mb-0"><i class="fa-solid fa-phone me-2"></i>{{ settings('contact.phone') }}</p>
                     </div>
                 </div>
                 <div class="col-lg-7">

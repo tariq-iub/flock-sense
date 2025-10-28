@@ -2,13 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Chart;
-use App\Models\ChartData; // If you store rows in a ChartData model
+use App\Models\ChartData;
+use Carbon\Carbon; // If you store rows in a ChartData model
+use Illuminate\Database\Seeder;
 use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
-use Carbon\Carbon;
 
 class ChartSeeder extends Seeder
 {
@@ -32,7 +30,9 @@ class ChartSeeder extends Seeder
 
         // Step 3: Loop and create chart data entries
         foreach ($rows as $index => $row) {
-            if ($index == 0) continue; // skip header row
+            if ($index == 0) {
+                continue;
+            } // skip header row
 
             ChartData::firstOrCreate([
                 'chart_id' => $chart->id,
@@ -44,7 +44,7 @@ class ChartSeeder extends Seeder
                 'avg_daily_gain' => (float) $row[4] ?? null,
                 'daily_intake' => (float) $row[5] ?? null,
                 'cum_intake' => (float) $row[6] ?? null,
-                'fcr' => (float) $row[3] ?? null,
+                'fcr' => (float) $row[7] ?? null,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);

@@ -5,8 +5,8 @@
     <header class="hero-section homepage-top d-flex align-items-center">
         <div class="homepage-top__video" aria-hidden="true">
             <video id="homepage-video-bg" class="homepage-top__video-player" preload="auto" autoplay muted loop
-                   playsinline webkit-playsinline="true" poster="assets/img/video_cover.webp">
-                <source src="assets/img/homepage_background_video.mp4" type="video/mp4">
+                   playsinline webkit-playsinline="true" poster="{{ asset('assets/img/video_cover.webp') }}">
+                <source src="{{ asset('assets/img/homepage_background_video.mp4') }}" type="video/mp4">
                 Sorry, your browser doesn't support HTML5 video.
             </video>
             <div class="homepage-top__bg"></div>
@@ -22,10 +22,10 @@
                                 </h1>
                                 <p class="lead hero-subtitle mb-4">Remotely monitor and control complete poultry farm operations</p>
                                 <div class="d-flex justify-content-center flex-wrap">
-                                    <a href="#mobile-demo" class="btn btn-primary me-3 mb-2">
+                                    <a href="{{ asset('assets/app/demo.apk') }}" class="btn btn-primary me-3 mb-2">
                                         <i class="bi bi-phone-vibrate me-2"></i>Mobile Demo
                                     </a>
-                                    <a href="#web-demo" class="btn btn-outline-light mb-2">
+                                    <a href="{{ route('demo') }}" class="btn btn-outline-light mb-2">
                                         <i class="bi bi-window me-2"></i>Web Demo
                                     </a>
                                 </div>
@@ -40,10 +40,10 @@
                                 </h1>
                                 <p class="lead hero-subtitle mb-4">Get instant insights on climate, feeding and welfare across every shed.</p>
                                 <div class="d-flex justify-content-center flex-wrap">
-                                    <a href="#features" class="btn btn-primary me-3 mb-2">
+                                    <a href="/features" class="btn btn-primary me-3 mb-2">
                                         <i class="bi bi-activity me-2"></i>Explore Features
                                     </a>
-                                    <a href="pricing.html" class="btn btn-outline-light mb-2">
+                                    <a href="{{ route('pricing') }}" class="btn btn-outline-light mb-2">
                                         <i class="bi bi-currency-dollar me-2"></i>View Pricing
                                     </a>
                                 </div>

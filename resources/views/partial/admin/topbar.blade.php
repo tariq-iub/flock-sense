@@ -5,13 +5,13 @@
         <!-- Logo -->
         <div class="header-left active">
             <a href="{{ route('dashboard') }}" class="logo logo-normal">
-                <img src="{{ asset('assets/img/logo.svg') }}" alt="Img">
+                <img src="{{ asset('assets/img/logo.svg') }}" alt="Logo">
             </a>
             <a href="{{ route('dashboard') }}" class="logo logo-white">
-                <img src="{{ asset('assets/img/logo-white.svg') }}" alt="Img">
+                <img src="{{ asset('assets/img/logo-white.svg') }}" alt="Logo">
             </a>
             <a href="{{ route('dashboard') }}" class="logo-small">
-                <img src="{{ asset('assets/img/logo-small.png') }}" alt="Img">
+                <img src="{{ asset('assets/img/logo-small.png') }}" alt="Logo">
             </a>
         </div>
         <!-- /Logo -->

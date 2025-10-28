@@ -7,9 +7,9 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <a class="navbar-brand d-flex align-items-center" href="/">
-                <img src="{{ asset('assets/img/logo.png') }}" alt="FlockSense logo" class="desktop-logo d-none d-lg-block">
-                <img src="{{ asset('assets/img/mobile_logo.png') }}" alt="FlockSense mobile logo" class="mobile-logo d-lg-none">
-                <span class="visually-hidden">FlockSense</span>
+                <img src="{{ settings('company.logo') }}" alt="FlockSense logo" class="desktop-logo d-none d-lg-block">
+                <img src="{{ asset(settings('company.mobile-logo')) }}" alt="FlockSense mobile logo" class="mobile-logo d-lg-none">
+                <span class="visually-hidden">{{ settings('company.name') }}</span>
             </a>
         </div>
         <div class="offcanvas offcanvas-start offcanvas-lg" tabindex="-1" id="navbarOffcanvas"
@@ -23,12 +23,23 @@
                     <li class="nav-item">
                         <a @class(['nav-link', 'active' => Request::is('/')]) href="/">Home</a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#resources">Resources</a></li>
+                    <li class="nav-item">
+                        <a @class(['nav-link', 'active' => Request::routeIs('features')]) href="{{ route('features') }}">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a @class(['nav-link', 'active' => Request::routeIs('partners')]) href="{{ route('partners') }}">Partners</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a @class(['nav-link dropdown-toggle', 'active' => Request::routeIs('blogs') || Request::routeIs('events')])
+                          href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
+                        <ul class="dropdown-menu" aria-labelledby="resourcesDropdown">
+                            <li><a class="dropdown-item" href="{{ route('blogs') }}">Blogs</a></li>
+                            <li><a class="dropdown-item" href="{{ route('events') }}">Upcoming Events</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a @class(['nav-link', 'active' => Request::routeIs('pricing')]) href="{{ route('pricing') }}">Pricing</a>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="#partners">Partners</a></li>
                     <li class="nav-item">
                         <a @class(['nav-link', 'active' => Request::routeIs('about')]) href="{{ route('about') }}">About Us</a>
                     </li>

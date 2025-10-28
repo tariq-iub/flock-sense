@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Services\WeightLogService;
 use App\Models\ProductionLog;
-use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
+use App\Services\WeightLogService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class WeightLogSeeder extends Seeder
 {
@@ -21,7 +21,9 @@ class WeightLogSeeder extends Seeder
         $timezone = 'Asia/Karachi';
 
         foreach ($weightRows as $index => $row) {
-            if ($index == 0) continue; // skip header row
+            if ($index == 0) {
+                continue;
+            } // skip header row
 
             // 1. Parse date (assume $row[0] is Excel date, $row[1] weighted_chickens_count, $row[2] total_weight)
             $production_log_date = Carbon::instance(
@@ -33,8 +35,8 @@ class WeightLogSeeder extends Seeder
 
             $service->createOrUpdateWeightLog(
                 $log,                   // The found ProductionLog model
-                (int)$row[1],           // weighted_chickens_count
-                (float)$row[2]          // total_weight
+                (int) $row[1],           // weighted_chickens_count
+                (float) $row[2]          // total_weight
             );
         }
     }

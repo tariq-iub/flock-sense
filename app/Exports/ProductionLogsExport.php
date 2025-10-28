@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\ProductionLog;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
@@ -16,24 +17,30 @@ class ProductionLogsExport implements FromCollection, WithHeadings
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         // Load relations if needed and select fields you want to export
-        return $this->logs->map(function($log) {
+        return $this->logs->map(function ($log) {
             return [
-                'created_at'  => $log->production_log_date->format('m-d-Y'),
-                'flock'       => optional($log->flock)->name,
-                'shed'        => optional($log->shed)->name,
-                'age'         => $log->age,
-                'net_count'   => $log->net_count,
-                'livability'  => $log->livability . '%',
+                'created_at' => Carbon::parse($log->production_log_date)
+                    ->timezone('Asia/Karachi')
+                    ->format('m-d-Y'),
+                'flock' => optional($log->flock)->name,
+                'shed' => optional($log->shed)->name,
+                'age' => $log->age,
+                'net_count' => $log->net_count,
+                'livability' => $log->livability.'%',
                 'day_mortality' => $log->day_mortality_count,
                 'night_mortality' => $log->night_mortality_count,
-                'day_feed'    => $log->day_feed_consumed,
-                'night_feed'  => $log->night_feed_consumed,
-                'day_water'   => $log->day_water_consumed,
+                'total_mortality' => $log->total_mortality_count,
+                'todate_mortality' => $log->todate_mortality_count,
+                'day_feed' => $log->day_feed_consumed,
+                'night_feed' => $log->night_feed_consumed,
+                'total_feed' => $log->total_feed_consumed,
+                'todate_feed' => $log->todate_feed_consumed,
+                'day_water' => $log->day_water_consumed,
                 'night_water' => $log->night_water_consumed,
                 'weighted_chickens_count' => $log->weightLog->weighted_chickens_count ?? '',
                 'total_weight' => $log->weightLog->total_weight ?? '',
@@ -46,8 +53,9 @@ class ProductionLogsExport implements FromCollection, WithHeadings
                 'fcr_standard_diff' => $log->weightLog->fcr_standard_diff ?? '',
                 'standard_deviation' => $log->weightLog->standard_deviation ?? '',
                 'coefficient_of_variation' => $log->weightLog->coefficient_of_variation ?? '',
+                'uniformity' => $log->weightLog->uniformity ?? '',
                 'production_efficiency_factor' => $log->weightLog->production_efficiency_factor ?? '',
-                'user'        => optional($log->user)->name,
+                'user' => optional($log->user)->name,
             ];
         });
     }
@@ -55,10 +63,10 @@ class ProductionLogsExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'Log Date', 'Flock', 'Shed', 'Age', 'Net Count', 'Livability', 'Day Mortality', 'Night Mortality',
-            'Day Feed', 'Night Feed', 'Day Water', 'Night Water', 'Weighted Chickens', 'Recorded Weight', 'Avg Weight',
+            'Log Date', 'Flock', 'Shed', 'Age', 'Net Count', 'Livability', 'Day Mortality', 'Night Mortality', 'Total Mortality', 'Todate Mortality',
+            'Day Feed', 'Night Feed', 'Total Feed', 'Todate Feed', 'Day Water', 'Night Water', 'Weighted Chickens', 'Recorded Weight', 'Avg Weight',
             'Avg Weight Gain', 'Flock Weight', 'Feed Efficiency', 'FCR', 'Adjusted FCR', 'FCR Standard Diff',
-            'SD', 'CV', 'PEF', 'User'
+            'SD', 'CV', 'Uniformity', 'PEF', 'User',
         ];
     }
 }

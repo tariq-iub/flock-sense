@@ -44,6 +44,7 @@ class DatabaseSeeder extends Seeder
             DeviceSeeder::class,
             PakistanTablesSeeder::class,
             SettingsTableSeeder::class,
+            ShortcutSeeder::class,
         ]);
     }
 }

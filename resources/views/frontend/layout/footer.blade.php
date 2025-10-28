@@ -22,11 +22,12 @@
             <div class="col-lg-2">
                 <h6 class="fw-bold mb-3">Quick Links</h6>
                 <ul class="list-unstyled">
-                    <li><a href="#solutions" class="footer-link">Solutions</a></li>
-                    <li><a href="#resources" class="footer-link">Resources</a></li>
-                    <li><a href="pricing.html" class="footer-link">Pricing</a></li>
-                    <li><a href="#partners" class="footer-link">Partners</a></li>
-                    <li><a href="#about" class="footer-link">About Us</a></li>
+                    <li><a href="{{ route('features') }}" class="footer-link">Features</a></li>
+                    <li><a href="{{ route('partners') }}" class="footer-link">Partners</a></li>
+                    <li><a href="{{ route('blogs') }}" class="footer-link">Blogs</a></li>
+                    <li><a href="{{ route('events') }}" class="footer-link">Events</a></li>
+                    <li><a href="{{ route('pricing') }}" class="footer-link">Pricing</a></li>
+                    <li><a href="{{ route('about') }}" class="footer-link">About Us</a></li>
                 </ul>
             </div>
             <div class="col-lg-4">
@@ -34,7 +35,7 @@
                 <ul class="list-unstyled small mb-0">
                     <li class="mb-2"><i class="text-white fa-solid fa-envelope me-2"></i>{{ settings('contact.email') }}</li>
                     <li class="mb-2"><i class="text-white fa-solid fa-phone me-2"></i>{{ settings('contact.phone') }}</li>
-                    <li>
+                    <li class="mb-2">
                         <i class="text-white fa-solid fa-location-dot me-2"></i>{{ settings('contact.address1') }}
                     </li>
                     <li>

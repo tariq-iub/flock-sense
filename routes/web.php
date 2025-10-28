@@ -20,6 +20,7 @@ use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\SettingController;
 use App\Http\Controllers\Web\ShedController;
+use App\Http\Controllers\Web\ShortcutController;
 use App\Models\Flock;
 use App\Models\Shed;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('frontend.index');
 });
+
+Route::get('/features', function () {
+    return view('frontend.features');
+})->name('features');
+
+Route::get('/partners', function () {
+    return view('frontend.partners');
+})->name('partners');
+
+Route::get('/blogs', function () {
+    return view('frontend.blog');
+})->name('blogs');
+
+Route::get('/events', function () {
+    return view('frontend.events');
+})->name('events');
 
 Route::get('/pricing', function () {
     return view('frontend.pricing');
@@ -78,6 +95,10 @@ Route::get('/email/verify', function () {
 
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/demo', function () {
+    return view('frontend.demo');
+})->name('demo');
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
 
@@ -139,6 +160,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
     });
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin-shortcuts', [ShortcutController::class, 'getAdminShortcuts']);
+    Route::get('/user-shortcuts', [ShortcutController::class, 'getUserShortcuts']);
+    Route::get('/my-shortcuts', [ShortcutController::class, 'getUserPersonalizedShortcuts']);
+    Route::get('/shortcuts/{group}', [ShortcutController::class, 'getShortcutsByGroup']);
+});
+
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
     // Register routes (GET and POST)
     //    Route::get('/register', [AuthController::class, 'register'])->name('register');
@@ -166,6 +194,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
 
     // Resource routes for clients and charts
     Route::resources([
+        'shortcuts' => ShortcutController::class,
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
         'pricing-plans' => PricingController::class,
