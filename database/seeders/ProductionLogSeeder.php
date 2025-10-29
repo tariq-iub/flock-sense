@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Flock;
 use App\Models\ProductionLog;
 use App\Models\Shed;
-use App\Models\WeightLog;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,10 +18,7 @@ class ProductionLogSeeder extends Seeder
     public function run(): void
     {
         $dataRows = Excel::toArray([], public_path('assets/data/ProductionData.xlsx'))[0];
-        $timezone = 'Asia/Karachi'; // or your preferred timezone
-
-        $shed_ids = Shed::all()->pluck('id')->toArray();
-        $flock_ids = Flock::all()->pluck('id')->toArray();
+        $timezone = 'Asia/Karachi';
 
         foreach ($dataRows as $index => $row) {
             // Optionally skip header
@@ -36,13 +32,15 @@ class ProductionLogSeeder extends Seeder
             )->setTimezone($timezone);
 
             // 2. Get related flock and opening count
-            $flock_id = (int)$row[2];
-            $shed_id = (int)$row[3];
+            $flock_id = (int) $row[1];
+            $shed_id = (int) $row[2];
 
             $flock = Flock::find($flock_id);
             $shed = Shed::find($shed_id);
 
-            if (!$shed or !$flock) continue;
+            if (! $shed or ! $flock) {
+                continue;
+            }
 
             // 3. Find previous log for net_count
             $lastLog = ProductionLog::where('flock_id', $flock_id)
@@ -68,7 +66,7 @@ class ProductionLogSeeder extends Seeder
             // 6. Create ProductionLog
             ProductionLog::firstOrCreate([
                 'production_log_date' => $production_log_date,
-                'shed_id' => (int) $row[1],
+                'shed_id' => $shed_id,
                 'flock_id' => $flock_id,
                 'age' => $age,
                 'day_mortality_count' => $day_mortality,

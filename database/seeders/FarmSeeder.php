@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Farm;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class FarmSeeder extends Seeder
 {
@@ -21,6 +22,12 @@ class FarmSeeder extends Seeder
             'longitude' => 74.23520000,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('farm_managers')->insert([
+            'farm_id' => 1,
+            'manager_id' => 2,
+            'link_date' => Carbon::now(),
         ]);
     }
 }

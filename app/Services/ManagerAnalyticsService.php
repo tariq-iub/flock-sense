@@ -87,8 +87,8 @@ class ManagerAnalyticsService
                     ELSE 0
                   END                                                              AS mortality_rate_pct,
                   ROUND(AVG(ch.livability),2)                                      AS avg_livability_pct,
-                  ROUND(COALESCE((SELECT avg_fcr FROM fcr_pef),0), 3)              AS avg_fcr,
-                  ROUND(COALESCE((SELECT avg_adj_fcr FROM fcr_pef),0), 3)          AS avg_adj_fcr,
+                  ROUND(COALESCE((SELECT avg_fcr FROM fcr_pef),0), 2)              AS avg_fcr,
+                  ROUND(COALESCE((SELECT avg_adj_fcr FROM fcr_pef),0), 2)          AS avg_adj_fcr,
                   ROUND(COALESCE((SELECT avg_pef FROM fcr_pef),0), 1)              AS avg_pef,
                   ROUND(COALESCE((SELECT period_feed_kg FROM farm_window),0), 2)   AS feed_kg_window,
                   ROUND(COALESCE((SELECT period_water_l FROM farm_window),0), 2)   AS water_l_window

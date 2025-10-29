@@ -49,35 +49,42 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card dash-widget dash2 w-100">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="dash-widgetimg">
-                            <span><img src="{{ asset('assets/img/icons/dash3.svg') }}" alt="img"></span>
-                        </div>
-                        <div class="dash-widgetcontent">
-                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_birds_current }}">0</span></h5>
-                            <div class="mb-0">
-                                Total Live Birds
-                                <span class="badge bg-soft-info ms-5">{{ $data->avg_livability_pct }}%</span>
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-row">
+                            <div class="dash-widgetimg">
+                                <span><img src="{{ asset('assets/img/icons/dash3.svg') }}" alt="img"></span>
                             </div>
+                            <div class="dash-widgetcontent d-flex flex-column">
+                                <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_birds_current }}">0</span></h5>
+                                Total Live Birds
+                            </div>
+                        </div>
+                        <div class="fw-semibold mb-0">
+                            <span class="bg-soft-info p-3">{{ $data->avg_livability_pct }}%</span>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card dash-widget dash3 w-100">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="dash-widgetimg">
-                            <span><img src="{{ asset('assets/img/icons/dash4.svg') }}" alt="img"></span>
-                        </div>
-                        <div class="dash-widgetcontent">
-                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_mortalities_window }}">0</span></h5>
-                            <p class="mb-0">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-row">
+                            <div class="dash-widgetimg">
+                                <span><img src="{{ asset('assets/img/icons/dash4.svg') }}" alt="img"></span>
+                            </div>
+                            <div class="dash-widgetcontent">
+                                <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_mortalities_window }}">0</span></h5>
                                 Total Mortalities
-                                <span class="badge bg-soft-danger ms-5">{{ $data->mortality_rate_pct }}%</span>
-                            </p>
+                            </div>
                         </div>
+                        <div class="fw-semibold mb-0">
+                            <span class="bg-soft-danger p-3">{{ $data->mortality_rate_pct }}%</span>
+                        </div>
+
                     </div>
                 </div>
             </div>

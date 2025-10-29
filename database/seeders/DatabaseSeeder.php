@@ -17,13 +17,13 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Muhammad Tariq',
             'email' => 'saaim01@gmail.com',
-            'phone' => '+923346031107',
+            'phone' => '+03346031105',
         ]);
 
         User::factory()->create([
             'name' => 'Abdullah Abid',
             'email' => 'abdrps2004@gmail.com',
-            'phone' => '+923326334598',
+            'phone' => '03326334598',
         ]);
 
         $this->call([
