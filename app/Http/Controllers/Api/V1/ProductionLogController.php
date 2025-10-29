@@ -65,11 +65,11 @@ class ProductionLogController extends ApiController
         $net_count = $lastNetCount - ($validated['day_mortality_count'] + $validated['night_mortality_count']);
 
         // Calculate age (days since flock's start_date)
-        $age = $flock->start_date->diffInDays(today());
+        $age = $flock->start_date->diffInDays(today()) ?? 0;
 
         // Calculate livability
         $livability = $flock->chicken_count > 0
-            ? round(($net_count / $flock->chicken_count) * 100, 3)
+            ? daily_livability($net_count, $flock->chicken_count)
             : 0;
 
         // Prepare data for new ProductionLog
@@ -79,12 +79,21 @@ class ProductionLogController extends ApiController
             'age' => $age,
             'day_mortality_count' => $validated['day_mortality_count'],
             'night_mortality_count' => $validated['night_mortality_count'],
+            'todate_mortality_count' => $lastLog
+                ? $lastLog->todate_mortality_count + $validated['day_mortality_count'] + $validated['night_mortality_count']
+                : $validated['day_mortality_count'] + $validated['night_mortality_count'],
             'net_count' => $net_count,
             'livability' => $livability,
             'day_feed_consumed' => $validated['day_feed_consumed'],
             'night_feed_consumed' => $validated['night_feed_consumed'],
+            'todate_feed_consumed' => $lastLog
+                ? $lastLog->todate_feed_consumed + $validated['day_feed_consumed'] + $validated['night_feed_consumed']
+                : $validated['day_feed_consumed'] + $validated['night_feed_consumed'],
             'day_water_consumed' => $validated['day_water_consumed'],
             'night_water_consumed' => $validated['night_water_consumed'],
+            'todate_water_consumed' => $lastLog
+                ? $lastLog->todate_water_consumed + $validated['day_water_consumed'] + $validated['night_water_consumed']
+                : $validated['day_water_consumed'] + $validated['night_water_consumed'],
             'is_vaccinated' => $validated['is_vaccinated'],
             'day_medicine' => $validated['day_medicine'],
             'night_medicine' => $validated['night_medicine'],
