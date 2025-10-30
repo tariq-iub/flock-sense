@@ -84,7 +84,6 @@
                         <div class="fw-semibold mb-0">
                             <span class="bg-soft-danger p-3">{{ $data->mortality_rate_pct }}%</span>
                         </div>
-
                     </div>
                 </div>
             </div>

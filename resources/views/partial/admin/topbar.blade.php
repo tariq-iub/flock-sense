@@ -75,9 +75,11 @@
 
             <!-- Impersonated -->
             @impersonating()
-            <li class="nav-item nav-item-box">
+            <li class="nav-item">
                 <a href="{{ route('impersonate.leave') }}">
-                    <i data-feather="log-out" class="feather-log-out"></i>
+                    <span class="title-icon bg-soft-danger fs-16">
+                        <i data-feather="log-out" class="feather-log-out text-danger"></i>
+                    </span>
                 </a>
             </li>
             @endImpersonating
