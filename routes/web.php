@@ -97,6 +97,8 @@ Route::get('/email/verify', function () {
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
+Route::impersonate();
+
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
 
     // Logout route (POST)

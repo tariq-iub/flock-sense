@@ -73,6 +73,15 @@
             </li>
             <!-- /Search -->
 
+            <!-- Impersonated -->
+            @impersonating()
+            <li class="nav-item nav-item-box">
+                <a href="{{ route('impersonate.leave') }}">
+                    <i data-feather="log-out" class="feather-log-out"></i>
+                </a>
+            </li>
+            @endImpersonating
+
             <!-- Add New Overall -->
             <li class="nav-item dropdown link-nav">
                 <a href="javascript:void(0);" class="btn btn-primary btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">

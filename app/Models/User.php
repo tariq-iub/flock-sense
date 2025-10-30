@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
@@ -18,12 +19,10 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use Billable;
     use HasApiTokens;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
-
     use HasMedia;
     use HasRoles;
+    use Impersonate;
     use Notifiable;
 
     protected $dates = ['trial_ends_at'];
@@ -68,6 +67,15 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'password_reset_required' => 'boolean',
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function canImpersonate(): bool
+    {
+        return auth()->check()
+            && auth()->user()->hasRole('admin');
     }
 
     public function farms(): HasMany
