@@ -265,7 +265,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/data/{chart}', 'chartData')->name('charts.data');
         Route::get('/{chart}/toggle', 'toggle')->name('charts.toggle');
         Route::post('/data/update', 'data_update')->name('charts.data.update');
-
     });
 
     // Roles
