@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Setting;
-use Illuminate\Support\Facades\Cache;
 
 class SettingsService
 {
@@ -11,9 +10,7 @@ class SettingsService
     {
         // explode by '.' to group/key
         [$group, $settingKey, $nested] = explode('.', $key, 3) + [null, null, null];
-        $setting = Cache::rememberForever('settings.all', function () {
-            return Setting::all()->keyBy(fn ($s) => "{$s->group}.{$s->key}");
-        });
+        $setting = Setting::all()->keyBy(fn ($s) => "{$s->group}.{$s->key}");
         $value = $setting["$group.$settingKey"]->value ?? $default;
 
         // Decrypt if needed
@@ -73,10 +70,12 @@ class SettingsService
                     'description' => $description,
                 ]
             );
+
             return true;
 
         } catch (\Exception $e) {
             Log::error('Settings set error: '.$e->getMessage());
+
             return false;
         }
     }

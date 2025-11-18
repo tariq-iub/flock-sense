@@ -173,9 +173,10 @@
                 @admin
                 <li class="submenu-open">
                     <h6 class="submenu-hdr">OPERATIONS</h6>
+
                     <ul>
-                        <li>
-                            <a href="#">
+                        <li class="{{ Route::is('web-settings.*') ? 'active' : '' }}">
+                            <a href="{{ route('web-settings.index') }}">
                                 <i class="ti ti-settings-automation fs-16 me-2"></i>
                                 <span>System Settings</span>
                             </a>

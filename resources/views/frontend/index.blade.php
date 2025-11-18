@@ -67,7 +67,7 @@
                         <div class="row justify-content-center text-center">
                             <div class="col-lg-8">
                                 <h1 class="display-2 fw-bold hero-heading mb-3">
-                                    Automate, Benchmark, Improve
+                                    <span class="text-primary">Automate</span>, Benchmark, Improve
                                 </h1>
                                 <p class="lead hero-subtitle mb-4">Automate controllers, benchmark KPIs, and drive better flock performance.</p>
                                 <div class="d-flex justify-content-center flex-wrap">

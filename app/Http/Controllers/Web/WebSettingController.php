@@ -3,28 +3,23 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
-class SettingController extends Controller
+class WebSettingController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the settings by group.
      */
     public function index()
     {
-        try {
-            $settings = Setting::all()->groupBy('group');
+        $settings = Setting::all()->groupBy('group');
 
-            return response()->json([
-                'success' => true,
-                'data' => $settings,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve settings',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return view(
+            'admin.settings.index',
+            compact('settings')
+        );
     }
 
     /**
@@ -90,22 +85,17 @@ class SettingController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = $request->validate([
             'group' => 'required|string|max:255',
             'key' => 'required|string|max:255',
             'value' => 'required',
             'type' => 'nullable|string|max:255',
-            'is_encrypted' => 'boolean',
+            'is_encrypted' => 'sometimes',
             'description' => 'nullable|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        // Convert checkbox value to boolean
+        $validator['is_encrypted'] = $request->has('is_encrypted');
 
         try {
             // Check if setting already exists
@@ -114,86 +104,95 @@ class SettingController extends Controller
                 ->first();
 
             if ($existingSetting) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Setting already exists: {$request->group}.{$request->key}",
-                ], 409);
+                return redirect()
+                    ->route('web-settings.index')
+                    ->with('error', "Setting already exists: {$request->group}.{$request->key}");
             }
 
-            $setting = Setting::create([
-                'group' => $request->group,
-                'key' => $request->key,
-                'value' => json_encode($request->value),
-                'type' => $request->type ?? 'string',
-                'is_encrypted' => $request->is_encrypted ?? false,
-                'description' => $request->description,
+            Setting::create([
+                'group' => $validator['group'],
+                'key' => $validator['key'],
+                'value' => $validator['value'],
+                'type' => $validator['type'] ?? 'string',
+                'is_encrypted' => $validator['is_encrypted'] ?? false,
+                'description' => $validator['description'],
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Setting created successfully',
-                'data' => $setting,
-            ], 201);
+            return redirect()
+                ->route('web-settings.index')
+                ->with('success', "Setting is created successfully with {$request->group}.{$request->key}");
+
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create setting',
-                'error' => $e->getMessage(),
-            ], 500);
+            return redirect()
+                ->route('web-settings.index')
+                ->with('error', "Failed to create setting: $e->getMessage()");
         }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $group, $key)
+    public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'value' => 'required',
-            'type' => 'nullable|string|max:255',
-            'is_encrypted' => 'boolean',
-            'description' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'value' => ['required'],
+            'description' => ['nullable', 'string', 'max:255'],
+            'type' => ['nullable', 'string', 'in:string,number,boolean,json,url'],
         ]);
 
-        if ($validator->fails()) {
+        $setting = Setting::find($id);
+
+        if (! $setting) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
+                'message' => "Setting not found for id: {$id}",
+            ], 404);
         }
 
-        try {
-            $setting = Setting::where('group', $group)
-                ->where('key', $key)
-                ->first();
+        // Decide final type: request overrides existing
+        $type = $validated['type'] ?? $setting->type ?? 'string';
+        $rawValue = $validated['value'];
 
-            if (! $setting) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Setting not found: {$group}.{$key}",
-                ], 404);
-            }
+        switch ($type) {
+            case 'json':
+                // If we receive a string, try to decode; if we receive an array, use it directly
+                if (is_string($rawValue)) {
+                    $decoded = json_decode($rawValue, true);
+                    $setting->value = json_last_error() === JSON_ERROR_NONE
+                        ? $decoded
+                        : $rawValue; // fallback: store raw string
+                } else {
+                    // Frontend is already sending object → will arrive as array
+                    $setting->value = $rawValue; // cast handles JSON encoding
+                }
+                break;
 
-            $setting->update([
-                'value' => json_encode($request->value),
-                'type' => $request->type ?? $setting->type,
-                'is_encrypted' => $request->has('is_encrypted') ? $request->is_encrypted : $setting->is_encrypted,
-                'description' => $request->description ?? $setting->description,
-            ]);
+            case 'boolean':
+                $setting->value = filter_var($rawValue, FILTER_VALIDATE_BOOLEAN);
+                break;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Setting updated successfully',
-                'data' => $setting->fresh(),
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update setting',
-                'error' => $e->getMessage(),
-            ], 500);
+            case 'number':
+                $setting->value = is_numeric($rawValue)
+                    ? $rawValue + 0 // normalize to int/float
+                    : $rawValue;
+                break;
+
+            case 'string':
+            default:
+                $setting->value = (string) $rawValue;
+                break;
         }
+
+        $setting->type = $type;
+        $setting->description = $validated['description'] ?? $setting->description;
+
+        $setting->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Setting updated successfully',
+            'data' => $setting->fresh(),
+        ]);
     }
 
     /**
@@ -255,32 +254,26 @@ class SettingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($group, $key)
+    public function destroy($id)
     {
         try {
-            $setting = Setting::where('group', $group)
-                ->where('key', $key)
-                ->first();
+            $setting = Setting::find($id);
 
             if (! $setting) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Setting not found: {$group}.{$key}",
-                ], 404);
+                return redirect()
+                    ->route('web-settings.index')
+                    ->with('error', "Setting is not found for id: $id");
             }
 
             $setting->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Setting deleted successfully',
-            ]);
+            return redirect()
+                ->route('web-settings.index')
+                ->with('success', 'Setting is deleted successfully.');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete setting',
-                'error' => $e->getMessage(),
-            ], 500);
+            return redirect()
+                ->route('web-settings.index')
+                ->with('error', "Failed to delete setting: $e->getMessage()");
         }
     }
 

@@ -6,12 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    protected $fillable = ['group', 'key', 'value', 'type', 'is_encrypted'];
+    protected $fillable = ['group', 'key', 'value', 'type', 'is_encrypted', 'description'];
 
     protected $casts = [
         'value' => 'json',
         'is_encrypted' => 'boolean',
     ];
+
+    /**
+     * Convert "on" to true, absence to false
+     * @param $value
+     * @return void
+     */
+    public function setIsEncryptedAttribute($value): void
+    {
+        $this->attributes['is_encrypted'] = ! is_null($value);
+    }
 
     /**
      * Get the decrypted value if the setting is encrypted

@@ -71,7 +71,7 @@ class SettingsTableSeeder extends Seeder
                 'key' => 'demo',
                 'value' => json_encode('http://flocksense.cosmosalgos.com/'),
                 'type' => 'url',
-                'is_encrypted' => 0,
+                'is_encrypted' => 1,
                 'description' => 'Demo url',
                 'created_at' => $now,
                 'updated_at' => $now,

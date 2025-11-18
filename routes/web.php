@@ -19,9 +19,9 @@ use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
-use App\Http\Controllers\Web\SettingController;
 use App\Http\Controllers\Web\ShedController;
 use App\Http\Controllers\Web\ShortcutController;
+use App\Http\Controllers\Web\WebSettingController;
 use App\Models\Flock;
 use App\Models\Shed;
 use Illuminate\Support\Facades\Route;
@@ -120,7 +120,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
     Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
 
     // Settings
-    Route::get('/setting/personal', [SettingController::class, 'personal'])->name('setting.personal');
+    Route::get('/web-setting/personal', [WebSettingController::class, 'personal'])->name('setting.personal');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -176,19 +176,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
 
     // Settings
-    Route::prefix('settings')->group(function () {
-        Route::get('/', [SettingController::class, 'index']);
-        Route::get('/public', [SettingController::class, 'publicSettings']);
-        Route::get('/general', [SettingController::class, 'general'])->name('setting.general');
-        Route::get('/company', [SettingController::class, 'companySettings']);
-        Route::get('/social', [SettingController::class, 'socialSettings']);
-        Route::get('/contact', [SettingController::class, 'contactSettings']);
-        Route::get('/{group}', [SettingController::class, 'byGroup']);
-        Route::get('/{group}/{key}', [SettingController::class, 'show']);
-        Route::post('/', [SettingController::class, 'store']);
-        Route::put('/bulk', [SettingController::class, 'bulkUpdate']);
-        Route::put('/{group}/{key}', [SettingController::class, 'update']);
-        Route::delete('/{group}/{key}', [SettingController::class, 'destroy']);
+    Route::prefix('system')->group(function () {
+        Route::apiResource('/web-settings', WebSettingController::class);
+        Route::get('/web-settings/public', [WebSettingController::class, 'publicSettings'])->name('system.settings.public');
+        Route::get('/web-settings/general', [WebSettingController::class, 'general'])->name('system.settings.general');
+        Route::get('/web-settings/company', [WebSettingController::class, 'companySettings'])->name('system.settings.company');
+        Route::get('/web-settings/social', [WebSettingController::class, 'socialSettings'])->name('system.settings.social');
+        Route::get('/web-settings/contact', [WebSettingController::class, 'contactSettings'])->name('system.settings.contact');
+        Route::get('/web-settings/{group}', [WebSettingController::class, 'byGroup'])->name('system.settings.group');
+        Route::put('/web-settings/bulk', [WebSettingController::class, 'bulkUpdate'])->name('system.settings.bulk');
     });
 
     // Resource routes for clients and charts
@@ -206,7 +202,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::post('/{partner}/remove-keyword', 'removeKeyword');
         Route::get('partners-keywords', 'getAllKeywords');
     });
-
 
     // Users and Clients
     Route::prefix('clients')->controller(ClientController::class)->group(function () {
