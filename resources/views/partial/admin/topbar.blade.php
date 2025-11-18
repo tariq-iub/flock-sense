@@ -87,7 +87,7 @@
             <!-- Add New Overall -->
             <li class="nav-item dropdown link-nav">
                 <a href="javascript:void(0);" class="btn btn-primary btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                    <i class="ti ti-circle-plus me-1"></i>Add New
+                    <i class="ti ti-device-analytics me-1"></i>Shortcuts
                 </a>
                 <div class="dropdown-menu dropdown-xl dropdown-menu-center">
                     <div class="row g-2">
