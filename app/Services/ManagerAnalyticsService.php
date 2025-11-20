@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\IotDataLog;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ManagerAnalyticsService
@@ -220,7 +222,7 @@ class ManagerAnalyticsService
         // ---- Build labels (ages) and datasets (one per flock) ----
         $ageSet = [];
         $flocks = [];
-        $palette  = [
+        $palette = [
             // pair colors (barColor, lineColor)
             ['#fb9a99', '#e31a1c'], // light red/pink bars, strong red line
             ['#a6cee3', '#1f78b4'], // light blue bars, dark blue line
@@ -241,8 +243,8 @@ class ManagerAnalyticsService
                     'feed' => [],
                 ];
             }
-            $flocks[$r->flock_id]['adg'][(int)$r->age]  = (float)$r->adg_g_per_bird;
-            $flocks[$r->flock_id]['feed'][(int)$r->age] = (float)$r->feed_kg_cum;
+            $flocks[$r->flock_id]['adg'][(int) $r->age] = (float) $r->adg_g_per_bird;
+            $flocks[$r->flock_id]['feed'][(int) $r->age] = (float) $r->feed_kg_cum;
         }
 
         // Sorted unique ages as x-axis labels
@@ -257,10 +259,10 @@ class ManagerAnalyticsService
             $i++;
 
             // Data aligned to labels (ages)
-            $adgData  = [];
+            $adgData = [];
             $feedData = [];
             foreach ($labels as $age) {
-                $adgData[]  = $series['adg'][$age]  ?? null; // null -> skip bar for that age
+                $adgData[] = $series['adg'][$age] ?? null; // null -> skip bar for that age
                 $feedData[] = $series['feed'][$age] ?? null; // null -> skip line for that age
             }
 
@@ -296,10 +298,152 @@ class ManagerAnalyticsService
         ];
     }
 
-    function hexToRgba($hex, $alpha = 1) {
+    public function getIoTChartData(int $shedId, int $deviceId, $start_date, $end_date)
+    {
+        $query = IotDataLog::query()
+            ->hourly()
+            ->forPeriod($start_date, $end_date)
+            ->orderBy('record_time');
+
+        // Apply device/shed scope
+        if ($deviceId != 0) {
+            $query->forDevice($shedId, $deviceId);
+        } else {
+            $query->forShed($shedId);
+        }
+
+        $logs = $query->get();
+
+        $firstTime = Carbon::parse($start_date);
+        $grouped = $logs->groupBy('record_time');
+
+        $labels = array_keys($grouped->toArray()) ?? [];
+        foreach ($labels as $k => $l) {
+            $labels[$k] = Carbon::parse($l)->format('d, M H:i');
+        }
+        $temp1Values = [];
+        $temp2Values = [];
+        $tempSafeLower = [];
+        $tempSafeUpper = [];
+
+        $humidityValues = [];
+        $humSafeLower = [];
+        $humSafeUpper = [];
+
+        $nh3Values = [];
+        $nh3SafeLower = [];
+        $nh3SafeUpper = [];
+
+        $co2Values = [];
+        $co2SafeLower = [];
+        $co2SafeUpper = [];
+
+        foreach ($grouped as $timeStr => $records) {
+            $time = Carbon::parse($timeStr);
+            $dayIndex = $firstTime->startOfDay()->diffInDays($time->startOfDay());
+
+            // Helper to get avg for each parameter
+            $byParam = $records->keyBy('parameter');
+
+            $temp1 = optional($byParam->get('temp1'))->avg_value;
+            $temp2 = optional($byParam->get('temp2'))->avg_value;
+            $hum = optional($byParam->get('humidity'))->avg_value;
+            $nh3 = optional($byParam->get('nh3'))->avg_value;
+            $co2 = optional($byParam->get('co2'))->avg_value;
+
+            // -------- TEMPERATURE SAFE RANGE (depends on age) -------
+            [$tempLower, $tempUpper] = $this->temperatureRangeForDay($dayIndex);
+
+            $temp1Values[] = $temp1;
+            $temp2Values[] = $temp2;
+            $tempSafeLower[] = $tempLower;
+            $tempSafeUpper[] = $tempUpper;
+
+            // -------- HUMIDITY SAFE RANGE --------
+            if ($dayIndex < 7) {
+                // Brooding: 60–80%
+                $hLower = 60;
+                $hUpper = 80;
+            } else {
+                // Grower/Finisher: 50–70%
+                $hLower = 50;
+                $hUpper = 70;
+            }
+
+            $humidityValues[] = $hum;
+            $humSafeLower[] = $hLower;
+            $humSafeUpper[] = $hUpper;
+
+            // -------- NH3 SAFE RANGE --------
+            // Recommended upper: 20–25 ppm; ideal below 10 ppm
+            // We'll treat 0–20 as safe zone visually.
+            $nh3SafeLower[] = 0;
+            $nh3SafeUpper[] = 20;
+            $nh3Values[] = $nh3;
+
+            // -------- CO2 SAFE RANGE --------
+            // Recommended upper: 3000 ppm; ideal <1000–1500 ppm
+            // We'll treat 0–3000 as safe zone visually.
+            $co2SafeLower[] = 0;
+            $co2SafeUpper[] = 3000;
+            $co2Values[] = $co2;
+        }
+
+        $chartData = [
+            'labels' => $labels,
+
+            'temp1' => $temp1Values,
+            'temp2' => $temp2Values,
+            'tempSafeLower' => $tempSafeLower,
+            'tempSafeUpper' => $tempSafeUpper,
+
+            'humidity' => $humidityValues,
+            'humSafeLower' => $humSafeLower,
+            'humSafeUpper' => $humSafeUpper,
+
+            'nh3' => $nh3Values,
+            'nh3SafeLower' => $nh3SafeLower,
+            'nh3SafeUpper' => $nh3SafeUpper,
+
+            'co2' => $co2Values,
+            'co2SafeLower' => $co2SafeLower,
+            'co2SafeUpper' => $co2SafeUpper,
+        ];
+
+        return $chartData;
+    }
+
+    /**
+     * Same schedule you used in the seeder.
+     */
+    protected function temperatureRangeForDay(int $dayIndex): array
+    {
+        if ($dayIndex <= 6) {
+            // day 0–7
+            return [33.9, 35.0];
+        } elseif ($dayIndex <= 13) {
+            // day 8–14
+            return [31.1, 32.2];
+        } elseif ($dayIndex <= 20) {
+            // day 15–21
+            return [28.3, 29.4];
+        } elseif ($dayIndex <= 27) {
+            // day 22–28
+            return [25.6, 26.7];
+        } elseif ($dayIndex <= 34) {
+            // day 29–35 (around 23.9)
+            return [23.4, 24.4];
+        } else {
+            // day 36–42 (around 21.1)
+            return [20.6, 21.6];
+        }
+    }
+
+    public function hexToRgba($hex, $alpha = 1)
+    {
         $hex = str_replace('#', '', $hex);
 
-        if(strlen($hex) == 3) {
+        if (strlen($hex) == 3) {
             $r = hexdec(substr($hex, 0, 1).substr($hex, 0, 1));
             $g = hexdec(substr($hex, 1, 1).substr($hex, 1, 1));
             $b = hexdec(substr($hex, 2, 1).substr($hex, 2, 1));
@@ -308,6 +452,7 @@ class ManagerAnalyticsService
             $g = hexdec(substr($hex, 2, 2));
             $b = hexdec(substr($hex, 4, 2));
         }
+
         return "rgba($r, $g, $b, $alpha)";
     }
 

@@ -89,6 +89,7 @@
             </div>
         </div>
 
+        {{-- Mortality and ADG Graphs --}}
         <div class="row">
             <div class="col-xxl-8 col-xl-7 col-sm-12 col-12 d-flex">
                 <div class="card flex-fill">
@@ -103,7 +104,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-xxl-4 col-xl-5 d-flex">
                 <div class="card flex-fill">
                     <div class="card-header">
@@ -119,6 +119,7 @@
             </div>
         </div>
 
+        {{-- Environment and IoT Snapshot --}}
         <div class="row">
             <div class="col-12">
                 <div class="card flex-fill">
@@ -167,6 +168,52 @@
             </div>
         </div>
 
+        {{-- IoT Log Graphs --}}
+        <div class="row">
+            <div class="col-xl-6 col-sm-12 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <div class="d-inline-flex align-items-center">
+                            <span class="title-icon bg-soft-pink fs-16 me-2"><i class="ti ti-chart-line"></i></span>
+                            <h5 class="card-title mb-0">Temperature</h5>
+                        </div>
+                    </div>
+                    <div class="card-body pb-0" style="height: 420px;">
+                        <div id="tempChart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6 col-sm-12 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <div class="d-inline-flex align-items-center">
+                            <span class="title-icon bg-soft-skyblue fs-16 me-2"><i class="ti ti-map-pin-check"></i></span>
+                            <h5 class="card-title mb-0">Humidity</h5>
+                        </div>
+                    </div>
+                    <div class="card-body pb-0" style="height: 420px;">
+                        <div id="humidityChart"></div>
+                    </div>
+                </div>
+            </div>
+
+{{--            <div class="col-4 d-flex">--}}
+{{--                <div class="card flex-fill">--}}
+{{--                    <div class="card-header">--}}
+{{--                        <div class="d-inline-flex align-items-center">--}}
+{{--                            <span class="title-icon bg-soft-orange fs-16 me-2"><i class="ti ti-chart-pie"></i></span>--}}
+{{--                            <h5 class="card-title mb-0">CO<sub>2</sub> / NH<sub>3</sub> Trend</h5>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="card-body pb-0" style="height: 420px;">--}}
+{{--                        <div id="gasChart"></div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+        </div>
+
+        {{-- Environment Alerts --}}
         <div class="row">
             <div class="col-12">
                 <div class="card flex-fill">
@@ -210,12 +257,13 @@
                 </div>
             </div>
         </div>
+
     </div>
 @endsection
 
 @push('js')
     <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
-
+    <script src="{{ asset('assets/plugins/apexchart/apexcharts.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Normalize datasets: object -> array
@@ -381,6 +429,284 @@
                 }
             });
         });
+    </script>
+    <script>
+        const chartData = @json($iotChartData);
+
+        // Helper: build rangeArea data [{ x, y: [lower, upper] }]
+        function buildRangeAreaData(lowerArr, upperArr) {
+            return lowerArr.map((low, idx) => ({
+                x: chartData.labels[idx],
+                y: [Number(low), Number(upperArr[idx])]
+            }));
+        }
+
+        // Helper: build line data [{ x, y, marker: { size, fillColor } }]
+        function buildLineData(values, lowerArr, upperArr, inRangeColor, outRangeColor) {
+            return values.map((v, idx) => {
+                const val = Number(v);
+                const low = Number(lowerArr[idx]);
+                const up  = Number(upperArr[idx]);
+                const inRange = val >= low && val <= up;
+
+                return {
+                    x: chartData.labels[idx],
+                    y: val,
+                    marker: {
+                        size: 3,
+                        fillColor: inRange ? inRangeColor : outRangeColor
+                    }
+                };
+            });
+        }
+
+        // Common x-axis config
+        const commonXAxis = {
+            type: 'category',
+            categories: chartData.labels,
+            tickAmount: 24, // roughly 1 label per ~1-2 hours
+            axisBorder: {show: false},
+            axisTicks: {show: false},
+            labels: {
+                rotate: -45,
+                hideOverlappingLabels: true
+            }
+        };
+
+        // ======================================================
+        // 1) TEMPERATURE CHART (Temp1 + Temp2 + Safe Band)
+        // ======================================================
+        const tempRangeData = buildRangeAreaData(
+            chartData.tempSafeLower,
+            chartData.tempSafeUpper
+        );
+
+        const temp1LineData = buildLineData(
+            chartData.temp1,
+            chartData.tempSafeLower,
+            chartData.tempSafeUpper,
+            '#007bff', // in-range
+            '#dc3545'  // out-of-range
+        );
+
+        const temp2LineData = buildLineData(
+            chartData.temp2,
+            chartData.tempSafeLower,
+            chartData.tempSafeUpper,
+            '#ffc107',
+            '#dc3545'
+        );
+
+        const tempOptions = {
+            chart: {
+                type: 'line',
+                height: 350,
+                zoom: { enabled: true },
+                toolbar: { show: false },
+                fontFamily: "inherit",
+                parentHeightOffset: 0,
+            },
+            series: [
+                // {
+                //     name: 'Temp Safe Range',
+                //     type: 'rangeArea',
+                //     data: tempRangeData
+                // },
+                {
+                    name: 'Shed Temp (°C)',
+                    type: 'line',
+                    data: temp1LineData
+                },
+                {
+                    name: 'Brooder Temp (°C)',
+                    type: 'line',
+                    data: temp2LineData
+                }
+            ],
+            xaxis: commonXAxis,
+            yaxis: {
+                min: 15,
+                title: { text: 'Temperature' },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                // width: [0, 2, 2],
+                width: [2, 2],
+                curve: 'smooth'
+            },
+            fill: {
+                // opacity: [0.15, 0.8, 0.8]
+                opacity: [1, 1]
+            },
+            markers: {
+                size: 0
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: "right",
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+            },
+        };
+
+        new ApexCharts(document.querySelector('#tempChart'), tempOptions).render();
+
+
+        // ======================================================
+        // 2) HUMIDITY CHART (+ Safe Band)
+        // ======================================================
+        const humRangeData = buildRangeAreaData(
+            chartData.humSafeLower,
+            chartData.humSafeUpper
+        );
+
+        const humLineData = buildLineData(
+            chartData.humidity,
+            chartData.humSafeLower,
+            chartData.humSafeUpper,
+            '#36a2eb',
+            '#dc3545'
+        );
+
+        const humidityOptions = {
+            chart: {
+                type: 'rangeArea',
+                height: 350,
+                zoom: { enabled: true },
+                toolbar: { show: false }
+            },
+            series: [
+                {
+                    name: 'Humidity Safe Range',
+                    type: 'rangeArea',
+                    data: humRangeData
+                },
+                {
+                    name: 'Humidity (%)',
+                    type: 'line',
+                    data: humLineData
+                }
+            ],
+            xaxis: commonXAxis,
+            yaxis: {
+                min: 20,
+                title: { text: '% Relative Humidity' }
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                width: [0, 2],
+                curve: 'smooth'
+            },
+            fill: {
+                opacity: [0.15, 0.8]
+            },
+            markers: {
+                size: 0
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: "right",
+            },
+            tooltip: {
+                shared: true
+            },
+        };
+
+        new ApexCharts(document.querySelector('#humidityChart'), humidityOptions).render();
+
+
+        // ======================================================
+        // 3) GAS CHART (NH3 + CO2 + Safe Bands)
+        // NOTE: for simplicity, both share same axis here.
+        //       If you want dual y-axes, we can wire that next.
+        // ======================================================
+        const nh3RangeData = buildRangeAreaData(
+            chartData.nh3SafeLower,
+            chartData.nh3SafeUpper
+        );
+        const nh3LineData = buildLineData(
+            chartData.nh3,
+            chartData.nh3SafeLower,
+            chartData.nh3SafeUpper,
+            '#9966ff',
+            '#dc3545'
+        );
+
+        const co2RangeData = buildRangeAreaData(
+            chartData.co2SafeLower,
+            chartData.co2SafeUpper
+        );
+        const co2LineData = buildLineData(
+            chartData.co2,
+            chartData.co2SafeLower,
+            chartData.co2SafeUpper,
+            '#ff6384',
+            '#dc3545'
+        );
+
+        const gasOptions = {
+            chart: {
+                type: 'rangeArea',
+                height: 350,
+                zoom: { enabled: true },
+                toolbar: { show: false }
+            },
+            series: [
+                {
+                    name: 'NH₃ Safe Range',
+                    type: 'rangeArea',
+                    data: nh3RangeData
+                },
+                {
+                    name: 'NH₃ (ppm)',
+                    type: 'line',
+                    data: nh3LineData
+                },
+                {
+                    name: 'CO₂ Safe Range',
+                    type: 'rangeArea',
+                    data: co2RangeData
+                },
+                {
+                    name: 'CO₂ (ppm)',
+                    type: 'line',
+                    data: co2LineData
+                }
+            ],
+            xaxis: commonXAxis,
+            yaxis: {
+                title: { text: 'ppm (NH₃ & CO₂)' }
+                // For *proper* dual-axis (NH3 vs CO2),
+                // we can configure yaxis: [{...}, {...}] and link series.
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                width: [0, 2, 0, 2],
+                curve: 'smooth'
+            },
+            fill: {
+                opacity: [0.15, 0, 0.08, 0]
+            },
+            markers: {
+                size: 0
+            },
+            legend: {
+                position: 'top'
+            },
+            tooltip: {
+                shared: true
+            },
+        };
+
+        // new ApexCharts(document.querySelector('#gasChart'), gasOptions).render();
     </script>
 @endpush
 
