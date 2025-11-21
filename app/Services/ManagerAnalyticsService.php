@@ -298,7 +298,7 @@ class ManagerAnalyticsService
         ];
     }
 
-    public function getIoTChartData(int $shedId, int $deviceId, $start_date, $end_date)
+    public function getIoTChartData(int $shedId, int $deviceId, $start_date, $end_date): array
     {
         $query = IotDataLog::query()
             ->hourly()
@@ -522,12 +522,19 @@ class ManagerAnalyticsService
                     s.farm_id, s.id AS shed_id, s.name AS shed_name,
                     NULL AS flock_id, NULL AS flock_name,
                     'ENV' AS alert_type,
-                    el.parameter,
+                    CASE el.parameter
+                      WHEN 'temp1' THEN 'Shed Temperature'
+                      WHEN 'temp2' THEN 'Brooder Temperature'
+                      WHEN 'humidity'    THEN 'Relative Humidity'
+                      WHEN 'co2'         THEN 'CO2 Exposure'
+                      WHEN 'nh3'         THEN 'Ammonia Exposure'
+                      ELSE ''
+                    END AS parameter,
                     el.avg_value,
                     CASE el.parameter
                       WHEN 'temp1' THEN CONCAT(20,'-',25)
                       WHEN 'temp2' THEN CONCAT(29,'-',33)
-                      WHEN 'humidity'    THEN CONCAT(0.6,'-',0.7)
+                      WHEN 'humidity'    THEN CONCAT(0.6,'-',0.8)
                       WHEN 'co2'         THEN CONCAT('<=', $co2_limit)
                       WHEN 'nh3'         THEN CONCAT('<=', $nh3_limit)
                       ELSE ''
@@ -539,7 +546,7 @@ class ManagerAnalyticsService
                     AND (
                       (el.parameter='temp1' AND (el.avg_value < 20 OR el.avg_value > 25)) OR
                       (el.parameter='temp2' AND (el.avg_value < 29 OR el.avg_value > 33)) OR
-                      (el.parameter='humidity'    AND (el.avg_value < 0.6 OR el.avg_value > 0.7)) OR
+                      (el.parameter='humidity'    AND (el.avg_value < 0.6 OR el.avg_value > 0.8)) OR
                       (el.parameter='co2'         AND el.avg_value > $co2_limit) OR
                       (el.parameter='nh3'         AND el.avg_value > $nh3_limit)
                     )

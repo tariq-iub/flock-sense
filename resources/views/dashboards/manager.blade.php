@@ -36,15 +36,29 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $flock = null;
+                if(count($flocks) == 1)
+                    $flock = $flocks[0];
+            @endphp
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card dash-widget dash1 w-100">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="dash-widgetimg">
-                            <span><img src="{{ asset('assets/img/icons/hen-icon.svg') }}" alt="img"></span>
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-row">
+                            <div class="dash-widgetimg">
+                                <span><img src="{{ asset('assets/img/icons/hen-icon.svg') }}" alt="img"></span>
+                            </div>
+                            <div class="dash-widgetcontent d-flex flex-column">
+                                <h5 class="mb-1"><span class="counters" data-count="{{ $data->active_flocks }}">0</span></h5>
+                                Active Flocks
+                            </div>
                         </div>
-                        <div class="dash-widgetcontent">
-                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->active_flocks }}">0</span></h5>
-                            <p class="mb-0">Active Flocks</p>
+                        <div class="d-flex flex-column mb-0">
+                            @if($flock)
+                            <span class="fw-semibold">{{ \Carbon\Carbon::parse($flock['start_date'])->format('d, M Y') }}</span>
+                            <span class="text-info fs-10">Start Count: {{ $flock['chicken_count'] }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -104,6 +118,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-xxl-4 col-xl-5 d-flex">
                 <div class="card flex-fill">
                     <div class="card-header">
@@ -263,7 +278,6 @@
 
 @push('js')
     <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
-    <script src="{{ asset('assets/plugins/apexchart/apexcharts.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Normalize datasets: object -> array
@@ -286,6 +300,36 @@
             const el = document.getElementById('mortalityChart');
             if (!el) return;
 
+            // Plugin to draw a horizontal acceptable limit line at 0.274%
+            const mortalityLimitLine = {
+                id: 'mortalityLimitLine',
+                afterDatasetsDraw(chart, args, pluginOptions) {
+                    const { ctx, chartArea, scales } = chart;
+                    if (!chartArea || !scales?.y) return;
+                    const value = typeof pluginOptions?.value === 'number' ? pluginOptions.value : 0.274;
+                    const y = scales.y.getPixelForValue(value);
+                    if (!isFinite(y)) return;
+                    ctx.save();
+                    ctx.strokeStyle = pluginOptions?.color || '#dc3545';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([6, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(chartArea.left, y);
+                    ctx.lineTo(chartArea.right, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    // Label
+                    const label = pluginOptions?.label || 'Acceptable Limit (0.274%)';
+                    ctx.fillStyle = pluginOptions?.color || '#dc3545';
+                    ctx.font = '12px sans-serif';
+                    const textWidth = ctx.measureText(label).width;
+                    const textX = Math.max(chartArea.left + 6, chartArea.right - textWidth - 6);
+                    const textY = Math.max(chartArea.top + 12, y - 6);
+                    ctx.fillText(label, textX, textY);
+                    ctx.restore();
+                }
+            };
+
             new Chart(el, {
                 type: 'line',
                 data: { datasets: prepared },
@@ -295,7 +339,7 @@
                     interaction: { mode: 'nearest', intersect: false },
                     scales: {
                         x: {
-                            type: 'linear',               // <-- key change: age is numeric
+                            type: 'linear',               // age is numeric
                             title: { display: true, text: 'Age (days)' },
                             ticks: { precision: 0 }       // whole-day ticks
                         },
@@ -311,14 +355,22 @@
                             callbacks: {
                                 label: (c) => `${c.dataset.label}: ${(c.parsed.y ?? 0).toFixed(2)}% (Day ${c.parsed.x})`
                             }
+                        },
+                        // Plugin options
+                        mortalityLimitLine: {
+                            value: 0.274,
+                            color: '#dc3545',
+                            label: 'Acceptable Limit (0.274%)'
                         }
                     }
-                }
+                },
+                plugins: [mortalityLimitLine]
             });
         });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // ADG (bars) + Cumulative Feed (line) → ApexCharts with dual y-axes
             const labels   = @json($adgData['labels'] ?? []);
             const datasets = @json($adgData['datasets'] ?? []);
 
@@ -430,6 +482,8 @@
             });
         });
     </script>
+
+    <script src="{{ asset('assets/plugins/apexchart/apexcharts.min.js') }}"></script>
     <script>
         const chartData = @json($iotChartData);
 
@@ -441,21 +495,21 @@
             }));
         }
 
-        // Helper: build line data [{ x, y, marker: { size, fillColor } }]
+        // Helper: build line data [{ x, y, fillColor }]
+        // ApexCharts supports per-point marker color via top-level `fillColor` on each datum.
+        // We use this to color points based on whether they are within the safe range.
         function buildLineData(values, lowerArr, upperArr, inRangeColor, outRangeColor) {
             return values.map((v, idx) => {
                 const val = Number(v);
                 const low = Number(lowerArr[idx]);
                 const up  = Number(upperArr[idx]);
                 const inRange = val >= low && val <= up;
+                const selectedColor = inRange ? inRangeColor : outRangeColor;
 
                 return {
                     x: chartData.labels[idx],
                     y: val,
-                    marker: {
-                        size: 3,
-                        fillColor: inRange ? inRangeColor : outRangeColor
-                    }
+                    fillColor: selectedColor
                 };
             });
         }
@@ -500,7 +554,7 @@
         const tempOptions = {
             chart: {
                 type: 'line',
-                height: 350,
+                height: 400,
                 zoom: { enabled: true },
                 toolbar: { show: false },
                 fontFamily: "inherit",
@@ -538,9 +592,10 @@
             },
             fill: {
                 // opacity: [0.15, 0.8, 0.8]
-                opacity: [1, 1]
+                opacity: [0.8, 0.8]
             },
             markers: {
+                // Show small markers so per-point fillColor is visible
                 size: 0
             },
             legend: {
@@ -575,9 +630,11 @@
         const humidityOptions = {
             chart: {
                 type: 'rangeArea',
-                height: 350,
+                height: 400,
                 zoom: { enabled: true },
-                toolbar: { show: false }
+                toolbar: { show: false },
+                fontFamily: "inherit",
+                parentHeightOffset: 0,
             },
             series: [
                 {
@@ -614,7 +671,8 @@
                 horizontalAlign: "right",
             },
             tooltip: {
-                shared: true
+                shared: true,
+                intersect: false,
             },
         };
 
@@ -709,6 +767,3 @@
         // new ApexCharts(document.querySelector('#gasChart'), gasOptions).render();
     </script>
 @endpush
-
-
-

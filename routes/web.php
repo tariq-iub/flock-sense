@@ -119,7 +119,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
     Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
     Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
 
-    // Settings
+    // Personal Settings
     Route::get('/web-setting/personal', [WebSettingController::class, 'personal'])->name('setting.personal');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {

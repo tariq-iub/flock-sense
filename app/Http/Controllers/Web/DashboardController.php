@@ -91,6 +91,7 @@ class DashboardController extends Controller
                 [
                     'user' => $user,
                     'farm' => $farm,
+                    'flocks' => $flocks,
                     'data' => $data,
                     'datasets' => $mortality_data,
                     'adgData' => $adgData,
