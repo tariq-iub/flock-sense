@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Device;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DeviceSeeder extends Seeder
 {
@@ -25,5 +26,15 @@ class DeviceSeeder extends Seeder
 
         // Attach capabilities (ensure IDs exist in capabilities table)
         $device->capabilities()->syncWithoutDetaching([1, 2]);
+
+        DB::table('shed_devices')->insertOrIgnore([
+            'shed_id' => 1,
+            'device_id' => $device->id,
+            'is_active' => true,
+            'location_in_shed' => 'Control Room',
+            'link_date' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

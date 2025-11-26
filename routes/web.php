@@ -14,12 +14,14 @@ use App\Http\Controllers\Web\IotController;
 use App\Http\Controllers\Web\LogsController;
 use App\Http\Controllers\Web\MapController;
 use App\Http\Controllers\Web\MedicineController;
+use App\Http\Controllers\Web\PartnerController;
 use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
-use App\Http\Controllers\Web\SettingController;
 use App\Http\Controllers\Web\ShedController;
+use App\Http\Controllers\Web\ShortcutController;
+use App\Http\Controllers\Web\WebSettingController;
 use App\Models\Flock;
 use App\Models\Shed;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +30,22 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('frontend.index');
 });
+
+Route::get('/features', function () {
+    return view('frontend.features');
+})->name('features');
+
+Route::get('/partners', function () {
+    return view('frontend.partners');
+})->name('partners');
+
+Route::get('/blogs', function () {
+    return view('frontend.blog');
+})->name('blogs');
+
+Route::get('/events', function () {
+    return view('frontend.events');
+})->name('events');
 
 Route::get('/pricing', function () {
     return view('frontend.pricing');
@@ -79,6 +97,8 @@ Route::get('/email/verify', function () {
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
+Route::impersonate();
+
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
 
     // Logout route (POST)
@@ -99,8 +119,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
     Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
     Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
 
-    // Settings
-    Route::get('/setting/personal', [SettingController::class, 'personal'])->name('setting.personal');
+    // Personal Settings
+    Route::get('/web-setting/personal', [WebSettingController::class, 'personal'])->name('setting.personal');
 
     Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
         return Shed::where('farm_id', $request->farm_id)
@@ -139,6 +159,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
     });
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin-shortcuts', [ShortcutController::class, 'getAdminShortcuts']);
+    Route::get('/user-shortcuts', [ShortcutController::class, 'getUserShortcuts']);
+    Route::get('/my-shortcuts', [ShortcutController::class, 'getUserPersonalizedShortcuts']);
+    Route::get('/shortcuts/{group}', [ShortcutController::class, 'getShortcutsByGroup']);
+});
+
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], function () {
     // Register routes (GET and POST)
     //    Route::get('/register', [AuthController::class, 'register'])->name('register');
@@ -149,14 +176,32 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     Route::get('/devices/map', [MapController::class, 'showDeviceMap'])->name('devices.map');
 
     // Settings
-    Route::get('/setting/general', [SettingController::class, 'general'])->name('setting.general');
+    Route::prefix('system')->group(function () {
+        Route::apiResource('/web-settings', WebSettingController::class);
+        Route::get('/web-settings/public', [WebSettingController::class, 'publicSettings'])->name('system.settings.public');
+        Route::get('/web-settings/general', [WebSettingController::class, 'general'])->name('system.settings.general');
+        Route::get('/web-settings/company', [WebSettingController::class, 'companySettings'])->name('system.settings.company');
+        Route::get('/web-settings/social', [WebSettingController::class, 'socialSettings'])->name('system.settings.social');
+        Route::get('/web-settings/contact', [WebSettingController::class, 'contactSettings'])->name('system.settings.contact');
+        Route::get('/web-settings/{group}', [WebSettingController::class, 'byGroup'])->name('system.settings.group');
+        Route::put('/web-settings/bulk', [WebSettingController::class, 'bulkUpdate'])->name('system.settings.bulk');
+    });
 
     // Resource routes for clients and charts
     Route::resources([
+        'shortcuts' => ShortcutController::class,
         'breeding' => BreedController::class,
         'feeds' => FeedController::class,
         'pricing-plans' => PricingController::class,
+        'partners' => PartnerController::class,
     ]);
+
+    // Partner Routes
+    Route::prefix('partners')->controller(PartnerController::class)->group(function () {
+        Route::post('/{partner}/add-keyword', 'addKeyword');
+        Route::post('/{partner}/remove-keyword', 'removeKeyword');
+        Route::get('partners-keywords', 'getAllKeywords');
+    });
 
     // Users and Clients
     Route::prefix('clients')->controller(ClientController::class)->group(function () {
@@ -215,7 +260,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/data/{chart}', 'chartData')->name('charts.data');
         Route::get('/{chart}/toggle', 'toggle')->name('charts.toggle');
         Route::post('/data/update', 'data_update')->name('charts.data.update');
-
     });
 
     // Roles

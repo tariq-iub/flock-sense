@@ -35,13 +35,13 @@
                     <p class="text-muted">Reach out or visit one of our locations. We’d love to connect.</p>
                     <div class="mb-4">
                         <h6 class="fw-semibold mb-1">United Kingdom</h6>
-                        <p class="small mb-2">23 Roundtree Cl, Norwich, NR7 8SX</p>
-                        <p class="small mb-0"><i class="fa-solid fa-envelope me-2"></i>contact@flocksense.ai</p>
+                        <p class="small mb-2">{{ settings('contact.address1') }}</p>
+                        <p class="small mb-0"><i class="fa-solid fa-envelope me-2"></i>{{ settings('contact.email') }}</p>
                     </div>
                     <div class="mb-4">
                         <h6 class="fw-semibold mb-1">Pakistan</h6>
-                        <p class="small mb-2">300 Street-17, G-15/2, Islamabad</p>
-                        <p class="small mb-0"><i class="fa-solid fa-phone me-2"></i>+92 (0) 300 073 0490</p>
+                        <p class="small mb-2">{{ settings('contact.address2') }}</p>
+                        <p class="small mb-0"><i class="fa-solid fa-phone me-2"></i>{{ settings('contact.phone') }}</p>
                     </div>
                 </div>
                 <div class="col-lg-7">
@@ -54,12 +54,12 @@
 
     <!-- Contact Form -->
     <section class="section-dark py-5">
-        <div class="container">
+        <div class="container" id="contact">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <h2 class="fw-bold mb-3">Contact Us</h2>
                     <p class="mb-4">Send us a message and our team will get back to you shortly.</p>
-                    <form action="mailto:contact@flocksense.ai" method="post" enctype="text/plain">
+                    <form action="mailto:{{ settings('contact.email') }}" method="post" enctype="text/plain">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Full Name</label>

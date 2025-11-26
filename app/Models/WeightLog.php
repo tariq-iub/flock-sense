@@ -18,21 +18,23 @@ class WeightLog extends Model
         'avg_weight',
         'avg_weight_gain',
         'aggregated_total_weight',
+        'flock_weight_gain',
         'feed_efficiency',
         'feed_conversion_ratio',
         'adjusted_feed_conversion_ratio',
         'fcr_standard_diff',
         'standard_deviation',
         'coefficient_of_variation',
+        'uniformity',
         'production_efficiency_factor',
     ];
 
-    public function productionLog() : BelongsTo
+    public function productionLog(): BelongsTo
     {
         return $this->belongsTo(ProductionLog::class);
     }
 
-    public function flock() : BelongsTo
+    public function flock(): BelongsTo
     {
         return $this->belongsTo(Flock::class);
     }

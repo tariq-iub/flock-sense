@@ -5,13 +5,13 @@
         <!-- Logo -->
         <div class="header-left active">
             <a href="{{ route('dashboard') }}" class="logo logo-normal">
-                <img src="{{ asset('assets/img/logo.svg') }}" alt="Img">
+                <img src="{{ asset('assets/img/logo.svg') }}" alt="Logo">
             </a>
             <a href="{{ route('dashboard') }}" class="logo logo-white">
-                <img src="{{ asset('assets/img/logo-white.svg') }}" alt="Img">
+                <img src="{{ asset('assets/img/logo-white.svg') }}" alt="Logo">
             </a>
             <a href="{{ route('dashboard') }}" class="logo-small">
-                <img src="{{ asset('assets/img/logo-small.png') }}" alt="Img">
+                <img src="{{ asset('assets/img/logo-small.png') }}" alt="Logo">
             </a>
         </div>
         <!-- /Logo -->
@@ -73,10 +73,21 @@
             </li>
             <!-- /Search -->
 
+            <!-- Impersonated -->
+            @impersonating()
+            <li class="nav-item">
+                <a href="{{ route('impersonate.leave') }}">
+                    <span class="title-icon bg-soft-danger fs-16">
+                        <i data-feather="log-out" class="feather-log-out text-danger"></i>
+                    </span>
+                </a>
+            </li>
+            @endImpersonating
+
             <!-- Add New Overall -->
             <li class="nav-item dropdown link-nav">
                 <a href="javascript:void(0);" class="btn btn-primary btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                    <i class="ti ti-circle-plus me-1"></i>Add New
+                    <i class="ti ti-device-analytics me-1"></i>Shortcuts
                 </a>
                 <div class="dropdown-menu dropdown-xl dropdown-menu-center">
                     <div class="row g-2">

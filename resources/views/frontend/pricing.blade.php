@@ -15,7 +15,7 @@
                         <a href="#plans" class="btn btn-primary btn-lg">
                             View Plans <i class="bi bi-arrow-right ms-2"></i>
                         </a>
-                        <a href="#contact" class="btn btn-outline-light btn-lg">
+                        <a href="{{ route('about') }}#contact" class="btn btn-outline-light btn-lg">
                             Talk to Sales <i class="bi bi-chat-dots ms-2"></i>
                         </a>
                     </div>

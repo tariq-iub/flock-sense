@@ -81,16 +81,23 @@ class DashboardController extends Controller
             $shedEnvironment = $this->managerAnalyticsService->shedEnvironmentData($filters);
             $environmentAlerts = $this->managerAnalyticsService->environmentAlerts($filters);
 
+            $shedId = $farm->sheds->first()->id ?? 1;
+            $end_date = Carbon::now()->format('Y-m-d');
+            $start_date = Carbon::now()->subDays(7)->format('Y-m-d');
+            $iotChartData = $this->managerAnalyticsService->getIotChartData($shedId, 0, $start_date, $end_date);
+
             return view(
                 'dashboards.manager',
                 [
                     'user' => $user,
                     'farm' => $farm,
+                    'flocks' => $flocks,
                     'data' => $data,
                     'datasets' => $mortality_data,
                     'adgData' => $adgData,
                     'shedEnvironment' => $shedEnvironment,
                     'environmentAlerts' => $environmentAlerts,
+                    'iotChartData' => $iotChartData,
                 ]
             );
         }

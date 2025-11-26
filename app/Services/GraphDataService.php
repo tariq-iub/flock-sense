@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\IotDataLog;
 use Illuminate\Support\Facades\DB;
 
 class GraphDataService
@@ -9,12 +10,11 @@ class GraphDataService
     /**
      * Get Daily Mortality Rate by Flock
      *
-     * @param int $flockId
      * @return \Illuminate\Support\Collection
      */
     public function getDailyMortalityRate(int $flockId)
     {
-        $sql = "
+        $sql = '
             WITH x AS (
               SELECT
                 pl.flock_id,
@@ -34,7 +34,7 @@ class GraphDataService
               END AS mortality_rate
             FROM x
             ORDER BY flock_id, d
-        ";
+        ';
 
         return DB::select($sql, ['flockId' => $flockId]);
     }
@@ -44,7 +44,7 @@ class GraphDataService
      */
     public function getDailyAdgAndWeight(int $flockId)
     {
-        $sql = "
+        $sql = '
             SELECT
               w.flock_id,
               DATE(p.production_log_date) AS d,
@@ -60,7 +60,7 @@ class GraphDataService
               w.flock_id,
               DATE(p.production_log_date),
               p.age
-            ";
+            ';
 
         return DB::select($sql, ['flockId' => $flockId]);
     }
@@ -68,9 +68,9 @@ class GraphDataService
     /**
      * Get Feed/Weight Data with Cumulative Metrics
      */
-    public function getFeedWeightCumulativeData(int $farmId = null, string $startDate = null, string $endDate = null)
+    public function getFeedWeightCumulativeData(?int $farmId = null, ?string $startDate = null, ?string $endDate = null)
     {
-        $sql = "
+        $sql = '
             WITH base AS (
               SELECT
                 w.flock_id,
@@ -125,7 +125,7 @@ class GraphDataService
               ROUND(feed_kg_cum, 2)      AS feed_kg_cum
             FROM cum
             ORDER BY flock_id, d
-        ";
+        ';
 
         return DB::select($sql, [
             'farmId' => $farmId,
@@ -178,7 +178,7 @@ class GraphDataService
      */
     public function getWaterToFeedRatio()
     {
-        $sql = "
+        $sql = '
             SELECT
               flock_id,
               DATE(production_log_date) AS d,
@@ -190,7 +190,7 @@ class GraphDataService
               flock_id,
               DATE(production_log_date),
               age
-        ";
+        ';
 
         return DB::select($sql);
     }
@@ -200,7 +200,7 @@ class GraphDataService
      */
     public function getUniformity()
     {
-        $sql = "
+        $sql = '
             SELECT
               p.flock_id,
               DATE(p.production_log_date) AS d,
@@ -213,7 +213,7 @@ class GraphDataService
               p.flock_id,
               DATE(p.production_log_date),
               age
-        ";
+        ';
 
         return DB::select($sql);
     }
@@ -223,7 +223,7 @@ class GraphDataService
      */
     public function getVaccinationHistory(int $flockId)
     {
-        $sql = "
+        $sql = '
         SELECT
           flock_id,
           DATE(production_log_date) AS d,
@@ -234,7 +234,7 @@ class GraphDataService
         WHERE flock_id = :flockId
           AND is_vaccinated = 1
         ORDER BY d
-    ";
+    ';
 
         return DB::select($sql, ['flockId' => $flockId]);
     }
@@ -244,7 +244,7 @@ class GraphDataService
      */
     public function getFeedConsumptionHistory(int $flockId)
     {
-        $sql = "
+        $sql = '
         SELECT
           flock_id,
           DATE(production_log_date) AS d,
@@ -256,7 +256,7 @@ class GraphDataService
         FROM production_logs
         WHERE flock_id = :flockId
         ORDER BY d
-    ";
+    ';
 
         return DB::select($sql, ['flockId' => $flockId]);
     }
@@ -266,7 +266,7 @@ class GraphDataService
      */
     public function getWaterConsumptionHistory(int $flockId)
     {
-        $sql = "
+        $sql = '
         SELECT
           flock_id,
           DATE(production_log_date) AS d,
@@ -278,7 +278,7 @@ class GraphDataService
         FROM production_logs
         WHERE flock_id = :flockId
         ORDER BY d
-    ";
+    ';
 
         return DB::select($sql, ['flockId' => $flockId]);
     }

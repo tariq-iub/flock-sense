@@ -36,53 +36,74 @@
                     </div>
                 </div>
             </div>
+
+            @php
+                $flock = null;
+                if(count($flocks) == 1)
+                    $flock = $flocks[0];
+            @endphp
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card dash-widget dash1 w-100">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="dash-widgetimg">
-                            <span><img src="{{ asset('assets/img/icons/hen-icon.svg') }}" alt="img"></span>
-                        </div>
-                        <div class="dash-widgetcontent">
-                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->active_flocks }}">0</span></h5>
-                            <p class="mb-0">Active Flocks</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-sm-6 col-12 d-flex">
-                <div class="card dash-widget dash2 w-100">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="dash-widgetimg">
-                            <span><img src="{{ asset('assets/img/icons/dash3.svg') }}" alt="img"></span>
-                        </div>
-                        <div class="dash-widgetcontent">
-                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_birds_current }}">0</span></h5>
-                            <div class="mb-0">
-                                Total Live Birds
-                                <span class="badge bg-soft-info ms-5">{{ $data->avg_livability_pct }}%</span>
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-row">
+                            <div class="dash-widgetimg">
+                                <span><img src="{{ asset('assets/img/icons/hen-icon.svg') }}" alt="img"></span>
+                            </div>
+                            <div class="dash-widgetcontent d-flex flex-column">
+                                <h5 class="mb-1"><span class="counters" data-count="{{ $data->active_flocks }}">0</span></h5>
+                                Active Flocks
                             </div>
                         </div>
+                        <div class="d-flex flex-column mb-0">
+                            @if($flock)
+                            <span class="fw-semibold">{{ \Carbon\Carbon::parse($flock['start_date'])->format('d, M Y') }}</span>
+                            <span class="text-info fs-10">Start Count: {{ $flock['chicken_count'] }}</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="col-xl-3 col-sm-6 col-12 d-flex">
+                <div class="card dash-widget dash2 w-100">
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-row">
+                            <div class="dash-widgetimg">
+                                <span><img src="{{ asset('assets/img/icons/dash3.svg') }}" alt="img"></span>
+                            </div>
+                            <div class="dash-widgetcontent d-flex flex-column">
+                                <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_birds_current }}">0</span></h5>
+                                Total Live Birds
+                            </div>
+                        </div>
+                        <div class="fw-semibold mb-0">
+                            <span class="bg-soft-info p-3">{{ $data->avg_livability_pct }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-xl-3 col-sm-6 col-12 d-flex">
                 <div class="card dash-widget dash3 w-100">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="dash-widgetimg">
-                            <span><img src="{{ asset('assets/img/icons/dash4.svg') }}" alt="img"></span>
-                        </div>
-                        <div class="dash-widgetcontent">
-                            <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_mortalities_window }}">0</span></h5>
-                            <p class="mb-0">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-row">
+                            <div class="dash-widgetimg">
+                                <span><img src="{{ asset('assets/img/icons/dash4.svg') }}" alt="img"></span>
+                            </div>
+                            <div class="dash-widgetcontent">
+                                <h5 class="mb-1"><span class="counters" data-count="{{ $data->total_mortalities_window }}">0</span></h5>
                                 Total Mortalities
-                                <span class="badge bg-soft-danger ms-5">{{ $data->mortality_rate_pct }}%</span>
-                            </p>
+                            </div>
+                        </div>
+                        <div class="fw-semibold mb-0">
+                            <span class="bg-soft-danger p-3">{{ $data->mortality_rate_pct }}%</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        {{-- Mortality and ADG Graphs --}}
         <div class="row">
             <div class="col-xxl-8 col-xl-7 col-sm-12 col-12 d-flex">
                 <div class="card flex-fill">
@@ -113,6 +134,7 @@
             </div>
         </div>
 
+        {{-- Environment and IoT Snapshot --}}
         <div class="row">
             <div class="col-12">
                 <div class="card flex-fill">
@@ -161,6 +183,52 @@
             </div>
         </div>
 
+        {{-- IoT Log Graphs --}}
+        <div class="row">
+            <div class="col-xl-6 col-sm-12 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <div class="d-inline-flex align-items-center">
+                            <span class="title-icon bg-soft-pink fs-16 me-2"><i class="ti ti-chart-line"></i></span>
+                            <h5 class="card-title mb-0">Temperature</h5>
+                        </div>
+                    </div>
+                    <div class="card-body pb-0" style="height: 420px;">
+                        <div id="tempChart"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-6 col-sm-12 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <div class="d-inline-flex align-items-center">
+                            <span class="title-icon bg-soft-skyblue fs-16 me-2"><i class="ti ti-map-pin-check"></i></span>
+                            <h5 class="card-title mb-0">Humidity</h5>
+                        </div>
+                    </div>
+                    <div class="card-body pb-0" style="height: 420px;">
+                        <div id="humidityChart"></div>
+                    </div>
+                </div>
+            </div>
+
+{{--            <div class="col-4 d-flex">--}}
+{{--                <div class="card flex-fill">--}}
+{{--                    <div class="card-header">--}}
+{{--                        <div class="d-inline-flex align-items-center">--}}
+{{--                            <span class="title-icon bg-soft-orange fs-16 me-2"><i class="ti ti-chart-pie"></i></span>--}}
+{{--                            <h5 class="card-title mb-0">CO<sub>2</sub> / NH<sub>3</sub> Trend</h5>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="card-body pb-0" style="height: 420px;">--}}
+{{--                        <div id="gasChart"></div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+        </div>
+
+        {{-- Environment Alerts --}}
         <div class="row">
             <div class="col-12">
                 <div class="card flex-fill">
@@ -204,12 +272,12 @@
                 </div>
             </div>
         </div>
+
     </div>
 @endsection
 
 @push('js')
     <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Normalize datasets: object -> array
@@ -232,6 +300,36 @@
             const el = document.getElementById('mortalityChart');
             if (!el) return;
 
+            // Plugin to draw a horizontal acceptable limit line at 0.274%
+            const mortalityLimitLine = {
+                id: 'mortalityLimitLine',
+                afterDatasetsDraw(chart, args, pluginOptions) {
+                    const { ctx, chartArea, scales } = chart;
+                    if (!chartArea || !scales?.y) return;
+                    const value = typeof pluginOptions?.value === 'number' ? pluginOptions.value : 0.274;
+                    const y = scales.y.getPixelForValue(value);
+                    if (!isFinite(y)) return;
+                    ctx.save();
+                    ctx.strokeStyle = pluginOptions?.color || '#dc3545';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([6, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(chartArea.left, y);
+                    ctx.lineTo(chartArea.right, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    // Label
+                    const label = pluginOptions?.label || 'Acceptable Limit (0.274%)';
+                    ctx.fillStyle = pluginOptions?.color || '#dc3545';
+                    ctx.font = '12px sans-serif';
+                    const textWidth = ctx.measureText(label).width;
+                    const textX = Math.max(chartArea.left + 6, chartArea.right - textWidth - 6);
+                    const textY = Math.max(chartArea.top + 12, y - 6);
+                    ctx.fillText(label, textX, textY);
+                    ctx.restore();
+                }
+            };
+
             new Chart(el, {
                 type: 'line',
                 data: { datasets: prepared },
@@ -241,7 +339,7 @@
                     interaction: { mode: 'nearest', intersect: false },
                     scales: {
                         x: {
-                            type: 'linear',               // <-- key change: age is numeric
+                            type: 'linear',               // age is numeric
                             title: { display: true, text: 'Age (days)' },
                             ticks: { precision: 0 }       // whole-day ticks
                         },
@@ -257,14 +355,22 @@
                             callbacks: {
                                 label: (c) => `${c.dataset.label}: ${(c.parsed.y ?? 0).toFixed(2)}% (Day ${c.parsed.x})`
                             }
+                        },
+                        // Plugin options
+                        mortalityLimitLine: {
+                            value: 0.274,
+                            color: '#dc3545',
+                            label: 'Acceptable Limit (0.274%)'
                         }
                     }
-                }
+                },
+                plugins: [mortalityLimitLine]
             });
         });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // ADG (bars) + Cumulative Feed (line) → ApexCharts with dual y-axes
             const labels   = @json($adgData['labels'] ?? []);
             const datasets = @json($adgData['datasets'] ?? []);
 
@@ -376,7 +482,288 @@
             });
         });
     </script>
+
+    <script src="{{ asset('assets/plugins/apexchart/apexcharts.min.js') }}"></script>
+    <script>
+        const chartData = @json($iotChartData);
+
+        // Helper: build rangeArea data [{ x, y: [lower, upper] }]
+        function buildRangeAreaData(lowerArr, upperArr) {
+            return lowerArr.map((low, idx) => ({
+                x: chartData.labels[idx],
+                y: [Number(low), Number(upperArr[idx])]
+            }));
+        }
+
+        // Helper: build line data [{ x, y, fillColor }]
+        // ApexCharts supports per-point marker color via top-level `fillColor` on each datum.
+        // We use this to color points based on whether they are within the safe range.
+        function buildLineData(values, lowerArr, upperArr, inRangeColor, outRangeColor) {
+            return values.map((v, idx) => {
+                const val = Number(v);
+                const low = Number(lowerArr[idx]);
+                const up  = Number(upperArr[idx]);
+                const inRange = val >= low && val <= up;
+                const selectedColor = inRange ? inRangeColor : outRangeColor;
+
+                return {
+                    x: chartData.labels[idx],
+                    y: val,
+                    fillColor: selectedColor
+                };
+            });
+        }
+
+        // Common x-axis config
+        const commonXAxis = {
+            type: 'category',
+            categories: chartData.labels,
+            tickAmount: 24, // roughly 1 label per ~1-2 hours
+            axisBorder: {show: false},
+            axisTicks: {show: false},
+            labels: {
+                rotate: -45,
+                hideOverlappingLabels: true
+            }
+        };
+
+        // ======================================================
+        // 1) TEMPERATURE CHART (Temp1 + Temp2 + Safe Band)
+        // ======================================================
+        const tempRangeData = buildRangeAreaData(
+            chartData.tempSafeLower,
+            chartData.tempSafeUpper
+        );
+
+        const temp1LineData = buildLineData(
+            chartData.temp1,
+            chartData.tempSafeLower,
+            chartData.tempSafeUpper,
+            '#007bff', // in-range
+            '#dc3545'  // out-of-range
+        );
+
+        const temp2LineData = buildLineData(
+            chartData.temp2,
+            chartData.tempSafeLower,
+            chartData.tempSafeUpper,
+            '#ffc107',
+            '#dc3545'
+        );
+
+        const tempOptions = {
+            chart: {
+                type: 'line',
+                height: 400,
+                zoom: { enabled: true },
+                toolbar: { show: false },
+                fontFamily: "inherit",
+                parentHeightOffset: 0,
+            },
+            series: [
+                // {
+                //     name: 'Temp Safe Range',
+                //     type: 'rangeArea',
+                //     data: tempRangeData
+                // },
+                {
+                    name: 'Shed Temp (°C)',
+                    type: 'line',
+                    data: temp1LineData
+                },
+                {
+                    name: 'Brooder Temp (°C)',
+                    type: 'line',
+                    data: temp2LineData
+                }
+            ],
+            xaxis: commonXAxis,
+            yaxis: {
+                min: 15,
+                title: { text: 'Temperature' },
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                // width: [0, 2, 2],
+                width: [2, 2],
+                curve: 'smooth'
+            },
+            fill: {
+                // opacity: [0.15, 0.8, 0.8]
+                opacity: [0.8, 0.8]
+            },
+            markers: {
+                // Show small markers so per-point fillColor is visible
+                size: 0
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: "right",
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+            },
+        };
+
+        new ApexCharts(document.querySelector('#tempChart'), tempOptions).render();
+
+
+        // ======================================================
+        // 2) HUMIDITY CHART (+ Safe Band)
+        // ======================================================
+        const humRangeData = buildRangeAreaData(
+            chartData.humSafeLower,
+            chartData.humSafeUpper
+        );
+
+        const humLineData = buildLineData(
+            chartData.humidity,
+            chartData.humSafeLower,
+            chartData.humSafeUpper,
+            '#36a2eb',
+            '#dc3545'
+        );
+
+        const humidityOptions = {
+            chart: {
+                type: 'rangeArea',
+                height: 400,
+                zoom: { enabled: true },
+                toolbar: { show: false },
+                fontFamily: "inherit",
+                parentHeightOffset: 0,
+            },
+            series: [
+                {
+                    name: 'Humidity Safe Range',
+                    type: 'rangeArea',
+                    data: humRangeData
+                },
+                {
+                    name: 'Humidity (%)',
+                    type: 'line',
+                    data: humLineData
+                }
+            ],
+            xaxis: commonXAxis,
+            yaxis: {
+                min: 20,
+                title: { text: '% Relative Humidity' }
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                width: [0, 2],
+                curve: 'smooth'
+            },
+            fill: {
+                opacity: [0.15, 0.8]
+            },
+            markers: {
+                size: 0
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: "right",
+            },
+            tooltip: {
+                shared: true,
+                intersect: false,
+            },
+        };
+
+        new ApexCharts(document.querySelector('#humidityChart'), humidityOptions).render();
+
+
+        // ======================================================
+        // 3) GAS CHART (NH3 + CO2 + Safe Bands)
+        // NOTE: for simplicity, both share same axis here.
+        //       If you want dual y-axes, we can wire that next.
+        // ======================================================
+        const nh3RangeData = buildRangeAreaData(
+            chartData.nh3SafeLower,
+            chartData.nh3SafeUpper
+        );
+        const nh3LineData = buildLineData(
+            chartData.nh3,
+            chartData.nh3SafeLower,
+            chartData.nh3SafeUpper,
+            '#9966ff',
+            '#dc3545'
+        );
+
+        const co2RangeData = buildRangeAreaData(
+            chartData.co2SafeLower,
+            chartData.co2SafeUpper
+        );
+        const co2LineData = buildLineData(
+            chartData.co2,
+            chartData.co2SafeLower,
+            chartData.co2SafeUpper,
+            '#ff6384',
+            '#dc3545'
+        );
+
+        const gasOptions = {
+            chart: {
+                type: 'rangeArea',
+                height: 350,
+                zoom: { enabled: true },
+                toolbar: { show: false }
+            },
+            series: [
+                {
+                    name: 'NH₃ Safe Range',
+                    type: 'rangeArea',
+                    data: nh3RangeData
+                },
+                {
+                    name: 'NH₃ (ppm)',
+                    type: 'line',
+                    data: nh3LineData
+                },
+                {
+                    name: 'CO₂ Safe Range',
+                    type: 'rangeArea',
+                    data: co2RangeData
+                },
+                {
+                    name: 'CO₂ (ppm)',
+                    type: 'line',
+                    data: co2LineData
+                }
+            ],
+            xaxis: commonXAxis,
+            yaxis: {
+                title: { text: 'ppm (NH₃ & CO₂)' }
+                // For *proper* dual-axis (NH3 vs CO2),
+                // we can configure yaxis: [{...}, {...}] and link series.
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            stroke: {
+                width: [0, 2, 0, 2],
+                curve: 'smooth'
+            },
+            fill: {
+                opacity: [0.15, 0, 0.08, 0]
+            },
+            markers: {
+                size: 0
+            },
+            legend: {
+                position: 'top'
+            },
+            tooltip: {
+                shared: true
+            },
+        };
+
+        // new ApexCharts(document.querySelector('#gasChart'), gasOptions).render();
+    </script>
 @endpush
-
-
-

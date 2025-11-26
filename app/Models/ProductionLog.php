@@ -17,13 +17,16 @@ class ProductionLog extends Model
         'age',
         'day_mortality_count',
         'night_mortality_count',
+        'todate_mortality_count',
         'net_count',
         'livability',
         'day_feed_consumed',
         'night_feed_consumed',
+        'todate_feed_consumed',
         'avg_feed_consumed',
         'day_water_consumed',
         'night_water_consumed',
+        'todate_water_consumed',
         'avg_water_consumed',
         'day_medicine',
         'night_medicine',
@@ -55,26 +58,11 @@ class ProductionLog extends Model
         return $this->hasOne(WeightLog::class);
     }
 
-    /**
-     * Get the cumulative mortality (day + night)
-     * up to the current log’s date for the same flock.
-     */
-    public function getTodateMortalityAttribute(): int
+    public function getTodateWaterConsumedAttribute(): float
     {
         return self::where('flock_id', $this->flock_id)
             ->whereDate('production_log_date', '<=', $this->production_log_date)
-            ->sum(\DB::raw('day_mortality_count + night_mortality_count'));
-    }
-
-    /**
-     * Get the cumulative feed consumption (day + night)
-     * up to the current log’s date for the same flock.
-     */
-    public function getTodateFeedConsumedAttribute(): float
-    {
-        return self::where('flock_id', $this->flock_id)
-            ->whereDate('production_log_date', '<=', $this->production_log_date)
-            ->sum(\DB::raw('day_feed_consumed + night_feed_consumed'));
+            ->sum(\DB::raw('day_water_consumed + night_water_consumed'));
 
         //        return $total / 1000;
     }

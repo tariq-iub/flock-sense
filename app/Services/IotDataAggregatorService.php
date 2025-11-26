@@ -2,17 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\IotDataLog;
 use App\Models\Device;
+use App\Models\IotDataLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class IotDataAggregatorService
 {
-    public function __construct(protected DynamoDbService $dynamoDbService)
-    {
-    }
+    public function __construct(protected DynamoDbService $dynamoDbService) {}
 
     /**
      * Main entry: aggregate last hour’s data for all devices.
@@ -25,7 +23,7 @@ class IotDataAggregatorService
             try {
                 $this->aggregateDeviceData($device->id);
             } catch (\Throwable $e) {
-                Log::error("[IotDataAggregator] Failed for device {$device->id}: " . $e->getMessage());
+                Log::error("[IotDataAggregator] Failed for device {$device->id}: ".$e->getMessage());
             }
         }
     }
@@ -42,7 +40,7 @@ class IotDataAggregatorService
         $hourStart = $now->copy()->subHour()->startOfMinute();
         $hourEnd = $now->copy();
 
-        // ✅ Get sensor data from DynamoDB
+        // Get sensor data from DynamoDB
         $records = $this->dynamoDbService->getSensorData(
             [$deviceId],
             $hourStart->timestamp,
@@ -50,9 +48,10 @@ class IotDataAggregatorService
             false
         );
 
-        // ✅ Handle both possible return types (old and new)
+        // Handle both possible return types (old and new)
         if (empty($records)) {
             Log::info("[IotDataAggregator] No sensor data for device {$deviceId}");
+
             return;
         }
 
@@ -66,26 +65,29 @@ class IotDataAggregatorService
             $records = $records[$deviceId];
         }
 
-        // ✅ Defensive check
-        if (empty($records) || !is_array($records)) {
+        // Defensive check
+        if (empty($records) || ! is_array($records)) {
             Log::warning("[IotDataAggregator] Device {$deviceId} has no valid record structure.");
+
             return;
         }
 
-        // ✅ Ensure the first record exists
+        // Ensure the first record exists
         $firstRecord = is_array(reset($records)) ? reset($records) : $records;
         if (empty($firstRecord)) {
             Log::warning("[IotDataAggregator] Empty record content for device {$deviceId}");
+
             return;
         }
 
-        // ✅ Extract parameter keys dynamically
+        // Extract parameter keys dynamically
         $parameters = collect($firstRecord)
             ->keys()
-            ->reject(fn($key) => in_array(strtolower($key), ['device_id', 'timestamp', 'Timestamp']));
+            ->reject(fn ($key) => in_array(strtolower($key), ['device_id', 'timestamp', 'Timestamp']));
 
         if ($parameters->isEmpty()) {
             Log::warning("[IotDataAggregator] No measurable parameters for device {$deviceId}");
+
             return;
         }
 
@@ -110,22 +112,22 @@ class IotDataAggregatorService
      * Aggregate all readings within the hourly window.
      */
     protected function processWindow(
-        int    $deviceId,
-        array  $records,
-               $parameters,
+        int $deviceId,
+        array $records,
+        $parameters,
         string $windowName,
-        int    $windowStart,
-        int    $windowEnd
-    ): void
-    {
+        int $windowStart,
+        int $windowEnd
+    ): void {
         foreach ($parameters as $param) {
             $values = collect($records)
-                ->map(fn($r) => $r[$param] ?? null)
-                ->filter(fn($v) => $v !== null && is_numeric($v))
-                ->map(fn($v) => (float)$v);
+                ->map(fn ($r) => $r[$param] ?? null)
+                ->filter(fn ($v) => $v !== null && is_numeric($v))
+                ->map(fn ($v) => (float) $v);
 
             if ($values->isEmpty()) {
                 Log::warning("[IotDataAggregator] No valid {$param} values for device {$deviceId} this hour.");
+
                 continue;
             }
 
@@ -158,25 +160,26 @@ class IotDataAggregatorService
     protected function processLatest(int $deviceId, array $records, $parameters): void
     {
         $latest = collect($records)
-            ->sortByDesc(fn($r) => (int)($r['timestamp'] ?? $r['Timestamp'] ?? 0))
+            ->sortByDesc(fn ($r) => (int) ($r['timestamp'] ?? $r['Timestamp'] ?? 0))
             ->first();
 
-        if (!$latest) {
+        if (! $latest) {
             Log::warning("[IotDataAggregator] No latest record found for device {$deviceId}");
+
             return;
         }
 
-        $recordTime = Carbon::createFromTimestamp((int)($latest['timestamp'] ?? $latest['Timestamp']))
+        $recordTime = Carbon::createFromTimestamp((int) ($latest['timestamp'] ?? $latest['Timestamp']))
             ->format('Y-m-d H:i:s');
 
         foreach ($parameters as $param) {
             $val = $latest[$param] ?? null;
 
-            if ($val === null || !is_numeric($val)) {
+            if ($val === null || ! is_numeric($val)) {
                 continue;
             }
 
-            $val = (float)$val;
+            $val = (float) $val;
 
             IotDataLog::updateOrCreate(
                 [
@@ -200,21 +203,23 @@ class IotDataAggregatorService
      */
     protected function getShedIdForDevice(int $deviceId): ?int
     {
-        return DB::table('shed_devices')->where('device_id', $deviceId)->value('shed_id');
+        return DB::table('shed_devices')
+            ->where('device_id', $deviceId)
+            ->value('shed_id');
     }
 }
 
 //
-//namespace App\Services;
+// namespace App\Services;
 //
-//use App\Models\IotDataLog;
-//use App\Models\Device;
-//use Carbon\Carbon;
-//use Illuminate\Support\Facades\DB;
-//use Illuminate\Support\Facades\Log;
+// use App\Models\IotDataLog;
+// use App\Models\Device;
+// use Carbon\Carbon;
+// use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\Log;
 //
-//class IotDataAggregatorService
-//{
+// class IotDataAggregatorService
+// {
 //    public function __construct(protected DynamoDbService $dynamoDbService)
 //    {
 //    }
@@ -445,4 +450,4 @@ class IotDataAggregatorService
 //    {
 //        return DB::table('shed_devices')->where('device_id', $deviceId)->value('shed_id');
 //    }
-//}
+// }

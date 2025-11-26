@@ -39,6 +39,7 @@
                                          Route::is('admin.farms.*') ||
                                          Route::is('admin.sheds.*') ||
                                          Route::is('admin.flocks.*') ||
+                                         Route::is('partners.*') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-user-edit fs-16 me-2"></i>
                                 <span>System Admin</span><span class="menu-arrow"></span>
@@ -98,8 +99,15 @@
                                         Flock Management
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('partners.index') }}"
+                                       class="{{ request()->routeIs('partners.*') ? 'active' : '' }}">
+                                        Partners
+                                    </a>
+                                </li>
                             </ul>
                         </li>
+
                         <li class="submenu">
                             <a href="javascript:void(0);" class="{{ Route::is('clients.*') || Route::is('roles.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-users-group fs-16 me-2"></i><span>Users and Clients</span>
@@ -165,9 +173,10 @@
                 @admin
                 <li class="submenu-open">
                     <h6 class="submenu-hdr">OPERATIONS</h6>
+
                     <ul>
-                        <li>
-                            <a href="#">
+                        <li class="{{ Route::is('web-settings.*') ? 'active' : '' }}">
+                            <a href="{{ route('web-settings.index') }}">
                                 <i class="ti ti-settings-automation fs-16 me-2"></i>
                                 <span>System Settings</span>
                             </a>
@@ -223,6 +232,16 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-file-stack fs-16 me-2"></i><span>Expenses</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <i class="ti ti-stack-3 fs-16 me-2"></i><span>Feed Inventory</span>
+                                </a>
                             </li>
                             <li class="submenu">
                                 <a href="javascript:void(0);"

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
@@ -18,12 +19,10 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use Billable;
     use HasApiTokens;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
-
     use HasMedia;
     use HasRoles;
+    use Impersonate;
     use Notifiable;
 
     protected $dates = ['trial_ends_at'];
@@ -70,6 +69,15 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    /**
+     * @return bool
+     */
+    public function canImpersonate(): bool
+    {
+        return auth()->check()
+            && auth()->user()->hasRole('admin');
+    }
+
     public function farms(): HasMany
     {
         return $this->hasMany(Farm::class, 'owner_id');
@@ -91,19 +99,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $count = 0;
 
-        if (!$this->relationLoaded('farms')) {
+        if (! $this->relationLoaded('farms')) {
             $count += $this->farms()->count();
         } else {
             $count += $this->farms->count();
         }
 
-        if (!$this->relationLoaded('managedFarms')) {
+        if (! $this->relationLoaded('managedFarms')) {
             $count += $this->managedFarms()->count();
         } else {
             $count += $this->managedFarms->count();
         }
 
-        if (!$this->relationLoaded('staffFarms')) {
+        if (! $this->relationLoaded('staffFarms')) {
             $count += $this->staffFarms()->count();
         } else {
             $count += $this->staffFarms->count();
@@ -112,10 +120,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $count;
     }
 
-
     public function getShedsCountAttribute()
     {
-        if (!$this->relationLoaded('farms')) {
+        if (! $this->relationLoaded('farms')) {
             return 0;
         }
 
@@ -124,7 +131,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getBirdsCountAttribute()
     {
-        if (!$this->relationLoaded('farms')) {
+        if (! $this->relationLoaded('farms')) {
             return 0;
         }
 
@@ -164,5 +171,48 @@ class User extends Authenticatable implements MustVerifyEmail
     public function activeSubscription()
     {
         return $this->subscriptions()->active()->first();
+    }
+
+    /**
+     * Get the shortcuts for the user
+     */
+    public function shortcuts(): BelongsToMany
+    {
+        return $this->belongsToMany(Shortcut::class, 'shortcut_user')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get admin shortcuts for the user (if user is admin)
+     */
+    public function adminShortcuts()
+    {
+        return $this->shortcuts()
+            ->where('group', 'admin');
+    }
+
+    /**
+     * Get user shortcuts for the user
+     */
+    public function userShortcuts()
+    {
+        return $this->shortcuts()
+            ->where('group', 'user');
+    }
+
+    /**
+     * Attach shortcuts to user based on their role
+     */
+    public function attachDefaultShortcuts()
+    {
+        $group = $this->is_admin ? 'admin' : 'user';
+
+        $defaultShortcuts = Shortcut::where('group', $group)
+            ->where('default', true)
+            ->pluck('id')
+            ->toArray();
+
+        $this->shortcuts()
+            ->syncWithoutDetaching($defaultShortcuts);
     }
 }
