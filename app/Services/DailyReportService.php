@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Flock;
 use App\Models\ProductionLog;
 use App\Models\Shed;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DailyReportService
@@ -34,14 +34,7 @@ class DailyReportService
             throw new NotFoundHttpException('Shed not found.');
         }
 
-        $latestFlock = $shed->latestFlock;
-
-        if (! $latestFlock) {
-            throw new NotFoundHttpException('No active flock found for this shed.');
-        }
-
-        $logs = ProductionLog::where('flock_id', $latestFlock->id)
-            ->where('shed_id', $shedId)
+        $logs = ProductionLog::where('shed_id', $shedId)
             ->whereDate('production_log_date', $reportDate)
             ->with(['user', 'weightLog'])
             ->get();
@@ -51,10 +44,14 @@ class DailyReportService
         }
 
         $data = $logs->first();
+        $flock = Flock::find($data->flock_id);
+        if (! $flock) {
+            throw new NotFoundHttpException('No active flock found for this shed.');
+        }
 
         return $version === 'en'
-            ? $this->formatEnglish($shed, $latestFlock, $data)
-            : $this->formatUrdu($shed, $latestFlock, $data);
+            ? $this->formatEnglish($shed, $flock, $data)
+            : $this->formatUrdu($shed, $flock, $data);
     }
 
     private function formatEnglish($shed, $flock, $data): array
