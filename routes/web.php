@@ -148,6 +148,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
     Route::prefix('clients')->controller(ClientController::class)->group(function () {
         Route::get('/{user}', 'show')->name('clients.show');
         Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
+
     });
     // Reports
     Route::prefix('reports')->controller(ReportsController::class)->group(function () {
@@ -212,6 +213,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{user}/edit', 'edit')->name('clients.edit');
         Route::put('/{user}', 'update')->name('clients.update');
         Route::delete('/{user}', 'destroy')->name('clients.destroy');
+        Route::get('/activities', 'activities')->name('clients.activities');
     });
 
     // Farms

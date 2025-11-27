@@ -189,4 +189,9 @@ class ClientController extends Controller
         return back()
             ->with('success', 'Password has been updated successfully.');
     }
+
+    public function activities()
+    {
+        return view('admin.users.activities');
+    }
 }

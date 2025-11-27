@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Shed extends Model
@@ -25,12 +25,12 @@ class Shed extends Model
         return $this->hasMany(Flock::class);
     }
 
-    public function latestFlock() : HasOne
+    public function latestFlock(): HasOne
     {
         return $this->hasOne(Flock::class)->latestOfMany();
     }
 
-    public function latestFlocks() : HasMany
+    public function latestFlocks(): HasMany
     {
         return $this->hasMany(Flock::class)->orderByDesc('created_at')->limit(5);
     }

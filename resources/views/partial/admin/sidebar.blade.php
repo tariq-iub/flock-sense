@@ -121,7 +121,12 @@
                                 </li>
                                 <li>
                                     <a href="{{ route('roles.index') }}" class="{{ Route::is('roles.*') ? 'active' : '' }}">
-                                        Roles and Permissions
+                                        User Roles
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('clients.activities') }}" @class(['active' => Route::is('clients.activities')])>
+                                        User Activities
                                     </a>
                                 </li>
                             </ul>

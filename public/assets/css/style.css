@@ -16631,7 +16631,7 @@ div#global-loader .whirly-loader:not(:required) {
 }
 .sidebar .sidebar-menu .submenu-open .submenu ul li a, .settings-sidebar .sidebar-menu .submenu-open .submenu ul li a {
   padding-bottom: 4px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   color: #646B72;
   padding: 8px 10px 8px 30px;
