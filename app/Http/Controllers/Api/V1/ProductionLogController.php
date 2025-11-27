@@ -9,6 +9,7 @@ use App\Models\ProductionLog;
 use App\Models\Shed;
 use App\Services\DailyReportService;
 use App\Services\WeightLogService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -181,7 +182,12 @@ class ProductionLogController extends ApiController
                 return response()->json(['message' => 'Shed not found'], 404);
             }
 
-            $productionLogDates = $shed->latestFlock->productionLogs->pluck('production_log_date');
+            $productionLogDates = $shed->latestFlock
+                ->productionLogs
+                ->pluck('production_log_date')
+                ->map(function ($date) {
+                    return Carbon::parse($date)->format('Y-m-d');
+                });
 
             return response()->json([
                 'shed_id' => $shed->id,
@@ -201,7 +207,10 @@ class ProductionLogController extends ApiController
             $flock = Flock::with('shed')->findOrFail($flockId);
 
             $productionLogDates = ProductionLog::where('flock_id', $flockId)
-                ->pluck('production_log_date');
+                ->pluck('production_log_date')
+                ->map(function ($date) {
+                    return Carbon::parse($date)->format('Y-m-d');
+                });
 
             return response()->json([
                 'shed_id' => $flock->shed->id,

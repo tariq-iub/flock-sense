@@ -143,21 +143,6 @@
                 }
             });
 
-            function formatedDates(log_dates)
-            {
-                const rawDates = Array.isArray(log_dates) ? log_dates : [];
-
-                // Use the date part before 'T' to avoid timezone shifts
-                const dates = rawDates
-                    .map(s => (typeof s === 'string' ? s.split('T')[0] : ''))
-                    .filter(Boolean)
-                    // ensure unique and sorted
-                    .filter((v, i, arr) => arr.indexOf(v) === i)
-                    .sort((a, b) => a.localeCompare(b));
-
-                return dates;
-            }
-
             // When shed changes, load flocks
             $('#shedSelect').on('change', function() {
                 var shedId = $(this).val();
@@ -184,7 +169,7 @@
                 if (flockId) {
                     $.get(`/api/v1/production/report/dates/${flockId}`, function(data) {
                         $('#dateSelect').prop('disabled', false);
-                        var dates = formatedDates(data.production_log_dates);
+                        var dates = data.production_log_dates;
                         $.each(dates, function(i, date) {
                             $('#dateSelect').append('<option value="' + date + '">' + date + '</option>');
                         });
