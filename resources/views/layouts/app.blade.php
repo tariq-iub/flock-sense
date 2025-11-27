@@ -20,9 +20,6 @@
     <link href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/feather.css') }}" rel="stylesheet">
 
-    <!-- Daterangepikcer CSS -->
-    <link href="{{ asset('assets/plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet">
-
     <!-- Form Date PIckers CSS -->
     <link href="{{ asset('assets/plugins/flatpickr/flatpickr.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/plugins/bootstrap-datepicker/bootstrap-datepicker.css') }}" rel="stylesheet">
@@ -76,6 +73,28 @@
 
     <script src="{{ asset('assets/js/jquery.PrintArea.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/js/script.js') }}" type="text/javascript"></script>
+
+    <script type="module">
+        import { InputSpinner } from "{{ asset('assets/plugins/bootstrap-spinner/InputSpinner.js') }}";
+
+        const config = {
+            autoDelay: 500,
+            autoInterval: 50,
+            buttonsOnly: true,
+            keyboardStepping: true,
+            locale: navigator.language,
+            template:`<div class="input-group input-group-sm">
+                        <button style="min-width: 2rem" class="btn btn-decrement btn-sm btn-warning btn-minus" type="button"><i class='bi bi-dash-lg'></i></button>
+                        <input type="text" inputmode="decimal" style="text-align: center; min-width: 50px; width: 50px;" class="form-control form-control-sm bs-spinner" placeholder="" readonly="">
+                        <button style="min-width: 2rem" class="btn btn-increment btn-sm btn-warning btn-plus" type="button"><i class='bi bi-plus-lg'></i></button>
+                      </div>`
+        };
+
+        const inputSpinnerElements = document.querySelectorAll(".bs-spinner");
+        for (const inputSpinnerElement of inputSpinnerElements) {
+            new InputSpinner(inputSpinnerElement, config);
+        }
+    </script>
 
     @stack('js')
 </body>

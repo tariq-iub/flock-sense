@@ -14,7 +14,8 @@ class PartnerController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Partner::ordered();
+        $query = Partner::with('media')
+            ->ordered();
 
         // Search functionality
         if ($request->has('search') && $request->search) {
@@ -46,7 +47,8 @@ class PartnerController extends Controller
      */
     public function create()
     {
-        //
+        $partner = null;
+        return view('admin.partners.create', compact('partner'));
     }
 
     /**
@@ -54,27 +56,17 @@ class PartnerController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = $request->validate([
             'company_name' => 'required|string|max:255',
             'url' => 'nullable|url',
             'introduction' => 'nullable|string',
             'partnership_detail' => 'nullable|string',
-            'support_keywords' => 'nullable|array',
-            'support_keywords.*' => 'string|max:50',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer',
-            'logo' => 'nullable|mimes:jpeg,jpg,png|max:2000',
+            'support_keywords' => 'nullable|json',
+            'logo' => 'nullable|mimes:jpeg,jpg,png,svg|max:2000',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
         $data = $request->only([
-            'company_name', 'url', 'introduction', 'partnership_detail', 'support_keywords', 'is_active', 'sort_order',
+            'company_name', 'url', 'introduction', 'partnership_detail', 'support_keywords',
         ]);
 
         $partner = Partner::create($data);
@@ -103,7 +95,7 @@ class PartnerController extends Controller
      */
     public function edit(Partner $partner)
     {
-        //
+        return view('admin.partners.create', compact('partner'));
     }
 
     /**
@@ -211,6 +203,33 @@ class PartnerController extends Controller
         return response()->json([
             'success' => true,
             'data' => $keywords,
+        ]);
+    }
+
+    public function toggleStatus(Partner $partner, Request $request)
+    {
+        // Either trust the toggle, or use $request->boolean('is_active')
+        $partner->is_active = ! $partner->is_active;
+        $partner->save();
+
+        return response()->json([
+            'success' => true,
+            'is_active' => $partner->is_active,
+        ]);
+    }
+
+    public function updateSort(Request $request, Partner $partner)
+    {
+        $validated = $request->validate([
+            'sort_order' => 'required|integer|min:0|max:9999',
+        ]);
+
+        $partner->sort_order = $validated['sort_order'];
+        $partner->save();
+
+        return response()->json([
+            'success' => true,
+            'sort_order' => $partner->sort_order,
         ]);
     }
 }

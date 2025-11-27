@@ -17,14 +17,13 @@ trait HasMedia
     {
         $name = time().'_media';
         $filename = $name.'.'.$file->getClientOriginalExtension();
-
-        // Store using 'media' disk
-        $file->storeAs('', $filename, 'media'); // no folder prefix needed since disk points to /media
         $size = $file->getSize();
+
+        $file->storeAs('', $filename, 'media');
 
         return $this->media()->create([
             'file_name' => $filename,
-            'file_path' => Storage::disk('media')->url($filename), // /storage/media/filename.jpg
+            'file_path' => Storage::disk('media')->url($filename),
             'size' => $size,
         ]);
     }
