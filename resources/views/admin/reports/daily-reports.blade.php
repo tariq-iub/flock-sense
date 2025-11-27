@@ -94,7 +94,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="form-label">Select Date</label>
-                            <select id="dateSelect" name="filter[report_date]"  class="select2" disabled>
+                            <select id="dateSelect" name="filter[report_date]" class="select2" disabled>
                                 <option value="">Select Report Date</option>
                             </select>
                         </div>
@@ -164,6 +164,7 @@
                 $('#flockSelect').prop('disabled', true).html('<option value="">Select Flock</option>');
                 $('#dateSelect').prop('disabled', true).html('<option value="">Select Report Date</option>');
                 $('#showLogsBtn').prop('disabled', true);
+
                 if (shedId) {
                     $.get('/admin/get-flocks', {shed_id: shedId}, function(flocks) {
                         $('#flockSelect').prop('disabled', false);
@@ -171,8 +172,17 @@
                             $('#flockSelect').append('<option value="' + flock.id + '">' + flock.name + '</option>');
                         });
                     });
+                }
+            });
 
-                    $.get(`/api/v1/production/report/headers/${shedId}`, function(data) {
+            // When shed changes, load flocks
+            $('#flockSelect').on('change', function() {
+                var flockId = $(this).val();
+                $('#dateSelect').prop('disabled', true).html('<option value="">Select Report Date</option>');
+                $('#showLogsBtn').prop('disabled', true);
+
+                if (flockId) {
+                    $.get(`/api/v1/production/report/dates/${flockId}`, function(data) {
                         $('#dateSelect').prop('disabled', false);
                         var dates = formatedDates(data.production_log_dates);
                         $.each(dates, function(i, date) {
