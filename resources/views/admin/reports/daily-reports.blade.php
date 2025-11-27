@@ -225,9 +225,30 @@
             var report_date = $('#dateSelect').val();
 
             $('#reportArea').html('<div class="text-center py-5"><div class="spinner-border text-success"></div></div>');
-            $.get(`/admin/daily-report-card/${version}?shed_id=${shed_id}&date=${report_date}`, function(data) {
-                $('#reportArea').html(data);
-            })
+
+            $.get(`/admin/daily-report-card/${version}?shed_id=${shed_id}&date=${report_date}`)
+                .done(function(data) {
+                    $('#reportArea').html(data);
+                })
+                .fail(function(xhr, status, error) {
+                    let errorMessage = "An error occurred while loading the report.";
+
+                    // Try to get the message from response if available
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.status === 404) {
+                        errorMessage = "Report not found for the specified date.";
+                    } else if (xhr.status >= 500) {
+                        errorMessage = "Server error occurred. Please try again later.";
+                    }
+
+                    $('#reportArea').html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error!</strong> ${errorMessage}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+                });
         });
     </script>
 @endpush
