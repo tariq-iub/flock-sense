@@ -201,6 +201,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::post('/{partner}/add-keyword', 'addKeyword');
         Route::post('/{partner}/remove-keyword', 'removeKeyword');
         Route::get('partners-keywords', 'getAllKeywords');
+        Route::patch('/{partner}/toggle-status', [PartnerController::class, 'toggleStatus'])->name('partners.toggle-status');
+        Route::patch('/{partner}/sort', [PartnerController::class, 'updateSort'])->name('partners.update-sort');
     });
 
     // Users and Clients

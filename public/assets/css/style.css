@@ -6151,8 +6151,8 @@ hr.text-danger {
   border: 1px solid #E6EAED;
 }
 .form-check-input:checked {
-  background-color: #556D6F;
-  border-color: #556D6F;
+  background-color: #198754;
+  border-color: #198754;
 }
 .form-check-input.form-checked-outline:checked {
   background-color: transparent;
@@ -11884,8 +11884,8 @@ table.dataTable {
   margin-left: 25%;
 }
 .card .card-body .payroll-info .status-updates .form-check-input:checked {
-  background-color: #556D6F;
-  border-color: #556D6F;
+  background-color: #198754;
+  border-color: #198754;
 }
 .card .card-body .payroll-info .status-updates .form-check-input:focus {
   box-shadow: none;
@@ -23336,8 +23336,8 @@ body.data-layout-transparent .page-wrapper .head-icons {
   color: #556D6F;
 }
 [data-color=primary] .form-check-input:checked {
-  background-color: #556D6F;
-  border-color: #556D6F;
+  background-color: #198754;
+  border-color: #198754;
 }
 [data-color=primary] .sidebar-contact .toggle-theme {
   background-color: #556D6F;
@@ -34009,7 +34009,7 @@ body.layout-mode-rtl .user-info {
   background: #E8E9EA;
   border-radius: 5px;
   padding: 0 5px;
-  font-size: 10px;
+  font-size: 11px;
   color: #212529;
   display: inline-flex;
   align-items: center;
@@ -45965,7 +45965,7 @@ span.flatpickr-weekday {
 
 .bootstrap-tagsinput .label-info {
   position: relative;
-  background: #E8E9EA;
+  background: #556D6F;
 }
 
 .pass-input{

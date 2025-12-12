@@ -2,7 +2,12 @@
 
 @section('title', 'Partners')
 
+@push('css')
+    <link rel="stylesheet" href="{{ asset('assets/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css') }}">
+@endpush
+
 @section('content')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="content">
         <div class="page-header">
             <div class="add-item d-flex">
@@ -72,8 +77,8 @@
                     <table class="table table-hover datatable-custom align-middle">
                         <thead class="thead-light">
                         <tr>
-                            <th>Company</th>
-                            <th class="text-center">URL</th>
+                            <th>Company Name</th>
+                            <th>Website URL</th>
                             <th class="text-center">Introduction</th>
                             <th class="text-center">Partnership Detail</th>
                             <th class="text-center">Keywords</th>
@@ -85,27 +90,90 @@
                         <tbody>
                         @foreach($partners as $partner)
                             <tr>
-                                <td>
-                                    <span class="fw-bold">{{ $partner->company_name }}</span>
+                                {{-- Company column inside the <tr> --}}
+                                <td class="w-fit">
+                                    <div class="d-flex align-items-center">
+                                        @if($partner->media->first())
+                                            <img
+                                                src="{{ $partner->media->first()->url }}"
+                                                alt="{{ $partner->company_name }} logo"
+                                                class="bg-light me-2 rounded"
+                                                style="width: 64px; height: 32px; object-fit: contain;"
+                                            >
+                                        @endif
+                                        <span class="fw-bold">{{ $partner->company_name }}</span>
+                                    </div>
                                 </td>
+
                                 <td class="fs-11">
                                     <a href="{{ $partner->url }}" target="_blank">{{ $partner->url }}</a>
                                 </td>
-                                <td>{{ $partner->introduction }}</td>
-                                <td>
-                                    {{ $partner->partnership_detail }}
-                                </td>
-                                <td class="text-center">
 
-                                </td>
                                 <td class="text-center">
-                                    @if($partner->is_active)
-                                        <span class="badge bg-success">Active</span>
-                                    @else
-                                        <span class="badge bg-secondary">Inactive</span>
-                                    @endif
+                                    <a href="javascript:void(0)"
+                                       class="btn btn-sm btn-outline-info chart-data js-partner-offcanvas"
+                                       data-title="Introduction – {{ $partner->company_name }}"
+                                       data-content="{{ e($partner->introduction) }}"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="View Introduction">
+                                        View
+                                    </a>
                                 </td>
-                                <td class="text-center">{{ $partner->sort_order }}</td>
+
+                                <td class="text-center">
+                                    <a href="javascript:void(0)"
+                                       class="btn btn-sm btn-outline-info chart-data js-partner-offcanvas"
+                                       data-title="Partnership Detail – {{ $partner->company_name }}"
+                                       data-content="{{ e($partner->partnership_detail) }}"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="View Partnership Detail">
+                                        View
+                                    </a>
+                                </td>
+
+                                <td class="text-center">
+                                    @php
+                                        $keywords = $partner->support_keywords
+                                            ? preg_split('/\s*,\s*/', $partner->support_keywords)
+                                            : [];
+                                    @endphp
+
+                                    @foreach($keywords as $keyword)
+                                        @if($keyword !== '')
+                                            <span class="badge bg-light text-dark border me-1 mb-1">
+                                                {{ $keyword }}
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </td>
+
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-flex align-items-center justify-content-center">
+                                        <input
+                                            class="form-check-input js-partner-status-toggle"
+                                            type="checkbox"
+                                            role="switch"
+                                            id="partnerStatus{{ $partner->id }}"
+                                            data-id="{{ $partner->id }}"
+                                            @checked($partner->is_active)
+                                        >
+                                    </div>
+                                </td>
+
+                                <td class="text-center">
+                                    <input
+                                        type="number"
+                                        class="form-control bs-spinner"
+                                        min="0"
+                                        step="1"
+                                        value="{{ $partner->sort_order }}"
+                                        data-id="{{ $partner->id }}"
+                                        style="min-width: 100px;"
+                                    >
+                                </td>
+
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
                                         <a href="javascript:void(0)"
@@ -175,9 +243,23 @@
             </div>
         </div>
     </div>
+
+    {{-- Right offcanvas to show Introduction / Partnership Detail --}}
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="partnerDetailOffcanvas"
+         aria-labelledby="partnerDetailOffcanvasLabel" aria-modal="true" role="dialog">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="partnerDetailOffcanvasLabel">Partner Detail</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div id="partnerDetailOffcanvasBody" class="text-wrap"></div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
+    <script src="{{ asset('assets/plugins/bootstrap-tagsinput/bootstrap-tagsinput.js') }}"></script>
     <script>
         $(function() {
             if($('.datatable-custom').length > 0) {
@@ -209,6 +291,7 @@
                 });
             }
         });
+
         // Edit modal JS (to be filled by AJAX if needed)
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.edit-pricing').forEach(function(button) {
@@ -251,6 +334,131 @@
                     document.getElementById('delete' + deleteId).submit();
                 }
             });
+        });
+        // Offcanvas for Introduction / Partnership Detail
+        document.addEventListener('DOMContentLoaded', function () {
+            const offcanvasEl  = document.getElementById('partnerDetailOffcanvas');
+            const bodyEl       = document.getElementById('partnerDetailOffcanvasBody');
+            const titleEl      = document.getElementById('partnerDetailOffcanvasLabel');
+
+            if (!offcanvasEl || !bodyEl || !titleEl) return;
+
+            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasEl);
+
+            document.querySelectorAll('.js-partner-offcanvas').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const title   = this.getAttribute('data-title') || '';
+                    const content = this.getAttribute('data-content') || '';
+
+                    titleEl.textContent = title;
+                    // Convert newlines to <br> for nicer display
+                    bodyEl.innerHTML = content.replace(/\n/g, '<br>');
+
+                    bsOffcanvas.show();
+                });
+            });
+        });
+        // Toggle partner active status via API
+        document.addEventListener('DOMContentLoaded', function () {
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
+
+            if (!csrfToken) return;
+
+            document.querySelectorAll('.js-partner-status-toggle').forEach(function (input) {
+                input.addEventListener('change', function () {
+                    const partnerId = this.getAttribute('data-id');
+                    const isActive  = this.checked;
+
+                    const url = "{{ route('partners.toggle-status', ':id') }}"
+                        .replace(':id', partnerId);
+
+                    fetch(url, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify({ is_active: isActive }),
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .catch(error => {
+                            console.error('Status toggle failed:', error);
+                            // Revert UI if error
+                            this.checked = !isActive;
+                            alert('Unable to update status. Please try again.');
+                        });
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
+
+            if (!csrfToken) return;
+
+            document.querySelectorAll('.bs-spinner').forEach(function (input) {
+                let debounceTimer = null;
+
+                input.addEventListener('change', function () {
+                    const el        = this;
+                    const partnerId = el.getAttribute('data-id');
+                    const newValue  = parseInt(el.value, 10);
+
+                    if (isNaN(newValue)) {
+                        return;
+                    }
+
+                    // Debounce to avoid multiple calls when user is clicking fast
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function () {
+                        updatePartnerSort(partnerId, newValue, el);
+                    }, 400);
+                });
+            });
+
+            function updatePartnerSort(partnerId, sortValue, inputEl) {
+                const url = "{{ route('partners.update-sort', ':id') }}".replace(':id', partnerId);
+
+                fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({ sort_order: sortValue }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(json => {
+                        if (!json.success) {
+                            throw new Error('Server error while updating sort order');
+                        }
+                        // Optionally show a toast or console log
+                        // console.log('Sort updated:', json.sort_order);
+                    })
+                    .catch(error => {
+                        console.error('Sort update failed:', error);
+                        // Optionally revert to previous value if you stored it somewhere
+                        alert('Unable to update sort order. Please try again.');
+                    });
+            }
         });
     </script>
 @endpush

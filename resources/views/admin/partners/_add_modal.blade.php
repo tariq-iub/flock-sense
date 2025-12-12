@@ -27,42 +27,21 @@
                     <div class="row g-3">
                         <!-- Name / Title -->
                         <div class="col-md-7">
-                            <label class="form-label">Partner Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
-                            <div class="invalid-feedback">Please enter the partner name.</div>
-                            @error('name') <div class="text-danger small">{{ $message }}</div> @enderror
+                            <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                            <input type="text" name="company_name" class="form-control" value="{{ old('company_name') }}" required>
+                            <div class="invalid-feedback">Please enter the company name.</div>
+                            @error('company_name') <div class="text-danger small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- Website URL -->
                         <div class="col-md-5">
                             <label class="form-label">Website</label>
-                            <input type="url" name="website_url" class="form-control" placeholder="https://example.com" value="{{ old('website_url') }}">
-                            @error('website_url') <div class="text-danger small">{{ $message }}</div> @enderror
-                        </div>
-
-                        <!-- Category/Group (optional; adjust to your schema) -->
-                        <div class="col-md-6">
-                            <label class="form-label">Category</label>
-                            <select name="category" class="form-select">
-                                <option value="">Select category</option>
-                                <option value="silicon" {{ old('category')=='silicon'?'selected':'' }}>Silicon / Hardware</option>
-                                <option value="distribution" {{ old('category')=='distribution'?'selected':'' }}>Distribution</option>
-                                <option value="ngo" {{ old('category')=='ngo'?'selected':'' }}>NGO / Development</option>
-                                <option value="academia" {{ old('category')=='academia'?'selected':'' }}>Academia / Research</option>
-                                <option value="engagement" {{ old('category')=='engagement'?'selected':'' }}>Engagement / UX</option>
-                            </select>
-                            @error('category') <div class="text-danger small">{{ $message }}</div> @enderror
-                        </div>
-
-                        <!-- Short Description -->
-                        <div class="col-12">
-                            <label class="form-label">Description</label>
-                            <textarea name="description" rows="3" class="form-control" placeholder="One or two lines about this partner...">{{ old('description') }}</textarea>
-                            @error('description') <div class="text-danger small">{{ $message }}</div> @enderror
+                            <input type="url" name="url" class="form-control" value="{{ old('url') }}">
+                            @error('url') <div class="text-danger small">{{ $message }}</div> @enderror
                         </div>
 
                         <!-- Logo upload -->
-                        <div class="col-md-6">
+                        <div class="col-md-7">
                             <label class="form-label">Logo <span class="text-muted">(PNG/JPG/SVG)</span></label>
                             <input type="file" name="logo" id="partnerLogoInput" class="form-control" accept=".png,.jpg,.jpeg,.svg,image/*">
                             <div class="form-text">Recommended: transparent PNG/SVG, ≤ 1MB.</div>
@@ -70,27 +49,59 @@
                         </div>
 
                         <!-- Live preview -->
-                        <div class="col-md-6 d-flex align-items-end">
+                        @php
+                            $partner_logo = 'assets/img/partner-placeholder.png';
+                        @endphp
+                        <div class="col-md-5 d-flex align-items-end">
                             <div>
                                 <div class="border rounded p-2 bg-light d-inline-block">
-                                    <img id="partnerLogoPreview" src="{{ asset('assets/img/placeholders/logo-placeholder.svg') }}" alt="Logo preview" style="max-height:56px; max-width:220px;">
+                                    <img id="partnerLogoPreview" src="{{ asset($partner_logo) }}" alt="Logo preview" style="max-height:56px; max-width:220px;">
                                 </div>
                                 <div class="small text-muted mt-1">Logo preview</div>
                             </div>
                         </div>
 
-                        <!-- (Optional) Highlights/Badges JSON -->
+                        <!-- Partner Introduction -->
                         <div class="col-12">
-                            <label class="form-label">Highlights (JSON, optional)</label>
-                            <textarea name="highlights" rows="2" class="form-control" placeholder='e.g. ["Supply Assurance","DFM Reviews"]'>{{ old('highlights') }}</textarea>
-                            @error('highlights') <div class="text-danger small">{{ $message }}</div> @enderror
+                            <label class="form-label">Partner Introduction</label>
+                            <textarea name="introduction" rows="3" class="form-control"
+                                      placeholder="Partner's introduction...">{{ old('introduction') }}</textarea>
+                            @error('introduction') <div class="text-danger small">{{ $message }}</div> @enderror
                         </div>
+
+                        <!-- Short Description -->
+                        <div class="col-12">
+                            <label class="form-label">Partnership Detail</label>
+                            <textarea name="partnership_detail" rows="3" class="form-control"
+                                      placeholder="Partnership detail...">{{ old('partnership_detail') }}</textarea>
+                            @error('partnership_detail') <div class="text-danger small">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- (Optional) Keywords -->
+                        <div class="col-12">
+                            <label class="form-label">Keywords</label>
+
+                            <input
+                                type="text"
+                                name="support_keywords_display"
+                                id="support_keywords_display"
+                                class="form-control"
+                                data-role="tagsinput"
+                                placeholder="Add keywords and press Enter"
+                            >
+
+                            {{-- Hidden real JSON field submitted to backend --}}
+                            <input type="hidden" name="support_keywords" id="support_keywords">
+
+                            @error('support_keywords') <div class="text-danger small">{{ $message }}</div> @enderror
+                        </div>
+
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Save Partner</button>
+                    <button type="submit" class="btn btn-success me-2">Save Partner</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>

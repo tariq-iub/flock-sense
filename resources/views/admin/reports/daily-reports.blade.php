@@ -94,7 +94,7 @@
                         </div>
                         <div class="mb-4">
                             <label class="form-label">Select Date</label>
-                            <select id="dateSelect" name="filter[report_date]"  class="select2" disabled>
+                            <select id="dateSelect" name="filter[report_date]" class="select2" disabled>
                                 <option value="">Select Report Date</option>
                             </select>
                         </div>
@@ -143,27 +143,13 @@
                 }
             });
 
-            function formatedDates(log_dates)
-            {
-                const rawDates = Array.isArray(log_dates) ? log_dates : [];
-
-                // Use the date part before 'T' to avoid timezone shifts
-                const dates = rawDates
-                    .map(s => (typeof s === 'string' ? s.split('T')[0] : ''))
-                    .filter(Boolean)
-                    // ensure unique and sorted
-                    .filter((v, i, arr) => arr.indexOf(v) === i)
-                    .sort((a, b) => a.localeCompare(b));
-
-                return dates;
-            }
-
             // When shed changes, load flocks
             $('#shedSelect').on('change', function() {
                 var shedId = $(this).val();
                 $('#flockSelect').prop('disabled', true).html('<option value="">Select Flock</option>');
                 $('#dateSelect').prop('disabled', true).html('<option value="">Select Report Date</option>');
                 $('#showLogsBtn').prop('disabled', true);
+
                 if (shedId) {
                     $.get('/admin/get-flocks', {shed_id: shedId}, function(flocks) {
                         $('#flockSelect').prop('disabled', false);
@@ -171,10 +157,19 @@
                             $('#flockSelect').append('<option value="' + flock.id + '">' + flock.name + '</option>');
                         });
                     });
+                }
+            });
 
-                    $.get(`/api/v1/production/report/headers/${shedId}`, function(data) {
+            // When shed changes, load flocks
+            $('#flockSelect').on('change', function() {
+                var flockId = $(this).val();
+                $('#dateSelect').prop('disabled', true).html('<option value="">Select Report Date</option>');
+                $('#showLogsBtn').prop('disabled', true);
+
+                if (flockId) {
+                    $.get(`/api/v1/production/report/dates/${flockId}`, function(data) {
                         $('#dateSelect').prop('disabled', false);
-                        var dates = formatedDates(data.production_log_dates);
+                        var dates = data.production_log_dates;
                         $.each(dates, function(i, date) {
                             $('#dateSelect').append('<option value="' + date + '">' + date + '</option>');
                         });
@@ -215,9 +210,30 @@
             var report_date = $('#dateSelect').val();
 
             $('#reportArea').html('<div class="text-center py-5"><div class="spinner-border text-success"></div></div>');
-            $.get(`/admin/daily-report-card/${version}?shed_id=${shed_id}&date=${report_date}`, function(data) {
-                $('#reportArea').html(data);
-            })
+
+            $.get(`/admin/daily-report-card/${version}?shed_id=${shed_id}&date=${report_date}`)
+                .done(function(data) {
+                    $('#reportArea').html(data);
+                })
+                .fail(function(xhr, status, error) {
+                    let errorMessage = "An error occurred while loading the report.";
+
+                    // Try to get the message from response if available
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    } else if (xhr.status === 404) {
+                        errorMessage = "Report not found for the specified date.";
+                    } else if (xhr.status >= 500) {
+                        errorMessage = "Server error occurred. Please try again later.";
+                    }
+
+                    $('#reportArea').html(`
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error!</strong> ${errorMessage}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `);
+                });
         });
     </script>
 @endpush

@@ -57,13 +57,4 @@ class ProductionLog extends Model
     {
         return $this->hasOne(WeightLog::class);
     }
-
-    public function getTodateWaterConsumedAttribute(): float
-    {
-        return self::where('flock_id', $this->flock_id)
-            ->whereDate('production_log_date', '<=', $this->production_log_date)
-            ->sum(\DB::raw('day_water_consumed + night_water_consumed'));
-
-        //        return $total / 1000;
-    }
 }
