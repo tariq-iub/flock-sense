@@ -52,165 +52,237 @@
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                <div class="search-set">
-                    <div class="search-input">
-                        <span class="btn-searchset"><i class="ti ti-search fs-14 feather-search"></i></span>
+        {{-- Filter Card --}}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <form method="GET" action="{{ route('clients.activities') }}" class="row g-3 align-items-end">
+                    {{-- Model Name --}}
+                    <div class="col-md-3">
+                        <label class="form-label">Model Name</label>
+                        <select name="model" class="form-select">
+                            <option value="">All Models</option>
+                            @foreach($models as $model)
+                                @php
+                                    $baseName = class_basename($model);
+                                @endphp
+                                <option value="{{ $model }}"
+                                    @selected(($filters['model'] ?? '') === $model)>
+                                    {{ $baseName }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                </div>
-                <div class="d-flex my-xl-auto right-content align-items-center row-gap-3">
-                    <select id="statusFilter" class="form-select">
-                        <option value="">All Statuses</option>
-                        <option value="Active">Active</option>
-                        <option value="Blocked">Blocked</option>
-                    </select>
-                </div>
+
+                    {{-- User --}}
+                    <div class="col-md-3">
+                        <label class="form-label">User</label>
+                        <select name="user_id" class="form-select">
+                            <option value="">All Users</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}"
+                                    @selected(($filters['user_id'] ?? '') == $user->id)>
+                                    {{ $user->name }} ({{ $user->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- Date From --}}
+                    <div class="col-md-2">
+                        <label class="form-label">Date From</label>
+                        <input type="date" name="date_from" class="form-control"
+                               value="{{ $filters['date_from'] ?? '' }}">
+                    </div>
+
+                    {{-- Date To --}}
+                    <div class="col-md-2">
+                        <label class="form-label">Date To</label>
+                        <input type="date" name="date_to" class="form-control"
+                               value="{{ $filters['date_to'] ?? '' }}">
+                    </div>
+
+                    {{-- Buttons --}}
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-success w-50">
+                            <i class="bi bi-funnel me-1"></i> Filter
+                        </button>
+                        <a href="{{ route('clients.activities') }}" class="btn btn-outline-secondary w-50">
+                            Clear
+                        </a>
+                    </div>
+                </form>
             </div>
+        </div>
+
+        {{-- Activities Table --}}
+        <div class="card shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table datatable-custom">
-                        <thead class="thead-light">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
                         <tr>
-                            <th class="w-100">Role</th>
-                            <th class="text-center">Guard</th>
-                            <th class="text-center">Users Attach</th>
-                            <th class="text-center">Create Date</th>
-                            <th class="no-sort"></th>
+                            <th style="width: 14%">Date / Time</th>
+                            <th style="width: 36%">Description</th>
+                            <th style="width: 15%">Model</th>
+                            <th style="width: 15%">User Name</th>
+                            <th style="width: 10%" class="text-center">Properties</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach([] as $role)
+                        @forelse($activities as $activity)
+                            @php
+                                $modelName = $activity->subject_type
+                                    ? class_basename($activity->subject_type)
+                                    : '-';
+
+                                $tableName = $activity->subject_type
+                                    ? \Illuminate\Support\Str::snake(
+                                        \Illuminate\Support\Str::pluralStudly($modelName)
+                                      )
+                                    : '-';
+
+                                $propertiesJson = $activity->properties
+                                    ? json_encode($activity->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                                    : '{}';
+                            @endphp
+
                             <tr>
-                                <td class="w-100">
-                                    {{ ucfirst($role->name) }}
-                                </td>
-                                <td class="text-center">{{ ucfirst($role->guard_name) }}</td>
-                                <td class="text-center">
-                                    <a href="javascript:void(0)"
-                                       class="btn btn-sm btn-outline-info users-data"
-                                       data-role-id="{{ $role->id }}"
-                                       data-role-name="{{ ucfirst($role->name) }}"
-                                       data-bs-toggle="tooltip"
-                                       data-bs-placement="top"
-                                       title=""
-                                       data-bs-original-title="View Attach Users">
-                                        View
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                   {{ $role->created_at->format('d-m-Y') }}
-                                </td>
-                                <td class="action-table-data">
-                                    <div class="action-icon d-inline-flex">
-                                        <a href="{{ route('roles.permissions', $role) }}" class="me-2 d-flex align-items-center p-2 border rounded"
-                                           data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Manage Permissions">
-                                            <i class="ti ti-shield"></i>
-                                        </a>
-                                        <a href="javascript:void(0)"
-                                           class="me-2 d-flex align-items-center p-2 border rounded edit-role"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-placement="top"
-                                           title=""
-                                           data-bs-original-title="Edit Role"
-                                           data-role-id="{{ $role->id }}"
-                                           data-role-name="{{ $role->name }}">
-                                            <i class="ti ti-edit"></i>
-                                        </a>
+                                {{-- Date/Time --}}
+                                <td>
+                                    <div class="small text-muted">
+                                        {{ $activity->created_at?->timezone(config('app.timezone'))->format('d-m-Y H:i:s') ?? '-' }}
+                                    </div>
+                                    <div class="small text-secondary">
+                                        {{ $activity->created_at?->diffForHumans() }}
                                     </div>
                                 </td>
+
+                                {{-- Description --}}
+                                <td>
+                                    <div class="">{{ $activity->description }}</div>
+                                    <div class="small text-muted">
+                                        <span class="badge rounded-pill bg-warning-gradient text-dark border me-1">
+                                            {{ $activity->event ?? 'event' }}
+                                        </span>
+                                        @if($activity->log_name)
+                                            <span class="badge bg-info-subtle text-secondary-emphasis">
+                                                {{ $activity->log_name }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
+
+                                {{-- Model (Table Name) --}}
+                                <td>
+                                    <div class="fw-semibold">{{ $modelName }}</div>
+                                    <div class="small text-muted">
+                                        <code><i class="bi bi-database me-1"></i>{{ $tableName }}</code>
+                                    </div>
+                                </td>
+
+                                {{-- User Name --}}
+                                <td>
+                                    @if($activity->causer)
+                                        <div class="fw-semibold">{{ $activity->causer->name }}</div>
+                                        <div class="small text-muted">{{ $activity->causer->email }}</div>
+                                    @else
+                                        <span class="badge bg-secondary">System</span>
+                                    @endif
+                                </td>
+
+                                {{-- Properties --}}
+                                @php
+                                    // Build raw JSON string once
+                                    $propertiesJson = $activity->properties
+                                        ? json_encode($activity->properties, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+                                        : '{}';
+                                @endphp
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-info js-activity-properties"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="View properties"
+                                            data-description="{{ e($activity->description) }}"
+                                            data-properties='@json($activity->properties ?? (object)[])'>
+                                        View
+                                    </button>
+                                </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No activities found for the selected filters.
+                                </td>
+                            </tr>
+                        @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <div class="p-3">
+                    {{ $activities->links() }}
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- Properties Modal --}}
+    <div class="modal fade" id="activityPropertiesModal" tabindex="-1"
+         aria-labelledby="activityPropertiesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="activityPropertiesModalLabel">Activity Properties</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <pre id="activityPropertiesContent"
+                     class="bg-info-subtle text-secondary p-3 rounded small mb-0"
+                     style="max-height: 60vh; overflow: auto;"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('js')
     <script>
-        $(function() {
-            // Datatable
-            if($('.datatable-custom').length > 0) {
-                var table = $('.datatable-custom').DataTable({
-                    "bFilter": true,
-                    "sDom": 'fBtlpi',
-                    "ordering": true,
-                    "language": {
-                        search: ' ',
-                        sLengthMenu: '_MENU_',
-                        searchPlaceholder: "Search",
-                        sLengthMenu: 'Rows Per Page _MENU_ Entries',
-                        info: "_START_ - _END_ of _TOTAL_ items",
-                        paginate: {
-                            next: ' <i class=" fa fa-angle-right"></i>',
-                            previous: '<i class="fa fa-angle-left"></i> '
-                        },
-                    },
-                    initComplete: (settings, json)=> {
-                        $('.dataTables_filter').appendTo('#tableSearch');
-                        $('.dataTables_filter').appendTo('.search-input');
-                    },
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalEl   = document.getElementById('activityPropertiesModal');
+            const contentEl = document.getElementById('activityPropertiesContent');
+            const titleEl   = document.getElementById('activityPropertiesModalLabel');
 
-                $('#statusFilter').on('change', function() {
-                    var selected = $(this).val();
-                    table.column(5).search(selected).draw();
-                });
-            }
-        });
-    </script>
-    <script>
-        $(function(){
-            $('.users-data').on('click', function() {
-                var roleId = $(this).data('role-id');
-                var roleName = $(this).data('role-name');
+            if (!modalEl || !contentEl || !titleEl) return;
 
-                // Show loading spinner in modal body
-                $('#attachUsersModal .modal-body').html('<div class="text-center py-5"><div class="spinner-border text-success"></div></div>');
-                $('#attachUsersModalLabel').text('Attach Users - ' + roleName);
+            const bsModal = new bootstrap.Modal(modalEl);
 
-                // Open the modal
-                var modal = new bootstrap.Modal(document.getElementById('attachUsersModal'));
-                modal.show();
+            document.querySelectorAll('.js-activity-properties').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const description = this.getAttribute('data-description') || 'Activity Properties';
+                    const properties  = this.getAttribute('data-properties') || '{}';
 
-                // Fetch the attached users via AJAX
-                $.ajax({
-                    url: '/admin/roles/' + roleId + '/users',
-                    method: 'GET',
-                    success: function(data) {
-                        $('#attachUsersModalLabel').text('Attach Users - ' + data.role_name);
-                        $('#attachUsersModal .modal-body').html(data.html);
-                    },
-                    error: function() {
-                        $('#attachUsersModal .modal-body').html('<div class="alert alert-danger">Failed to load users.</div>');
+                    titleEl.textContent = description;
+
+                    try {
+                        const parsed = JSON.parse(properties);
+                        contentEl.textContent = JSON.stringify(parsed, null, 2);
+                    } catch (e) {
+                        contentEl.textContent = properties;
                     }
+
+                    bsModal.show();
                 });
             });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.edit-role').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var roleId = this.getAttribute('data-role-id');
-                    var roleName = this.getAttribute('data-role-name');
-                    // Set the form action dynamically
-                    var form = document.getElementById('editRoleForm');
-                    form.action = '/admin/roles/' + roleId;
 
-                    // Set hidden and visible values
-                    document.getElementById('edit-role-id').value = roleId;
-                    document.getElementById('edit-name').value = roleName;
-                    // Update modal title (optional)
-                    document.getElementById('editRoleModalLabel').textContent = "Edit Role - " + roleName;
-
-                    // Show the modal
-                    var modal = new bootstrap.Modal(document.getElementById('editRoleModal'));
-                    modal.show();
-                });
+            // Enable Bootstrap tooltips
+            const tooltipTriggerList = [].slice.call(
+                document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            );
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
     </script>

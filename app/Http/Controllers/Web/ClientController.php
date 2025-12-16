@@ -7,6 +7,7 @@ use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
 
 class ClientController extends Controller
@@ -190,8 +191,53 @@ class ClientController extends Controller
             ->with('success', 'Password has been updated successfully.');
     }
 
-    public function activities()
+    public function activities(Request $request)
     {
-        return view('admin.users.activities');
+        $query = Activity::query()
+            ->with('causer') // assumes causer is User
+            ->orderByDesc('created_at');
+
+        // Filters
+        if ($request->filled('model')) {
+            $query->where('subject_type', $request->model);
+        }
+
+        if ($request->filled('user_id')) {
+            $query->where('causer_id', $request->user_id);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $activities = $query->paginate(25)->withQueryString();
+
+        // For filters dropdowns
+        $models = Activity::select('subject_type')
+            ->distinct()
+            ->orderBy('subject_type')
+            ->pluck('subject_type');
+
+        $userIds = Activity::whereNotNull('causer_id')
+            ->distinct()
+            ->pluck('causer_id');
+
+        $users = User::whereIn('id', $userIds)->orderBy('name')->get();
+
+        $filters = $request->only(['model', 'user_id', 'date_from', 'date_to']);
+
+        return view(
+            'admin.users.activities',
+            compact(
+                'activities',
+                'models',
+                'users',
+                'filters'
+            )
+        );
     }
 }

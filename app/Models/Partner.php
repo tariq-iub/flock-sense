@@ -5,11 +5,14 @@ namespace App\Models;
 use App\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Partner extends Model
 {
-    use SoftDeletes;
     use HasMedia;
+    use LogsActivity;
+    use SoftDeletes;
 
     protected $fillable = [
         'company_name',
@@ -125,5 +128,23 @@ class Partner extends Model
         $this->support_keywords = array_values(array_diff($keywords, [$keyword]));
 
         return $this;
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('partners')
+            ->logOnly([
+                'company_name',
+                'url',
+                'introduction',
+                'partnership_detail',
+                'support_keywords',
+                'is_active',
+                'sort_order',
+            ])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn (string $eventName) => "Partner {$this->name} was {$eventName} by ".optional(auth()->user())->name
+            );
     }
 }

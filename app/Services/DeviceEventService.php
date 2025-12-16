@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Http\Controllers\Web\DeviceEventsController;
 use App\Models\Device;
 use App\Models\DeviceEvent;
 use Illuminate\Support\Carbon;
@@ -20,12 +19,10 @@ class DeviceEventService
     /**
      * Log a device event in a reusable, centralized way.
      *
-     * @param int $deviceId
-     * @param string $eventType (e.g., linked, delinked, threshold_breach)
-     * @param array $details Additional event details (JSON stored)
-     * @param string|null $severity (info, warning, critical)
-     * @param Carbon|string|null $occurredAt
-     * @return DeviceEvent
+     * @param  string  $eventType  (e.g., linked, delinked, threshold_breach)
+     * @param  array  $details  Additional event details (JSON stored)
+     * @param  string|null  $severity  (info, warning, critical)
+     * @param  Carbon|string|null  $occurredAt
      */
     public function logEvent(
         int $deviceId,
@@ -35,10 +32,10 @@ class DeviceEventService
         $occurredAt = null
     ): DeviceEvent {
         return DeviceEvent::create([
-            'device_id'   => $deviceId,
-            'event_type'  => $eventType,
-            'severity'    => $severity,
-            'details'     => json_encode($details),
+            'device_id' => $deviceId,
+            'event_type' => $eventType,
+            'severity' => $severity,
+            'details' => json_encode($details),
             'occurred_at' => $occurredAt ?? now(),
         ]);
     }

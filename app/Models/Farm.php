@@ -2,22 +2,25 @@
 
 namespace App\Models;
 
-//use App\Models\Scopes\FarmScope;
+// use App\Models\Scopes\FarmScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Farm extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     /**
      * The "booted" method of the model.
      */
     protected static function booted()
     {
-//        static::addGlobalScope(new FarmScope);
+        //        static::addGlobalScope(new FarmScope);
     }
 
     protected $fillable = [
@@ -72,7 +75,7 @@ class Farm extends Model
 
     public function getBirdsCountAttribute(): int
     {
-        if (!$this->relationLoaded('sheds')) {
+        if (! $this->relationLoaded('sheds')) {
             return 0;
         }
 
@@ -104,5 +107,24 @@ class Farm extends Model
     public function city(): BelongsTo
     {
         return $this->belongsTo(Tehsil::class, 'city_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('farms') // goes into log_name
+            ->logOnly([
+                'name',
+                'province_id',
+                'district_id',
+                'city_id',
+                'address',
+                'owner_id',
+                'latitude',
+                'longitude',
+            ])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn (string $eventName) => "Farm {$this->name} was {$eventName} by ".optional(auth()->user())->name
+            );
     }
 }

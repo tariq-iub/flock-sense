@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Carbon\Carbon;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Flock extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'name',
@@ -28,8 +31,6 @@ class Flock extends Model
 
     /**
      * Get the age of the flock in days.
-     *
-     * @return int
      */
     public function getAgeAttribute(): int
     {
@@ -39,7 +40,7 @@ class Flock extends Model
         return $startDate->diffInDays($endDate);
     }
 
-    public function shed() : BelongsTo
+    public function shed(): BelongsTo
     {
         return $this->belongsTo(Shed::class);
     }
@@ -54,8 +55,25 @@ class Flock extends Model
         return $this->hasMany(ProductionLog::class);
     }
 
-    public function weightLog() : HasMany
+    public function weightLog(): HasMany
     {
         return $this->hasMany(WeightLog::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('flocks') // goes into log_name
+            ->logOnly([
+                'name',
+                'shed_id',
+                'breed_id',
+                'start_date',
+                'end_date',
+                'chicken_count',
+            ])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn (string $eventName) => "Flock {$this->name} was {$eventName} by ".optional(auth()->user())->name
+            );
     }
 }

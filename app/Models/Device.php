@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Device extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'serial_no',
         'model_number',
@@ -23,11 +26,11 @@ class Device extends Model
     ];
 
     protected $casts = [
-        'battery_operated'  => 'boolean',
-        'is_online'         => 'boolean',
-        'last_heartbeat'    => 'datetime',
-        'battery_level'     => 'integer',
-        'signal_strength'   => 'integer',
+        'battery_operated' => 'boolean',
+        'is_online' => 'boolean',
+        'last_heartbeat' => 'datetime',
+        'battery_level' => 'integer',
+        'signal_strength' => 'integer',
     ];
 
     /**
@@ -91,5 +94,26 @@ class Device extends Model
     {
         return $this->belongsToMany(Capability::class)
             ->withTimestamps();
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('devices') // goes into log_name
+            ->logOnly([
+                'serial_no',
+                'model_number',
+                'manufacturer',
+                'firmware_version',
+                'connectivity_type',
+                'battery_operated',
+                'battery_level',
+                'signal_strength',
+                'is_online',
+                'last_heartbeat',
+            ])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn (string $eventName) => "Device {$this->name} was {$eventName} by ".optional(auth()->user())->name
+            );
     }
 }
