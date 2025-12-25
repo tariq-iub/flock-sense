@@ -71,34 +71,33 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 });
 
-// Public sensor data store route (no auth required)
+Route::apiResource('device-appliances', DeviceApplianceController::class);
+
 Route::post('sensor-data', [SensorDataController::class, 'store']);
-
-// Push Sensor Data and Device Appliance Data
 Route::post('device/sync-data', [SensorDataController::class, 'syncDeviceData']);
-
-// Public sensor data store routes (with timestamp + multiple records)
 Route::post('sensor-data/with-timestamp', [SensorDataController::class, 'storeWithTimestamp']);
 Route::post('sensor-data/multiple', [SensorDataController::class, 'storeMultiple']);
-
-// Device data sync with timestamp
 Route::post('device/sync-data-with-timestamp', [SensorDataController::class, 'syncDeviceDataWithTimestamp']);
+Route::post('device-appliances/update-status', [DeviceApplianceController::class, 'updateStatus']);
+Route::post('device-appliances/update-all-statuses', [DeviceApplianceController::class, 'updateAllStatuses']);
 
-// Resource routes
-Route::apiResource('device-appliances', DeviceApplianceController::class);
+Route::prefix('iot')->group(function () {
+    Route::post('/sensor', [IoTDeviceDataController::class, 'storeSensor']);
+    Route::post('/sensors', [IoTDeviceDataController::class, 'storeMultipleSensor']);
+    Route::post('/appliances', [IoTDeviceDataController::class, 'updateAppliance']);
+    Route::post('/appliances/multiple', [IoTDeviceDataController::class, 'updateMultipleAppliances']);
+    Route::post('/sync', [IoTDeviceDataController::class, 'syncDeviceData']);
+    Route::post('/sync/multiple', [IoTDeviceDataController::class, 'syncMultipleDeviceData']);
+});
+
+// Legacy IoT-Device routes
+Route::get('device-appliances/statuses', [DeviceApplianceController::class, 'getAllStatuses']);
+Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'getStatus']);
 
 // Custom routes
 Route::get('shed/{shedId}/appliances', [DeviceApplianceController::class, 'fetchByShed']);
 Route::get('device/{serial}/appliances', [DeviceApplianceController::class, 'fetchByDevice']);
 Route::get('device/{serial}/appliance-ids', [DeviceApplianceController::class, 'fetchDeviceApplianceIds']);
-
-// Status routes - Updated for key-based approach
-Route::post('device-appliances/update-status', [DeviceApplianceController::class, 'updateStatus']);
-Route::post('device-appliances/update-all-statuses', [DeviceApplianceController::class, 'updateAllStatuses']);
-
-// Legacy routes
-Route::get('device-appliances/statuses', [DeviceApplianceController::class, 'getAllStatuses']);
-Route::get('device-appliances/{deviceAppliance}/status', [DeviceApplianceController::class, 'getStatus']);
 
 // Daily reports
 Route::get('production/report/headers/{id}', [ProductionLogController::class, 'dailyReportHeaders'])->name('productions.report.headers');
@@ -118,26 +117,6 @@ Route::get('/uniformity', [GraphDataController::class, 'uniformity']);
 Route::get('/vaccination-history', [GraphDataController::class, 'vaccinationHistory']);
 Route::get('/feed-consumption-history', [GraphDataController::class, 'feedConsumptionHistory']);
 Route::get('/water-consumption-history', [GraphDataController::class, 'waterConsumptionHistory']);
-
-Route::prefix('iot')->group(function () {
-    // 1. Store sensor data (single record)
-    Route::post('/sensor', [IoTDeviceDataController::class, 'storeSensor']);
-
-    // 2. Store multiple sensor data records
-    Route::post('/sensors', [IoTDeviceDataController::class, 'storeMultipleSensor']);
-
-    // 3. Update appliance data (single snapshot)
-    Route::post('/appliances', [IoTDeviceDataController::class, 'updateAppliance']);
-
-    // 4. Update multiple appliance records
-    Route::post('/appliances/multiple', [IoTDeviceDataController::class, 'updateMultipleAppliances']);
-
-    // 5. Sync device data (appliances + sensors, single record)
-    Route::post('/sync', [IoTDeviceDataController::class, 'syncDeviceData']);
-
-    // 6. Sync multiple device data records
-    Route::post('/sync/multiple', [IoTDeviceDataController::class, 'syncMultipleDeviceData']);
-});
 
 // Address Credentials
 Route::get('provinces', function () {
