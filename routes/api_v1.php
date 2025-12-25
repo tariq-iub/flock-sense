@@ -106,8 +106,6 @@ Route::get('production/report/history', [ProductionLogController::class, 'histor
 Route::get('production/report/latest', [ProductionLogController::class, 'latestHistory'])->name('productions.report.latest');
 Route::get('daily-report/{version}', [ProductionLogController::class, 'dailyReport'])->name('productions.daily.report');
 
-Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
-
 Route::get('/mortality-rate', [GraphDataController::class, 'mortalityRate']);
 Route::get('/adg-weight', [GraphDataController::class, 'adgAndWeight']);
 Route::get('/feed-weight-cumulative', [GraphDataController::class, 'feedWeightCumulative']);
@@ -117,6 +115,7 @@ Route::get('/uniformity', [GraphDataController::class, 'uniformity']);
 Route::get('/vaccination-history', [GraphDataController::class, 'vaccinationHistory']);
 Route::get('/feed-consumption-history', [GraphDataController::class, 'feedConsumptionHistory']);
 Route::get('/water-consumption-history', [GraphDataController::class, 'waterConsumptionHistory']);
+Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
 
 // Address Credentials
 Route::get('provinces', function () {
