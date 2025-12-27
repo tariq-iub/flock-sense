@@ -41,8 +41,8 @@
                                          Route::is('admin.flocks.*') ||
                                          Route::is('partners.*') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
-                                <i class="ti ti-user-edit fs-16 me-2"></i>
-                                <span>System Admin</span><span class="menu-arrow"></span>
+                                <i class="ti ti-database-cog fs-16 me-2"></i>
+                                <span>Master Data</span><span class="menu-arrow"></span>
                             </a>
                             <ul>
                                 <li>
@@ -142,7 +142,7 @@
                                          Route::is('devices.map') ||
                                          Route::is('iot.alerts') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-devices fs-16 me-2"></i>
-                                <span>IoT Management</span>
+                                <span>IoT & Devices</span>
                                 <span class="menu-arrow"></span>
                             </a>
                             <ul>
@@ -170,6 +170,11 @@
                                     <a href="{{ route('iot.alerts') }}"
                                        class="{{ request()->routeIs('iot.alerts') ? 'active' : '' }}">
                                         IoT Alerts
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Print QR Code
                                     </a>
                                 </li>
                             </ul>
@@ -241,11 +246,6 @@
                         <li>
                             <a href="#">
                                 <i class="ti ti-table-plus fs-16 me-2"></i><span>Support Requests</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="ti ti-qrcode fs-16 me-2"></i><span>Print QR Code</span>
                             </a>
                         </li>
                     </ul>

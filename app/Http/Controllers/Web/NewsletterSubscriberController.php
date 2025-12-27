@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Mail\Newsletter\SubscriberWelcomeMail;
 use App\Models\NewsletterSubscriber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -15,9 +16,9 @@ class NewsletterSubscriberController extends Controller
 
         $query = NewsletterSubscriber::query();
 
-        if ($status === 'subscribed') {
+        if ($status == 'subscribed') {
             $query->where('status', 'subscribed');
-        } elseif ($status === 'unsubscribed') {
+        } elseif ($status == 'unsubscribed') {
             $query->where('status', 'unsubscribed');
         }
 
@@ -37,6 +38,19 @@ class NewsletterSubscriberController extends Controller
             'source' => ['nullable', 'string', 'max:50'],
         ]);
 
+        // Check if already subscribed
+        $existingSubscriber = NewsletterSubscriber::where('email', strtolower($data['email']))
+            ->where('status', 'subscribed')
+            ->first();
+
+        if ($existingSubscriber) {
+            return response()->json([
+                'message' => 'This email is already subscribed.',
+                'type' => 'warning',
+            ], 409);
+        }
+
+        // Create or update subscriber
         $subscriber = NewsletterSubscriber::firstOrNew(['email' => strtolower($data['email'])]);
 
         // If previously unsubscribed, re-subscribe
@@ -54,6 +68,7 @@ class NewsletterSubscriberController extends Controller
 
         return response()->json([
             'message' => 'Subscribed successfully. Please check your email.',
+            'type' => 'success',
         ]);
     }
 
