@@ -14,6 +14,8 @@ use App\Http\Controllers\Web\IotController;
 use App\Http\Controllers\Web\LogsController;
 use App\Http\Controllers\Web\MapController;
 use App\Http\Controllers\Web\MedicineController;
+use App\Http\Controllers\Web\NewsletterController;
+use App\Http\Controllers\Web\NewsletterSubscriberController;
 use App\Http\Controllers\Web\PartnerController;
 use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
@@ -54,6 +56,12 @@ Route::get('/pricing', function () {
 Route::get('/about', function () {
     return view('frontend.about');
 })->name('about');
+
+Route::post('/newsletter/subscribe', [NewsletterSubscriberController::class, 'store'])
+    ->name('newsletter.subscribe');
+
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterSubscriberController::class, 'unsubscribe'])
+    ->name('newsletter.unsubscribe');
 
 // Login and forget-password routes (outside admin group)
 Route::get('/login', function () {
@@ -106,6 +114,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
+    Route::prefix('clients')->controller(ClientController::class)->group(function () {
+        Route::get('/{user}', 'show')->name('clients.show');
+        Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
+    });
+
     // Productions Logs
     Route::prefix('productions')->controller(ProductionLogController::class)->group(function () {
         Route::get('/', 'index')->name('productions.index');
@@ -144,12 +157,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|ma
             ->get();
     });
 
-    // Client
-    Route::prefix('clients')->controller(ClientController::class)->group(function () {
-        Route::get('/{user}', 'show')->name('clients.show');
-        Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
-
-    });
     // Reports
     Route::prefix('reports')->controller(ReportsController::class)->group(function () {
         Route::get('/income', 'income')->name('reports.income');
@@ -171,6 +178,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     // Register routes (GET and POST)
     //    Route::get('/register', [AuthController::class, 'register'])->name('register');
     //    Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+    // Newsletters
+    Route::get('newsletters/subscribers', [NewsletterSubscriberController::class, 'index'])
+        ->name('newsletters.subscribers');
+    Route::put('newsletters/subscribers/{subscriber}/toggle', [NewsletterSubscriberController::class, 'toggleStatus'])
+        ->name('newsletters.subscribers.toggle');
+    Route::resource('newsletters', NewsletterController::class);
+    Route::post('newsletters/{newsletter}/queue-send', [NewsletterController::class, 'queueSend'])
+        ->name('newsletters.queueSend');
 
     Route::get('/iot/alerts', [LogsController::class, 'alerts'])->name('iot.alerts');
     Route::get('/iot/events-data/{id}', [LogsController::class, 'events_data'])->name('iot.events.data');
@@ -207,13 +223,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
     });
 
     // Users and Clients
+    Route::get('user/activities', [ClientController::class, 'activities'])
+        ->name('clients.activities');
+
     Route::prefix('clients')->controller(ClientController::class)->group(function () {
         Route::get('/', 'index')->name('clients.index');
         Route::post('/', 'store')->name('clients.store');
         Route::get('/{user}/edit', 'edit')->name('clients.edit');
         Route::put('/{user}', 'update')->name('clients.update');
         Route::delete('/{user}', 'destroy')->name('clients.destroy');
-        Route::get('/activities', 'activities')->name('clients.activities');
     });
 
     // Farms

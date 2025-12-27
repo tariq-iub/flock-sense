@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
-use Aws\Sdk;
 use Aws\DynamoDb\Marshaler;
-use Illuminate\Support\Facades\Log;
+use Aws\Sdk;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class DynamoDbService
 {
     protected $client;
+
     protected $marshaler;
 
     /**
@@ -18,6 +19,7 @@ class DynamoDbService
      * applianceTable: stores appliance status history
      */
     protected string $sensorTable;
+
     protected string $applianceTable;
 
     public function __construct()
@@ -40,7 +42,7 @@ class DynamoDbService
         $this->client = $sdk->createDynamoDb();
 
         // Marshaler to convert PHP -> DynamoDB types and back
-        $this->marshaler = new Marshaler();
+        $this->marshaler = new Marshaler;
 
         // Table names (can be overridden via config if you want)
         $this->sensorTable = config('aws.dynamo.sensor_table', 'sensor-data');
@@ -103,11 +105,9 @@ class DynamoDbService
     /**
      * Get sensor data for one or more device_ids.
      *
-     * @param array $deviceIds
-     * @param int|null $fromTimestamp required unless $latest is true
-     * @param int|null $toTimestamp optional
-     * @param bool $latest if true returns only latest record per device
-     * @param bool $ascOrder
+     * @param  int|null  $fromTimestamp  required unless $latest is true
+     * @param  int|null  $toTimestamp  optional
+     * @param  bool  $latest  if true returns only latest record per device
      * @return array Array of unmarshalled items (PHP associative arrays)
      */
     public function getSensorData(array $deviceIds, ?int $fromTimestamp, ?int $toTimestamp = null, bool $latest = false, bool $ascOrder = true): array
@@ -124,7 +124,7 @@ class DynamoDbService
                     'TableName' => 'sensor-data',  // Explicit table name
                     'KeyConditionExpression' => 'device_id = :device_id',
                     'ExpressionAttributeValues' => [
-                        ':device_id' => $this->marshaler->marshalValue((int)$deviceId),
+                        ':device_id' => $this->marshaler->marshalValue((int) $deviceId),
                     ],
                     'ScanIndexForward' => $ascOrder,
                 ];
@@ -138,24 +138,24 @@ class DynamoDbService
                     $query['KeyConditionExpression'] .= ' AND #ts >= :from_ts';
                     $query['ExpressionAttributeNames'] = ['#ts' => 'timestamp'];
                     $query['ExpressionAttributeValues'][':from_ts'] =
-                        $this->marshaler->marshalValue((int)$fromTimestamp);
+                        $this->marshaler->marshalValue((int) $fromTimestamp);
 
                     if ($toTimestamp !== null) {
                         $query['KeyConditionExpression'] = 'device_id = :device_id AND #ts BETWEEN :from_ts AND :to_ts';
                         $query['ExpressionAttributeValues'][':to_ts'] =
-                            $this->marshaler->marshalValue((int)$toTimestamp);
+                            $this->marshaler->marshalValue((int) $toTimestamp);
                     }
                 }
 
                 $response = $this->client->query($query);
 
-                if (!empty($response['Items'])) {
+                if (! empty($response['Items'])) {
                     $record = $this->marshaler->unmarshalItem($response['Items'][0]);
 
                     // Normalize numeric strings
                     array_walk_recursive($record, function (&$v) {
                         if (is_string($v) && is_numeric($v)) {
-                            $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
+                            $v = (strpos($v, '.') === false) ? (int) $v : (float) $v;
                         }
                     });
 
@@ -178,13 +178,7 @@ class DynamoDbService
     /**
      * Get appliance history for device(s).
      *
-     * @param array $deviceIds
-     * @param int|null $fromTimestamp
-     * @param int|null $toTimestamp
-     * @param bool $latest
-     * @param string|null $applianceKey optional: filter by appliance_key (will be FilterExpression)
-     * @param bool $ascOrder
-     * @return array
+     * @param  string|null  $applianceKey  optional: filter by appliance_key (will be FilterExpression)
      */
     public function getApplianceHistory(array $deviceIds, ?int $fromTimestamp, ?int $toTimestamp = null, bool $latest = false, ?string $applianceKey = null, bool $ascOrder = true): array
     {
@@ -208,7 +202,7 @@ class DynamoDbService
                     'TableName' => 'sensor-data', // ✅ use correct name here
                     'KeyConditionExpression' => 'device_id = :device_id',
                     'ExpressionAttributeValues' => [
-                        ':device_id' => $this->marshaler->marshalValue((int)$deviceId),
+                        ':device_id' => $this->marshaler->marshalValue((int) $deviceId),
                     ],
                     'ScanIndexForward' => false, // newest first
                     'Limit' => 1,
@@ -216,13 +210,13 @@ class DynamoDbService
 
                 $response = $this->client->query($query);
 
-                if (!empty($response['Items']) && isset($response['Items'][0])) {
+                if (! empty($response['Items']) && isset($response['Items'][0])) {
                     $item = $response['Items'][0];
                     $record = $this->marshaler->unmarshalItem($item);
 
                     array_walk_recursive($record, function (&$v) {
                         if (is_string($v) && is_numeric($v)) {
-                            $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
+                            $v = (strpos($v, '.') === false) ? (int) $v : (float) $v;
                         }
                     });
 
@@ -248,6 +242,7 @@ class DynamoDbService
     public function getLatestApplianceStatus(int $deviceId, ?string $applianceKey = null)
     {
         $items = $this->getApplianceHistory([$deviceId], null, null, true, $applianceKey, false);
+
         return $items[0] ?? null;
     }
 
@@ -256,19 +251,18 @@ class DynamoDbService
      * Supports optional FilterExpression on a given attribute name.
      */
     protected function queryByDeviceIds(
-        string  $table,
-        array   $deviceIds,
-        ?int    $fromTimestamp,
-        ?int    $toTimestamp = null,
-        bool    $latest = false,
-        bool    $ascOrder = true,
+        string $table,
+        array $deviceIds,
+        ?int $fromTimestamp,
+        ?int $toTimestamp = null,
+        bool $latest = false,
+        bool $ascOrder = true,
         ?string $filterValue = null,
         ?string $filterAttributeName = null
-    ): array
-    {
+    ): array {
         $results = [];
 
-        if (empty($deviceIds) || (!$latest && $fromTimestamp === null)) {
+        if (empty($deviceIds) || (! $latest && $fromTimestamp === null)) {
             return $results;
         }
 
@@ -296,17 +290,17 @@ class DynamoDbService
 
                 // Prepare range values if needed (don't cast to int blindly — we'll marshal safely)
                 $rangeValues = [];
-                if (!$latest) {
-                    $rangeValues[':from_ts'] = $this->marshaler->marshalValue((int)$fromTimestamp);
+                if (! $latest) {
+                    $rangeValues[':from_ts'] = $this->marshaler->marshalValue((int) $fromTimestamp);
                     if ($toTimestamp !== null) {
-                        $rangeValues[':to_ts'] = $this->marshaler->marshalValue((int)$toTimestamp);
+                        $rangeValues[':to_ts'] = $this->marshaler->marshalValue((int) $toTimestamp);
                     }
                 }
 
                 // Filter expression (optional)
                 $filterExpression = null;
                 $filterValueMarshalled = null;
-                if (!empty($filterAttributeName) && $filterValue !== null) {
+                if (! empty($filterAttributeName) && $filterValue !== null) {
                     $exprAttrNames['#filter'] = $filterAttributeName;
                     $filterExpression = '#filter = :filter_val';
                     $filterValueMarshalled = $this->marshaler->marshalValue($filterValue);
@@ -316,8 +310,8 @@ class DynamoDbService
                 //  - numeric (N)
                 //  - string (S)
                 $attempts = [
-                    $this->marshaler->marshalValue(is_int($deviceId) ? $deviceId : (int)$deviceId),
-                    $this->marshaler->marshalValue((string)$deviceId),
+                    $this->marshaler->marshalValue(is_int($deviceId) ? $deviceId : (int) $deviceId),
+                    $this->marshaler->marshalValue((string) $deviceId),
                 ];
 
                 $foundItemsForDevice = [];
@@ -369,13 +363,13 @@ class DynamoDbService
 
                         $response = $this->client->query($query);
 
-                        if (!empty($response['Items'])) {
+                        if (! empty($response['Items'])) {
                             foreach ($response['Items'] as $item) {
                                 $record = $this->marshaler->unmarshalItem($item);
                                 // Optional: normalize numeric strings
                                 array_walk_recursive($record, function (&$v) {
                                     if (is_string($v) && is_numeric($v)) {
-                                        $v = (strpos($v, '.') === false) ? (int)$v : (float)$v;
+                                        $v = (strpos($v, '.') === false) ? (int) $v : (float) $v;
                                     }
                                 });
                                 $foundItemsForDevice[] = $record;
@@ -388,12 +382,12 @@ class DynamoDbService
                         // - If no filterExpression: we only needed the first page -> break to next device.
                         // - If filterExpression: continue paginating until we find a matching item or pages exhausted.
                         if ($latest) {
-                            if (!$filterExpression) {
+                            if (! $filterExpression) {
                                 // we wanted the single newest item only
                                 break; // break out of attempts+device loops and use found items
                             } else {
                                 // if we found at least one item matching filter in this attempt, we're done for this device
-                                if (!empty($foundItemsForDevice)) {
+                                if (! empty($foundItemsForDevice)) {
                                     break;
                                 }
                                 // else continue paging if AWS says there are more pages
@@ -401,7 +395,7 @@ class DynamoDbService
                         }
                     } while ($lastEvaluatedKey);
                     // if items found in this attempt and latest=false, we still append all pages; continue attempts no longer necessary
-                    if (!empty($foundItemsForDevice) && !$latest) {
+                    if (! empty($foundItemsForDevice) && ! $latest) {
                         break; // found data with current attempt, no need to try alternate key type
                     }
                 } // end attempts

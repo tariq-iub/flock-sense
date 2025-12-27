@@ -125,12 +125,14 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('clients.activities') }}" @class(['active' => Route::is('clients.activities')])>
+                                    <a href="{{ route('clients.activities') }}"
+                                        @class(['active' => Route::is('clients.activities')])>
                                         User Activities
                                     </a>
                                 </li>
                             </ul>
                         </li>
+
                         <li class="submenu">
                             <a href="javascript:void(0);"
                                class="{{ Route::is('iot.index') ||
@@ -176,6 +178,51 @@
                     </ul>
                 </li>
                 @admin
+                <li class="submenu-open">
+                    <h6 class="submenu-hdr">CONTENT MANAGEMENT</h6>
+                    <ul>
+                        <li class="submenu">
+                            <a href="javascript:void(0);"
+                               class="{{ Route::is('newsletters.*') ? 'subdrop active' : '' }}">
+                                <i class="ti ti-send fs-16 me-2"></i>
+                                <span>Newsletters</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                <li>
+                                    <a href="{{ route('newsletters.index') }}"
+                                       class="{{ request()->routeIs('newsletters.index') ||
+                                                 request()->routeIs('newsletters.create') ||
+                                                 request()->routeIs('newsletters.edit') ? 'active' : '' }}">
+                                        Newsletters List
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('newsletters.subscribers') }}"
+                                       class="{{ request()->routeIs('newsletters.subscribers') ? 'active' : '' }}">
+                                        Subscribers
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="ti ti-wallpaper fs-16 me-2"></i><span>Blogging</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="ti ti-table-plus fs-16 me-2"></i><span>Events</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="ti ti-star fs-16 me-2"></i><span>Testimonials</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
                 <li class="submenu-open">
                     <h6 class="submenu-hdr">OPERATIONS</h6>
 
