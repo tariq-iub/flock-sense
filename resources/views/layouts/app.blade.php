@@ -7,7 +7,7 @@
     <meta name="keywords" content="Smart farm management, poultry farm automation, IoT poultry farming, poultry monitoring system, real-time farm analytics, AI poultry management, poultry health monitoring, feed efficiency solutions, biosecurity poultry, smart poultry sensors, modern poultry farming, digital poultry solutions, flock management platform, poultry farm control system, smart poultry environment, poultry data analytics, automated poultry operations, remote poultry monitoring, sustainable poultry farming, advanced poultry technology, smart chicken farm, poultry performance optimization, cloud-based poultry management, AI farm insights, smart livestock solutions">
     <meta name="author" content="FlockSense">
     <meta name="robots" content="index, follow">
-    <meta name="google-site-verification" content="78jyRInmxCC83985nwpZ5qsVphiGHZqCWLYyoH_cnzA" />
+    <meta name="google-site-verification" content="7p6DahxeCXUehwhHcxN7p2yHr57EG8Ufugoery9m4lc" />
 
     <title>FlockSense - @yield('title')</title>
 

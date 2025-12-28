@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="google-site-verification" content="78jyRInmxCC83985nwpZ5qsVphiGHZqCWLYyoH_cnzA" />
+    <meta name="google-site-verification" content="7p6DahxeCXUehwhHcxN7p2yHr57EG8Ufugoery9m4lc" />
 
     <title>FlockSense - Smart Farm Management</title>
     <!-- Bootstrap CSS -->

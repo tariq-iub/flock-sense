@@ -15,94 +15,108 @@ class ShortcutSeeder extends Seeder
         $shortcuts = [
             [
                 'title' => 'Devices',
-                'url' => '/devices',
+                'url' => '/admin/iot',
                 'icon' => 'ti ti-device-desktop',
                 'group' => 'admin',
                 'default' => true,
             ],
             [
-                'title' => 'QR Printing',
-                'url' => '/qr-printing',
+                'title' => 'QR Codes',
+                'url' => '/admin/qr-code',
                 'icon' => 'ti ti-qrcode',
                 'group' => 'admin',
                 'default' => true,
             ],
             [
                 'title' => 'Settings',
-                'url' => '/settings',
+                'url' => '/admin/system/web-settings',
                 'icon' => 'ti ti-settings',
                 'group' => 'admin',
                 'default' => true,
             ],
             [
                 'title' => 'Vaccination',
-                'url' => '/vaccination',
+                'url' => '/admin/medicines',
                 'icon' => 'ti ti-vaccine',
                 'group' => 'admin',
-                'default' => false,
-            ],
-            [
-                'title' => 'Farms',
-                'url' => '/farms',
-                'icon' => 'ti ti-building-farm',
-                'group' => 'admin', // Will handle multiple groups in code
-                'default' => false,
-            ],
-            [
-                'title' => 'Sheds',
-                'url' => '/sheds',
-                'icon' => 'ti ti-building-warehouse',
-                'group' => 'admin', // Will handle multiple groups in code
-                'default' => false,
-            ],
-            [
-                'title' => 'Flocks',
-                'url' => '/flocks',
-                'icon' => 'ti ti-feather',
-                'group' => 'admin', // Will handle multiple groups in code
-                'default' => false,
+                'default' => true,
             ],
             [
                 'title' => 'Users',
-                'url' => '/users',
+                'url' => '/admin/clients',
                 'icon' => 'ti ti-users',
                 'group' => 'admin',
                 'default' => true,
             ],
             [
+                'title' => 'Roles',
+                'url' => '/admin/roles',
+                'icon' => 'ti ti-medal',
+                'group' => 'admin',
+                'default' => true,
+            ],
+            [
+                'title' => 'User Log',
+                'url' => '/admin/user/activities',
+                'icon' => 'ti ti-settings-2',
+                'group' => 'admin',
+                'default' => true,
+            ],
+            [
+                'title' => 'Farms',
+                'url' => '/admin/farms',
+                'icon' => 'ti ti-building',
+                'group' => 'user',
+                'default' => true,
+            ],
+            [
+                'title' => 'Sheds',
+                'url' => '/admin/sheds',
+                'icon' => 'ti ti-building-warehouse',
+                'group' => 'user',
+                'default' => true,
+            ],
+            [
+                'title' => 'Flocks',
+                'url' => '/admin/flocks',
+                'icon' => 'ti ti-feather',
+                'group' => 'user',
+                'default' => true,
+            ],
+            [
+                'title' => 'Productions',
+                'url' => '/admin/productions',
+                'icon' => 'ti ti-chart-bar',
+                'group' => 'user',
+                'default' => true,
+            ],
+            [
                 'title' => 'Staff',
-                'url' => '/staff',
+                'url' => '/admin/staff',
                 'icon' => 'ti ti-user-check',
                 'group' => 'user',
                 'default' => true,
             ],
             [
-                'title' => 'Analytics',
-                'url' => '/analytics',
-                'icon' => 'ti ti-chart-bar',
-                'group' => 'admin', // Will handle multiple groups in code
+                'title' => 'Inventory',
+                'url' => '/admin/inventory',
+                'icon' => 'ti ti-package',
+                'group' => 'user',
                 'default' => true,
             ],
             [
-                'title' => 'Inventory',
-                'url' => '/inventory',
-                'icon' => 'ti ti-package',
-                'group' => 'user',
-                'default' => false,
-            ],
-            [
                 'title' => 'Expenses',
-                'url' => '/expenses',
+                'url' => '/admin/expenses',
                 'icon' => 'ti ti-cash',
                 'group' => 'user',
-                'default' => false,
+                'default' => true,
             ],
             [
                 'title' => 'Live Rates',
-                'url' => '/live-rates',
+                'url' => '/admin/live-rates',
                 'icon' => 'ti ti-chart-line',
-                'group' => 'admin', // Will handle multiple groups in code
-                'default' => false,
+                'group' => 'user', // Will handle multiple groups in code
+                'default' => true,
             ],
         ];
 
@@ -116,38 +130,6 @@ class ShortcutSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-        }
-
-        // Create additional entries for shortcuts that belong to multiple groups
-        $multiGroupShortcuts = [
-            'Farms' => 'user',
-            'Sheds' => 'user',
-            'Flocks' => 'user',
-            'Analytics' => 'user',
-            'Live Rates' => 'user',
-        ];
-
-        foreach ($multiGroupShortcuts as $title => $group) {
-            $existing = DB::table('shortcuts')
-                ->where('title', $title)
-                ->where('group', $group)
-                ->first();
-
-            if (! $existing) {
-                $original = DB::table('shortcuts')
-                    ->where('title', $title)
-                    ->first();
-
-                DB::table('shortcuts')->insert([
-                    'title' => $title,
-                    'url' => $original->url,
-                    'icon' => $original->icon,
-                    'group' => $group,
-                    'default' => $original->default,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
         }
 
         // Get all admin shortcuts
