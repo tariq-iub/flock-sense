@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Partners')
+@section('title', 'Quick Actions')
 
 @section('content')
     <div class="content">
         <div class="page-header">
             <div class="add-item d-flex">
                 <div class="page-title">
-                    <h4 class="fw-bold">Shortcuts</h4>
-                    <h6>Manage shortcuts of the modules.</h6>
+                    <h4 class="fw-bold">Quick Actions</h4>
+                    <h6>Manage quick access shortcuts.</h6>
                 </div>
             </div>
             <ul class="table-top-head">
@@ -19,8 +19,8 @@
                 </li>
             </ul>
             <div class="page-btn">
-                <a href="javascript:void(0)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPricingModal">
-                    <i class="ti ti-circle-plus me-1"></i> Add Shortcut
+                <a href="{{ route('shortcuts.create') }}" class="btn btn-primary">
+                    <i class="ti ti-circle-plus me-1"></i>Add Shortcut
                 </a>
             </div>
         </div>
@@ -28,15 +28,15 @@
         <div class="container-fluid">
             <div class="row mb-3">
                 @if (session('success'))
-                    <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
-                        <div>
-                            <i class="feather-check-circle flex-shrink-0 me-2"></i>
-                            {{ session('success') }}
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                            <i class="fas fa-xmark"></i>
-                        </button>
+                <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
+                    <div>
+                        <i class="feather-check-circle flex-shrink-0 me-2"></i>
+                        {{ session('success') }}
                     </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
                 @endif
 
                 @if ($errors->any())
@@ -65,70 +65,87 @@
                         <span class="btn-searchset"><i class="ti ti-search fs-14 feather-search"></i></span>
                     </div>
                 </div>
+                <div class="d-flex my-xl-auto right-content align-items-center row-gap-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="groupFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="ti ti-filter me-2"></i>Filter by Group
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="groupFilter">
+                            <li><a class="dropdown-item" href="#" data-group="">All Groups</a></li>
+                            <li><a class="dropdown-item" href="#" data-group="admin">Admin</a></li>
+                            <li><a class="dropdown-item" href="#" data-group="user">User</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover datatable-custom align-middle">
+                    <table class="table datatable-custom">
                         <thead class="thead-light">
                         <tr>
-                            <th>Company</th>
-                            <th class="text-center">URL</th>
-                            <th class="text-center">Introduction</th>
-                            <th class="text-center">Partnership Detail</th>
-                            <th class="text-center">Keywords</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Sort</th>
-                            <th></th>
+                            <th>Icon</th>
+                            <th>Title</th>
+                            <th>URL</th>
+                            <th>Group</th>
+                            <th class="text-center">Default</th>
+                            <th class="text-center">Users Count</th>
+                            <th class="no-sort"></th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach([] as $partner)
+                        @foreach($shortcuts as $shortcut)
                             <tr>
                                 <td>
-                                    <span class="fw-bold">{{ $partner->company_name }}</span>
+                                    <span class="badge bg-soft-info text-dark border p-2">
+                                        <i class="{{ $shortcut->icon }} fs-20"></i>
+                                    </span>
                                 </td>
-                                <td class="fs-11">
-                                    <a href="{{ $partner->url }}" target="_blank">{{ $partner->url }}</a>
-                                </td>
-                                <td>{{ $partner->introduction }}</td>
+                                <td><strong>{{ $shortcut->title }}</strong></td>
+                                <td><code>{{ $shortcut->url }}</code></td>
                                 <td>
-                                    {{ $partner->partnership_detail }}
+                                    <span class="badge {{ $shortcut->group === 'admin' ? 'bg-soft-primary' : 'bg-soft-secondary' }} text-dark border">
+                                        <i class="ti {{ $shortcut->group === 'admin' ? 'ti-shield-check' : 'ti-users' }} me-1"></i>
+                                        {{ ucfirst($shortcut->group) }}
+                                    </span>
                                 </td>
                                 <td class="text-center">
-
-                                </td>
-                                <td class="text-center">
-                                    @if($partner->is_active)
-                                        <span class="badge bg-success">Active</span>
+                                    @if($shortcut->default)
+                                        <span class="badge bg-soft-success text-dark border">
+                                            <i class="ti ti-check"></i> Yes
+                                        </span>
                                     @else
-                                        <span class="badge bg-secondary">Inactive</span>
+                                        <span class="badge bg-soft-secondary text-dark border">
+                                            <i class="ti ti-x"></i> No
+                                        </span>
                                     @endif
                                 </td>
-                                <td class="text-center">{{ $partner->sort_order }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-soft-info text-dark border">
+                                        {{ $shortcut->users->count() }}
+                                    </span>
+                                </td>
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
-                                        <a href="javascript:void(0)"
-                                           class="me-2 d-flex align-items-center p-2 border rounded edit-pricing"
+                                        <a href="{{ route('shortcuts.edit', $shortcut) }}"
+                                           class="p-2 border rounded me-2"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Edit Plan"
-                                           data-pricing-id="{{ $partner->id }}"
-                                           data-pricing-name="{{ $partner->company_name }}">
+                                           data-bs-original-title="Edit Shortcut">
                                             <i class="ti ti-edit"></i>
                                         </a>
+
                                         <a href="javascript:void(0);"
+                                           class="p-2 border rounded me-2 open-delete-modal"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Delete Plan"
-                                           data-pricing-id="{{ $partner->id }}"
-                                           data-pricing-name="{{ $partner->company_name }}"
-                                           class="p-2 open-delete-modal">
+                                           data-bs-original-title="Delete Shortcut"
+                                           data-shortcut-id="{{ $shortcut->id }}"
+                                           data-shortcut-name="{{ $shortcut->title }}">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
-                                        <form action="{{ route('pricing-plans.destroy', $partner->id) }}" method="POST" id="delete{{ $partner->id }}">
+                                        <form action="{{ route('shortcuts.destroy', $shortcut->id) }}" method="POST" id="delete{{ $shortcut->id }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -143,12 +160,6 @@
         </div>
     </div>
 
-    <!-- Add Pricing Modal -->
-    @include('admin.partners._add_modal')
-
-    <!-- Edit Pricing Modal -->
-    @include('admin.partners._edit_modal')
-
     <!-- Delete Modal -->
     <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -158,9 +169,9 @@
                     <span class="rounded-circle d-inline-flex p-2 bg-danger-transparent mb-2">
                         <i class="ti ti-trash fs-24 text-danger"></i>
                     </span>
-                        <h4 class="fs-20 fw-bold mb-2 mt-1">Delete Partner</h4>
+                        <h4 class="fs-20 fw-bold mb-2 mt-1">Delete Shortcut</h4>
                         <p class="mb-0 fs-16" id="delete-modal-message">
-                            Are you sure you want to delete this partner?
+                            Are you sure you want to delete this shortcut?
                         </p>
                         <div class="modal-footer-btn mt-3 d-flex justify-content-center">
                             <button type="button" class="btn btn-secondary fs-13 fw-medium p-2 px-3 me-2" data-bs-dismiss="modal">
@@ -180,12 +191,12 @@
 @push('js')
     <script>
         $(function() {
+            // Datatable
             if($('.datatable-custom').length > 0) {
                 var table = $('.datatable-custom').DataTable({
                     "bFilter": true,
                     "sDom": 'fBtlpi',
                     "ordering": true,
-                    "order": [[7, 'asc']],
                     "language": {
                         search: ' ',
                         sLengthMenu: '_MENU_',
@@ -203,43 +214,25 @@
                     },
                 });
 
-                $('#intervalFilter').on('change', function() {
-                    var selected = $(this).val();
-                    table.column(2).search(selected).draw();
+                // Group filter
+                $('.dropdown-item[data-group]').on('click', function(e) {
+                    e.preventDefault();
+                    var group = $(this).data('group');
+                    table.column(3).search(group).draw();
                 });
             }
         });
-        // Edit modal JS (to be filled by AJAX if needed)
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.edit-pricing').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var pricingId = this.getAttribute('data-pricing-id');
-                    var pricingName = this.getAttribute('data-pricing-name');
-
-                    var form = document.getElementById('editPricingForm');
-                    var updateUrl = '/admin/pricing-plans/' + pricingId;
-
-                    document.getElementById('editPricingModalLabel').textContent = "Edit Plan - " + pricingName;
-
-                    $.get('/admin/pricing-plans/' + pricingId, function(plan) {
-                        // Populate fields
-                        fillEditPricingModal(plan, updateUrl);
-
-                        var modal = new bootstrap.Modal(document.getElementById('editPricingModal'));
-                        modal.show();
-                    });
-                });
-            });
-        });
-        // Delete modal logic
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             let deleteId = null;
+
             document.querySelectorAll('.open-delete-modal').forEach(function(el) {
                 el.addEventListener('click', function() {
-                    deleteId = this.getAttribute('data-pricing-id');
-                    const planName = this.getAttribute('data-pricing-name');
+                    deleteId = this.getAttribute('data-shortcut-id');
+                    const shortcutName = this.getAttribute('data-shortcut-name');
                     document.getElementById('delete-modal-message').textContent =
-                        `Are you sure you want to delete "${planName}" plan?`;
+                        `Are you sure you want to delete "${shortcutName}" shortcut?`;
 
                     var modal = new bootstrap.Modal(document.getElementById('delete-modal'));
                     modal.show();

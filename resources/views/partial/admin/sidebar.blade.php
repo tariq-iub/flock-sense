@@ -40,6 +40,7 @@
                                          Route::is('admin.sheds.*') ||
                                          Route::is('admin.flocks.*') ||
                                          Route::is('partners.*') ||
+                                         Route::is('shortcuts.*') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-database-cog fs-16 me-2"></i>
                                 <span>Master Data</span><span class="menu-arrow"></span>
@@ -105,6 +106,12 @@
                                         Partners
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('shortcuts.index') }}"
+                                       class="{{ request()->routeIs('shortcuts.*') ? 'active' : '' }}">
+                                        Quick Actions
+                                    </a>
+                                </li>
                             </ul>
                         </li>
 
@@ -140,7 +147,8 @@
                                          Route::is('iot.edit') ||
                                          Route::is('farm.devices') ||
                                          Route::is('devices.map') ||
-                                         Route::is('iot.alerts') ? 'subdrop active' : '' }}">
+                                         Route::is('iot.alerts') ||
+                                         Route::is('qr-code.*') ? 'subdrop active' : '' }}">
                                 <i class="ti ti-devices fs-16 me-2"></i>
                                 <span>IoT & Devices</span>
                                 <span class="menu-arrow"></span>
@@ -173,7 +181,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#">
+                                    <a href="{{ route('qr-code.index') }}"
+                                       class="{{ request()->routeIs('qr-code.*') ? 'active' : '' }}">
                                         Print QR Code
                                     </a>
                                 </li>

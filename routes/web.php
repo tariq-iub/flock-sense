@@ -16,9 +16,11 @@ use App\Http\Controllers\Web\MapController;
 use App\Http\Controllers\Web\MedicineController;
 use App\Http\Controllers\Web\NewsletterController;
 use App\Http\Controllers\Web\NewsletterSubscriberController;
+use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\PartnerController;
 use App\Http\Controllers\Web\PricingController;
 use App\Http\Controllers\Web\ProductionLogController;
+use App\Http\Controllers\Web\QrCodeController;
 use App\Http\Controllers\Web\ReportsController;
 use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\ShedController;
@@ -105,9 +107,12 @@ Route::get('/email/verify', function () {
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-Route::impersonate();
+// Impersonation routes (requires authentication)
+Route::group(['middleware' => 'auth'], function () {
+    Route::impersonate();
+});
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin_or_impersonator:admin,owner,manager']], function () {
 
     // Logout route (POST)
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -309,6 +314,20 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::put('/{device}', 'update')->name('iot.update');
         Route::delete('/{device}', 'destroy')->name('iot.destroy');
         Route::get('/devices/{device}/appliances', 'fetchAppliances');
+    });
+
+    // QR Code
+    Route::prefix('qr-code')->controller(QrCodeController::class)->group(function () {
+        Route::get('/', 'index')->name('qr-code.index');
+        Route::post('/print', 'print')->name('qr-code.print');
+        Route::get('/download/{device}', 'download')->name('qr-code.download');
+    });
+
+    // Notifications
+    Route::prefix('notifications')->controller(NotificationController::class)->group(function () {
+        Route::get('/', 'index')->name('notifications.index');
+        Route::post('/mark-all-read', 'markAllAsRead')->name('notifications.mark-all-read');
+        Route::post('/{notification}/mark-read', 'markAsRead')->name('notifications.mark-read');
     });
 
     // Expenses

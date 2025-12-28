@@ -32,7 +32,7 @@
                     <div class="auth-card shadow-lg">
                         <h4 class="fw-bold mb-3 text-white">Log in</h4>
                         <p class="text-white-50 mb-4">Enter your credentials to access your dashboard.</p>
-                        <form class="row g-3" action="{{ route('login') }}" method="POST">
+                        <form class="row g-3" action="{{ route('login') }}" method="POST" id="loginForm">
                             @csrf
                             <div class="col-12">
                                 <label class="form-label text-white-50" for="loginEmail">Email</label>
@@ -48,7 +48,7 @@
                             </div>
                             <div class="col-12 d-flex justify-content-between align-items-center">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                                    <input class="form-check-input" type="checkbox" value="" id="rememberMe" name="remember">
                                     <label class="form-check-label text-white-50" for="rememberMe">
                                         Remember me
                                     </label>
@@ -111,3 +111,35 @@
     </section>
 
 @endsection
+
+@push('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('loginEmail');
+        const passwordInput = document.getElementById('loginPassword');
+        const rememberMeCheckbox = document.getElementById('rememberMe');
+
+        // Load saved credentials on page load
+        const savedEmail = localStorage.getItem('rememberMeEmail');
+        const savedPassword = localStorage.getItem('rememberMePassword');
+
+        if (savedEmail && savedPassword) {
+            emailInput.value = savedEmail;
+            passwordInput.value = savedPassword;
+            rememberMeCheckbox.checked = true;
+        }
+
+        // Handle form submission
+        loginForm.addEventListener('submit', function(e) {
+            if (rememberMeCheckbox.checked) {
+                localStorage.setItem('rememberMeEmail', emailInput.value);
+                localStorage.setItem('rememberMePassword', passwordInput.value);
+            } else {
+                localStorage.removeItem('rememberMeEmail');
+                localStorage.removeItem('rememberMePassword');
+            }
+        });
+    });
+</script>
+@endpush

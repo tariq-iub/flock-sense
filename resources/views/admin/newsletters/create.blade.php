@@ -131,12 +131,13 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-end gap-2">
-                            <a href="{{ route('newsletters.index') }}" class="btn btn-secondary">
-                                <i class="ti ti-x me-1"></i>Cancel
-                            </a>
                             <button type="submit" class="btn btn-success">
                                 <i class="ti ti-device-floppy me-1"></i>Save Newsletter
                             </button>
+
+                            <a href="{{ route('newsletters.index') }}" class="btn btn-secondary">
+                                <i class="ti ti-x me-1"></i>Cancel
+                            </a>
                         </div>
                     </form>
                 </div>

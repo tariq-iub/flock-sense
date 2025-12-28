@@ -39,7 +39,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title">
-                            <i class="ti ti-info-circle text-primary me-2"></i>Newsletter Info
+                            <i class="ti ti-info-circle text-info me-2"></i>Newsletter Info
                         </h5>
                     </div>
                     <div class="card-body">
@@ -59,22 +59,22 @@
                             <label class="form-label text-muted text-uppercase fs-12">Status</label>
                             @switch($newsletter->status)
                                 @case('draft')
-                                    <span class="badge bg-secondary fs-13">Draft</span>
+                                    <span class="badge bg-gray-300 fs-13 ms-2">Draft</span>
                                     @break
                                 @case('pending')
-                                    <span class="badge bg-info fs-13">Pending</span>
+                                    <span class="badge bg-info-transparent fs-13 ms-2">Pending</span>
                                     @break
                                 @case('sending')
-                                    <span class="badge bg-primary fs-13">Sending</span>
+                                    <span class="badge bg-success-transparent fs-13 ms-2">Sending</span>
                                     @break
                                 @case('sent')
-                                    <span class="badge bg-success fs-13">Sent</span>
+                                    <span class="badge bg-success fs-13 ms-2">Sent</span>
                                     @break
                                 @case('failed')
-                                    <span class="badge bg-danger fs-13">Failed</span>
+                                    <span class="badge bg-danger fs-13 ms-2">Failed</span>
                                     @break
                                 @default
-                                    <span class="badge bg-secondary fs-13">{{ $newsletter->status }}</span>
+                                    <span class="badge bg-secondary fs-13 ms-2">{{ $newsletter->status }}</span>
                             @endswitch
                         </div>
 
@@ -100,7 +100,7 @@
                         </div>
 
                         <div class="d-flex gap-2 mt-4">
-                            <a href="{{ route('newsletters.edit', $newsletter) }}" class="btn btn-primary flex-fill">
+                            <a href="{{ route('newsletters.edit', $newsletter) }}" class="btn btn-success flex-fill">
                                 <i class="ti ti-edit me-1"></i>Edit
                             </a>
                             <a href="{{ route('newsletters.index') }}" class="btn btn-secondary">
@@ -126,13 +126,13 @@
                             </div>
                             <div class="col-6">
                                 <div class="bg-light rounded p-3 text-center">
-                                    <h4 class="mb-1">{{ $newsletter->sent_count }}</h4>
+                                    <h4 class="mb-1 text-info">{{ $newsletter->sent_count }}</h4>
                                     <p class="fs-12 mb-0">Sent</p>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="bg-light rounded p-3 text-center">
-                                    <h4 class="mb-1">{{ $newsletter->deliveries->where('status', 'delivered')->count() }}</h4>
+                                    <h4 class="mb-1 text-success">{{ $newsletter->deliveries->where('status', 'delivered')->count() }}</h4>
                                     <p class="fs-12 mb-0">Delivered</p>
                                 </div>
                             </div>
@@ -185,7 +185,7 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="deliveries-tab" data-bs-toggle="tab" data-bs-target="#deliveries" type="button" role="tab">
                                     <i class="ti ti-send me-1"></i>Deliveries
-                                    <span class="badge bg-primary ms-1">{{ $newsletter->deliveries->count() }}</span>
+                                    <span class="badge bg-success ms-1">{{ $newsletter->deliveries->count() }}</span>
                                 </button>
                             </li>
                         </ul>

@@ -46,7 +46,8 @@
                         </div>
                         <div class="dropdown-menu search-dropdown" aria-labelledby="dropdownMenuClickable">
                             <div class="search-info">
-                                <h6><span><i data-feather="search" class="feather-16"></i></span>Recent Searches
+                                <h6>
+                                    <span><i data-feather="search" class="feather-16"></i></span>Recent Searches
                                 </h6>
                                 <ul class="search-tags">
                                     <li><a href="javascript:void(0);">Products</a></li>
@@ -55,17 +56,17 @@
                                 </ul>
                             </div>
                             <div class="search-info">
-                                <h6><span><i data-feather="help-circle" class="feather-16"></i></span>Help</h6>
-                                <p>How to Change Product Volume from 0 to 200 on Inventory management</p>
-                                <p>Change Product Name</p>
+{{--                                <h6><span><i data-feather="help-circle" class="feather-16"></i></span>Help</h6>--}}
+{{--                                <p>How to Change Product Volume from 0 to 200 on Inventory management</p>--}}
+{{--                                <p>Change Product Name</p>--}}
                             </div>
                             <div class="search-info">
-                                <h6><span><i data-feather="user" class="feather-16"></i></span>Customers</h6>
-                                <ul class="customers">
-                                    <li><a href="javascript:void(0);">Aron Varu<img src="assets/img/profiles/avator1.jpg" alt="Img" class="img-fluid"></a></li>
-                                    <li><a href="javascript:void(0);">Jonita<img src="assets/img/profiles/avatar-01.jpg" alt="Img" class="img-fluid"></a></li>
-                                    <li><a href="javascript:void(0);">Aaron<img src="assets/img/profiles/avatar-10.jpg" alt="Img" class="img-fluid"></a></li>
-                                </ul>
+{{--                                <h6><span><i data-feather="user" class="feather-16"></i></span>Customers</h6>--}}
+{{--                                <ul class="customers">--}}
+{{--                                    <li><a href="javascript:void(0);">Aron Varu<img src="assets/img/profiles/avator1.jpg" alt="Img" class="img-fluid"></a></li>--}}
+{{--                                    <li><a href="javascript:void(0);">Jonita<img src="assets/img/profiles/avatar-01.jpg" alt="Img" class="img-fluid"></a></li>--}}
+{{--                                    <li><a href="javascript:void(0);">Aaron<img src="assets/img/profiles/avatar-10.jpg" alt="Img" class="img-fluid"></a></li>--}}
+{{--                                </ul>--}}
                             </div>
                         </div>
                     </form>
@@ -89,104 +90,24 @@
                 <a href="javascript:void(0);" class="btn btn-primary btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
                     <i class="ti ti-device-analytics me-1"></i>Shortcuts
                 </a>
+                @php
+                    $user = Auth::user();
+                    $shortcuts = [];
+                    if($user->hasRole('admin')) $shortcuts = \App\Models\Shortcut::all();
+                    else $shortcuts = \App\Models\Shortcut::where('group', 'user')->get();
+                @endphp
                 <div class="dropdown-menu dropdown-xl dropdown-menu-center">
                     <div class="row g-2">
-                        <div class="col-md-2">
-                            <a href="category-list.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-brand-codepen"></i>
-											</span>
-                                <p>Category</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="add-product.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-square-plus"></i>
-											</span>
-                                <p>Product</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="category-list.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-shopping-bag"></i>
-											</span>
-                                <p>Purchase</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="online-orders.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-shopping-cart"></i>
-											</span>
-                                <p>Sale</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="expense-list.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-file-text"></i>
-											</span>
-                                <p>Expense</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="quotation-list.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-device-floppy"></i>
-											</span>
-                                <p>Quotation</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="sales-returns.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-copy"></i>
-											</span>
-                                <p>Return</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="users.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-user"></i>
-											</span>
-                                <p>User</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="customers.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-users"></i>
-											</span>
-                                <p>Customer</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="sales-report.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-shield"></i>
-											</span>
-                                <p>Biller</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="suppliers.html" class="link-item">
-											<span class="link-icon">
-												<i class="ti ti-user-check"></i>
-											</span>
-                                <p>Supplier</p>
-                            </a>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="stock-transfer.html" class="link-item">
-                                <span class="link-icon">
-                                    <i class="ti ti-truck"></i>
-                                </span>
-                                <p>Transfer</p>
-                            </a>
-                        </div>
+                        @foreach($shortcuts as $shortcut)
+                            <div class="col-md-2">
+                                <a href="{{ $shortcut->url }}" class="link-item">
+                                    <span class="link-icon">
+                                        <i class="{{ $shortcut->icon }}"></i>
+                                    </span>
+                                    <p>{{ $shortcut->title }}</p>
+                                </a>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </li>
@@ -198,86 +119,84 @@
             </li>
 
             <!-- Notifications -->
+            @php
+                $latestNotifications = collect();
+                $unreadCount = 0;
+
+                if (Auth::check() && Auth::id()) {
+                    $latestNotifications = \App\Models\Notification::where('user_id', Auth::id())
+                        ->orderBy('created_at', 'desc')
+                        ->limit(5)
+                        ->get();
+                    $unreadCount = \App\Models\Notification::where('user_id', Auth::id())
+                        ->where('is_read', false)
+                        ->count();
+                }
+            @endphp
             <li class="nav-item dropdown nav-item-box">
                 <a href="javascript:void(0);" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
                     <i class="ti ti-bell"></i>
+                    @if($unreadCount > 0)
+                        <span class="badge rounded-pill badge-sm bg-danger position-absolute top-0 start-100 translate-middle">
+                            {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                        </span>
+                    @endif
                 </a>
                 <div class="dropdown-menu notifications">
                     <div class="topnav-dropdown-header">
                         <h5 class="notification-title">Notifications</h5>
-                        <a href="javascript:void(0)" class="clear-noti">Mark all as read</a>
+                        <form action="{{ route('notifications.mark-all-read') }}" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="clear-noti" style="background: none; border: none; color: inherit; cursor: pointer; padding: 0;">
+                                Mark all as read
+                            </button>
+                        </form>
                     </div>
                     <div class="noti-content">
                         <ul class="notification-list">
-                            <li class="notification-message">
-                                <a href="activities.html">
-                                    <div class="media d-flex">
-													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
-													</span>
-                                        <div class="flex-grow-1">
-                                            <p class="noti-details"><span class="noti-title">James Kirwin</span> confirmed his order.  Order No: #78901.Estimated delivery: 2 days</p>
-                                            <p class="noti-time">4 mins ago</p>
+                            @forelse($latestNotifications as $notification)
+                                <li class="notification-message {{ $notification->is_read ? '' : 'recent-msg' }}">
+                                    <a href="{{ route('notifications.index') }}">
+                                        <div class="media d-flex">
+                                            <span class="avatar flex-shrink-0">
+                                                @if($notification->type === 'report_submitted')
+                                                    <i class="ti ti-file-text text-primary fs-20"></i>
+                                                @elseif($notification->type === 'device_failure')
+                                                    <i class="ti ti-alert-triangle text-danger fs-20"></i>
+                                                @else
+                                                    <i class="ti ti-bell text-info fs-20"></i>
+                                                @endif
+                                            </span>
+                                            <div class="flex-grow-1">
+                                                <p class="noti-details">
+                                                    <span class="noti-title">{{ $notification->title }}</span>
+                                                    @if(!$notification->is_read)
+                                                        <span class="badge bg-primary badge-xs ms-1">New</span>
+                                                    @endif
+                                                </p>
+                                                <p class="noti-details text-muted small">{{ Str::limit($notification->message, 80) }}</p>
+                                                <p class="noti-time">{{ $notification->created_at->diffForHumans() }}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="notification-message">
-                                <a href="activities.html">
-                                    <div class="media d-flex">
-													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
-													</span>
-                                        <div class="flex-grow-1">
-                                            <p class="noti-details"><span class="noti-title">Leo Kelly</span> cancelled his order scheduled for  17 Jan 2025</p>
-                                            <p class="noti-time">10 mins ago</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="notification-message">
-                                <a href="activities.html" class="recent-msg">
-                                    <div class="media d-flex">
-													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
-													</span>
-                                        <div class="flex-grow-1">
-                                            <p class="noti-details">Payment of $50 received for Order #67890 from <span class="noti-title">Antonio Engle</span></p>
-                                            <p class="noti-time">05 mins ago</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="notification-message">
-                                <a href="activities.html" class="recent-msg">
-                                    <div class="media d-flex">
-													<span class="avatar flex-shrink-0">
-														<img alt="Img" src="{{ asset('assets/img/user.jpg') }}">
-													</span>
-                                        <div class="flex-grow-1">
-                                            <p class="noti-details"><span class="noti-title">Andrea</span> confirmed his order.  Order No: #73401.Estimated delivery: 3 days</p>
-                                            <p class="noti-time">4 mins ago</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
+                                    </a>
+                                </li>
+                            @empty
+                                <li class="notification-message text-center py-4">
+                                    <p class="text-muted mb-0">No notifications yet</p>
+                                </li>
+                            @endforelse
                         </ul>
                     </div>
                     <div class="topnav-dropdown-footer d-flex align-items-center gap-3">
-                        <a href="#" class="btn btn-secondary btn-md w-100">Cancel</a>
-                        <a href="activities.html" class="btn btn-primary btn-md w-100">View all</a>
+                        <button type="button" class="btn btn-secondary btn-md w-100" onclick="closeNotificationDropdown()">Close</button>
+                        <a href="{{ route('notifications.index') }}" class="btn btn-primary btn-md w-100">View all</a>
                     </div>
                 </div>
             </li>
             <!-- /Notifications -->
 
-            <li class="nav-item nav-item-box">
-                <a href="general-settings.html"><i class="ti ti-settings"></i></a>
-            </li>
-
             @php
                 $path = asset("assets/img/user.jpg");
-                $user = Auth::user();
                 $media = $user->media()->orderBy('order_column')->first();
                 if($media)
                 {
@@ -331,3 +250,16 @@
         <!-- /Mobile Menu -->
     </div>
 </div>
+
+<script>
+    function closeNotificationDropdown() {
+        // Close Bootstrap dropdown
+        const dropdown = document.querySelector('.notifications');
+        if (dropdown) {
+            const bsDropdown = bootstrap.Dropdown.getInstance(dropdown.previousElementSibling);
+            if (bsDropdown) {
+                bsDropdown.hide();
+            }
+        }
+    }
+</script>

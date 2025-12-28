@@ -33,7 +33,7 @@ class ShortcutController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'url' => 'required|url|max:255',
+            'url' => 'required|string|max:255',
             'icon' => 'nullable|string|max:255',
         ]);
         Shortcut::create($data);
@@ -66,7 +66,7 @@ class ShortcutController extends Controller
     {
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'url' => 'required|url|max:255',
+            'url' => 'required|string|max:255',
             'icon' => 'nullable|string|max:255',
         ]);
         $shortcut->update($data);

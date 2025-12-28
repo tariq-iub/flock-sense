@@ -8,8 +8,6 @@ use Illuminate\Support\Carbon;
 
 class Notification extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id', 'notifiable_id', 'notifiable_type', 'farm_id', 'type', 'title', 'message', 'data', 'is_read',
     ];

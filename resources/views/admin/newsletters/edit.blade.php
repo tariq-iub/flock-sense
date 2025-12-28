@@ -53,7 +53,7 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-12">
-                                    <label class="form-label">Subject<span class="text-danger">*</span></label>
+                                    <label class="form-label">Subject<span class="text-danger ms-1">*</span></label>
                                     <input type="text"
                                            name="subject"
                                            class="form-control @error('subject') is-invalid @enderror"
@@ -80,7 +80,7 @@
                                 </div>
 
                                 <div class="col-md-12">
-                                    <label class="form-label">HTML Content<span class="text-danger">*</span></label>
+                                    <label class="form-label">HTML Content<span class="text-danger ms-1">*</span></label>
                                     <textarea name="content_html"
                                               id="contentHtml"
                                               class="form-control @error('content_html') is-invalid @enderror"
@@ -105,7 +105,7 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label">Status<span class="text-danger">*</span></label>
+                                    <label class="form-label">Status<span class="text-danger ms-1">*</span></label>
                                     <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                                         <option value="draft" {{ old('status', $newsletter->status) === 'draft' ? 'selected' : '' }}>Draft</option>
                                         <option value="pending" {{ old('status', $newsletter->status) === 'pending' ? 'selected' : '' }}>Pending</option>
@@ -141,15 +141,17 @@
                             </div>
                         </div>
                         <div class="card-footer d-flex justify-content-end gap-2">
-                            <a href="{{ route('newsletters.show', $newsletter) }}" class="btn btn-secondary">
-                                <i class="ti ti-eye me-1"></i>View
-                            </a>
-                            <a href="{{ route('newsletters.index') }}" class="btn btn-secondary">
-                                <i class="ti ti-x me-1"></i>Cancel
-                            </a>
                             <button type="submit" class="btn btn-success">
                                 <i class="ti ti-device-floppy me-1"></i>Update Newsletter
                             </button>
+
+                            <a href="{{ route('newsletters.show', $newsletter) }}" class="btn btn-info">
+                                <i class="ti ti-eye me-1"></i>View
+                            </a>
+
+                            <a href="{{ route('newsletters.index') }}" class="btn btn-secondary">
+                                <i class="ti ti-x me-1"></i>Cancel
+                            </a>
                         </div>
                     </form>
                 </div>
