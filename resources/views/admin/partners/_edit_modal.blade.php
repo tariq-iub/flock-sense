@@ -1,121 +1,96 @@
-<!-- Edit Pricing Modal -->
-<div class="modal fade" id="editPricingModal" tabindex="-1" aria-labelledby="editPricingModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg">
+<!-- Edit Partner Modal -->
+<div class="modal fade" id="editPartnerModal" tabindex="-1" aria-labelledby="editPartnerModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
-            <form id="editPricingForm" action="" class="needs-validation" novalidate method="POST">
+            <form id="editPartnerForm" action="" class="needs-validation" novalidate method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editPricingModalLabel">Edit Pricing Plan</h5>
+                    <h5 class="modal-title" id="editPartnerModalLabel">Edit Partner</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <input type="hidden" id="edit-pricing-id" name="id" value="">
-                    <div class="row">
-                        <div class="col-lg-6 mb-3">
-                            <label for="edit-pricing-name" class="form-label">Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit-pricing-name" name="name" required>
-                            <div class="invalid-feedback">Name is required.</div>
+                    <input type="hidden" id="edit-partner-id" name="id" value="">
+
+                    <div class="row g-3">
+                        <!-- Company Name -->
+                        <div class="col-md-7">
+                            <label for="edit-company-name" class="form-label">Company Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit-company-name" name="company_name" required>
+                            <div class="invalid-feedback">Please enter the company name.</div>
                         </div>
-                        <div class="col-lg-6 mb-3">
-                            <label for="edit-pricing-currency" class="form-label">Currency <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="edit-pricing-currency" name="currency" maxlength="10" required>
-                            <div class="invalid-feedback">Currency is required.</div>
+
+                        <!-- Website URL -->
+                        <div class="col-md-5">
+                            <label for="edit-url" class="form-label">Website</label>
+                            <input type="url" class="form-control" id="edit-url" name="url">
                         </div>
-                        <div class="col-lg-6 mb-3">
-                            <label for="edit-pricing-price" class="form-label">Price <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="edit-pricing-price" name="price" min="0" step="0.01" required>
-                            <div class="invalid-feedback">Price is required.</div>
+
+                        <!-- Logo upload -->
+                        <div class="col-md-7">
+                            <label class="form-label">Logo <span class="text-muted">(PNG/JPG/SVG)</span></label>
+                            <input type="file" name="logo" id="editPartnerLogoInput" class="form-control" accept=".png,.jpg,.jpeg,.svg,image/*">
+                            <div class="form-text">Recommended: transparent PNG/SVG, ≤ 1MB. Leave empty to keep current logo.</div>
                         </div>
-                        <div class="col-lg-6 mb-3">
-                            <label for="edit-pricing-billing-interval" class="form-label">Billing Interval <span class="text-danger">*</span></label>
-                            <select class="form-select" id="edit-pricing-billing-interval" name="billing_interval" required>
-                                <option value="monthly">Monthly</option>
-                                <option value="yearly">Yearly</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="one_time">One Time</option>
-                            </select>
-                            <div class="invalid-feedback">Billing interval is required.</div>
-                        </div>
-                        <div class="col-lg-6 mb-3">
-                            <label for="edit-pricing-trial-period" class="form-label">Trial Period (days)</label>
-                            <input type="number" class="form-control" id="edit-pricing-trial-period" name="trial_period_days" min="0">
-                        </div>
-                        <div class="col-lg-6 mb-3">
-                            <label for="edit-pricing-sort-order" class="form-label">Sort Order</label>
-                            <input type="number" class="form-control" id="edit-pricing-sort-order" name="sort_order" min="0">
-                        </div>
-                        <div class="col-lg-12 mb-3">
-                            <label for="edit-pricing-description" class="form-label">Description</label>
-                            <textarea class="form-control" id="edit-pricing-description" name="description" rows="2"></textarea>
-                        </div>
-                        <div class="col-lg-12 mb-3 border rounded p-3">
-                            <div class="row">
-                                <div class="col-lg-2 mb-2">
-                                    <label class="form-label">Max Farms</label>
-                                    <input type="number" class="form-control" id="edit-max-farms" name="max_farms" min="1" required>
+
+                        <!-- Live preview -->
+                        <div class="col-md-5 d-flex align-items-end">
+                            <div>
+                                <div class="border rounded p-2 bg-light d-inline-block">
+                                    <img id="editPartnerLogoPreview" src="" alt="Logo preview" style="max-height:56px; max-width:220px;">
                                 </div>
-                                <div class="col-lg-2 mb-2">
-                                    <label class="form-label">Max Sheds</label>
-                                    <input type="number" class="form-control" id="edit-max-sheds" name="max_sheds" min="1" required>
-                                </div>
-                                <div class="col-lg-2 mb-2">
-                                    <label class="form-label">Max Flocks</label>
-                                    <input type="number" class="form-control" id="edit-max-flocks" name="max_flocks" min="1" required>
-                                </div>
-                                <div class="col-lg-2 mb-2">
-                                    <label class="form-label">Max Devices</label>
-                                    <input type="number" class="form-control" id="edit-max-devices" name="max_devices" min="1" required>
-                                </div>
-                                <div class="col-lg-2 mb-2">
-                                    <label class="form-label">Max Users</label>
-                                    <input type="number" class="form-control" id="edit-max-users" name="max_users" min="1" required>
-                                </div>
+                                <div class="small text-muted mt-1">Current logo</div>
                             </div>
                         </div>
-                        <div class="col-lg-12 mb-3 border rounded p-3">
-                            <label class="form-label mb-2">Feature Access</label>
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input" type="checkbox" id="edit-feature-auto-control" name="feature_flags[auto_control]" value="1">
-                                <label class="form-check-label" for="edit-feature-auto-control">Automated Control</label>
-                            </div>
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input" type="checkbox" id="edit-feature-reporting" name="feature_flags[reporting]" value="1">
-                                <label class="form-check-label" for="edit-feature-reporting">Reporting</label>
-                            </div>
-                            <div class="form-check form-switch mb-1">
-                                <input class="form-check-input" type="checkbox" id="edit-feature-analytics" name="feature_flags[analytics]" value="1">
-                                <label class="form-check-label" for="edit-feature-analytics">Historical Analytics</label>
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label mt-2" for="edit-feature-support">Support Level</label>
-                                <select class="form-select" id="edit-feature-support" name="feature_flags[support]">
-                                    <option value="none">None</option>
-                                    <option value="email">Email</option>
-                                    <option value="priority_email">Priority Email</option>
-                                    <option value="24/7_phone">24/7 Phone</option>
-                                </select>
-                            </div>
-                            <div class="mb-2">
-                                <label class="form-label mt-2" for="edit-feature-history-days">Data History (days)</label>
-                                <input type="number" class="form-control" id="edit-feature-history-days" name="feature_flags[history_days]" min="0">
-                            </div>
+
+                        <!-- Partner Introduction -->
+                        <div class="col-12">
+                            <label for="edit-introduction" class="form-label">Partner Introduction</label>
+                            <textarea name="introduction" id="edit-introduction" rows="3" class="form-control" placeholder="Partner's introduction..."></textarea>
                         </div>
-                        <div class="col-lg-12 mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="edit-pricing-active" name="is_active" value="1">
-                                <label class="form-check-label" for="edit-pricing-active">Active</label>
-                            </div>
+
+                        <!-- Partnership Detail -->
+                        <div class="col-12">
+                            <label for="edit-partnership-detail" class="form-label">Partnership Detail</label>
+                            <textarea name="partnership_detail" id="edit-partnership-detail" rows="3" class="form-control" placeholder="Partnership detail..."></textarea>
                         </div>
-                        <div class="col-lg-12 mb-3">
-                            <label for="edit-pricing-meta" class="form-label">Meta (optional, JSON)</label>
-                            <textarea class="form-control" id="edit-pricing-meta" name="meta" rows="2"></textarea>
+
+                        <!-- Keywords -->
+                        <div class="col-12">
+                            <label class="form-label">Keywords</label>
+                            <input
+                                type="text"
+                                name="support_keywords_display"
+                                id="edit_support_keywords_display"
+                                class="form-control"
+                                data-role="tagsinput"
+                                placeholder="Add keywords and press Enter"
+                            >
+                            <input type="hidden" name="support_keywords" id="edit_support_keywords">
+                        </div>
+
+                        <!-- Sort Order -->
+                        <div class="col-md-6">
+                            <label for="edit-sort-order" class="form-label">Sort Order</label>
+                            <input type="number" class="form-control" id="edit-sort-order" name="sort_order" min="0" value="0">
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="col-md-6">
+                            <label class="form-label d-block">Status</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="edit-is-active" name="is_active" value="1">
+                                <label class="form-check-label" for="edit-is-active">Active</label>
+                            </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Update Plan</button>
+                    <button type="submit" class="btn btn-success me-2">Update Partner</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
@@ -125,54 +100,71 @@
 @push('js')
     <script>
         /**
-         * Prefill the Edit Pricing Modal with pricing plan data.
-         * @param {Object} plan - The pricing plan data (from API or your DB).
-         * @param {string} updateUrl - The URL to submit the PUT request to (e.g. '/admin/pricings/5')
+         * Prefill the Edit Partner Modal with partner data.
+         * @param {Object} partner - The partner data (from API or your DB).
+         * @param {string} updateUrl - The URL to submit the PUT request to (e.g. '/admin/partners/5')
          */
-        function fillEditPricingModal(plan, updateUrl) {
+        function fillEditPartnerModal(partner, updateUrl) {
             // Set form action
-            $('#editPricingForm').attr('action', updateUrl);
+            $('#editPartnerForm').attr('action', updateUrl);
 
             // Set main fields
-            $('#edit-pricing-id').val(plan.id || '');
-            $('#edit-pricing-name').val(plan.name || '');
-            $('#edit-pricing-currency').val(plan.currency || '');
-            $('#edit-pricing-price').val(plan.price || 0);
-            $('#edit-pricing-billing-interval').val(plan.billing_interval || 'monthly');
-            $('#edit-pricing-trial-period').val(plan.trial_period_days || 0);
-            $('#edit-pricing-sort-order').val(plan.sort_order || 0);
-            $('#edit-pricing-description').val(plan.description || '');
-
-            // Tiered limits
-            $('#edit-max-farms').val(plan.max_farms || 1);
-            $('#edit-max-sheds').val(plan.max_sheds || 1);
-            $('#edit-max-flocks').val(plan.max_flocks || 1);
-            $('#edit-max-devices').val(plan.max_devices || 1);
-            $('#edit-max-users').val(plan.max_users || 1);
-
-            // Feature flags (handle as object)
-            const ff = plan.feature_flags || {};
-
-            $('#edit-feature-auto-control').prop('checked', !!ff.auto_control);
-            $('#edit-feature-reporting').prop('checked', !!ff.reporting);
-            $('#edit-feature-analytics').prop('checked', !!ff.analytics);
-
-            // Support level select
-            $('#edit-feature-support').val(ff.support || 'none');
-            // Data history
-            $('#edit-feature-history-days').val(ff.history_days || 0);
+            $('#edit-partner-id').val(partner.id || '');
+            $('#edit-company-name').val(partner.company_name || '');
+            $('#edit-url').val(partner.url || '');
+            $('#edit-introduction').val(partner.introduction || '');
+            $('#edit-partnership-detail').val(partner.partnership_detail || '');
+            $('#edit-sort-order').val(partner.sort_order || 0);
 
             // Active status
-            $('#edit-pricing-active').prop('checked', !!plan.is_active);
+            $('#edit-is-active').prop('checked', !!partner.is_active);
 
-            // Meta (show as formatted JSON if present)
-            let metaString = '';
-            if (typeof plan.meta === 'object' && plan.meta !== null) {
-                metaString = JSON.stringify(plan.meta, null, 2);
-            } else if (typeof plan.meta === 'string') {
-                metaString = plan.meta;
+            // Logo preview
+            const logoUrl = partner.logo_url || '{{ asset("assets/img/partner-placeholder.png") }}';
+            $('#editPartnerLogoPreview').attr('src', logoUrl);
+
+            // Keywords - Initialize tagsinput
+            const $editTagsInput = $('#edit_support_keywords_display');
+
+            // Destroy existing tagsinput if present
+            if ($editTagsInput.data('tagsinput')) {
+                $editTagsInput.tagsinput('destroy');
             }
-            $('#edit-pricing-meta').val(metaString);
+
+            // Re-initialize
+            $editTagsInput.tagsinput({
+                confirmKeys: [13, 188],
+                trimValue: true
+            });
+
+            // Clear and add keywords
+            $editTagsInput.tagsinput('removeAll');
+            if (partner.support_keywords && Array.isArray(partner.support_keywords)) {
+                partner.support_keywords.forEach(function(keyword) {
+                    $editTagsInput.tagsinput('add', keyword);
+                });
+            }
+
+            // Sync to hidden field
+            $('#edit_support_keywords').val(JSON.stringify(partner.support_keywords || []));
+
+            // Update hidden field on change
+            $editTagsInput.on('itemAdded itemRemoved', function() {
+                const tags = $(this).tagsinput('items');
+                $('#edit_support_keywords').val(JSON.stringify(tags));
+            });
         }
+
+        // Logo live preview for edit modal
+        $(document).ready(function() {
+            $('#editPartnerLogoInput').on('change', function(e) {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                const url = URL.createObjectURL(file);
+                const img = document.getElementById('editPartnerLogoPreview');
+                img.src = url;
+                img.onload = () => URL.revokeObjectURL(url);
+            });
+        });
     </script>
 @endpush
