@@ -64,16 +64,18 @@ class DeviceAppliance extends Model
         return LogOptions::defaults()
             ->useLogName('device_appliances') // goes into log_name
             ->logOnly([
-                'device' => Device::find('device_id')->serial_no,
-                'name' => $this->name,
-                'channel' => $this->channel,
-                'config' => $this->config,
-                'status' => $this->status,
-                'metrics' => $this->metrics,
-                'status_updated_at' => $this->status_updated_at,
+                'device_id',
+                'key',
+                'type',
+                'name',
+                'channel',
+                'config',
+                'status',
+                'metrics',
+                'status_updated_at',
             ])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn (string $eventName) => "Device appliance {$this->name} was {$eventName} by ".optional(auth()->user())->name
+            ->setDescriptionForEvent(fn(string $eventName) => "Device appliance {$this->name} was {$eventName} by " . optional(auth()->user())->name
             );
     }
 }
