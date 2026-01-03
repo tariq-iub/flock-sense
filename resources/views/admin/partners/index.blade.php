@@ -347,8 +347,20 @@
                     const content = this.getAttribute('data-content') || '';
 
                     titleEl.textContent = title;
-                    // Convert newlines to <br> for nicer display
-                    bodyEl.innerHTML = content.replace(/\n/g, '<br>');
+
+                    // Word wrap every 15 words
+                    const words = content.split(/\s+/);
+                    let formattedContent = '';
+                    for (let i = 0; i < words.length; i++) {
+                        formattedContent += words[i];
+                        if ((i + 1) % 15 === 0 && i !== words.length - 1) {
+                            formattedContent += '<br>';
+                        } else if (i !== words.length - 1) {
+                            formattedContent += ' ';
+                        }
+                    }
+
+                    bodyEl.innerHTML = formattedContent;
 
                     bsOffcanvas.show();
                 });
