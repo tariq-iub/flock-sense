@@ -154,4 +154,46 @@ class GraphDataController extends ApiController
 
         return response()->json(['data' => $data]);
     }
+
+    public function feedWaterConsumptionHistory(Request $request)
+    {
+        $request->validate([
+            'flock_id' => 'required|integer|exists:flocks,id',
+        ]);
+
+        $feed = $this->graphDataService->getFeedConsumptionHistory($request->flock_id);
+        $water = $this->graphDataService->getWaterConsumptionHistory($request->flock_id);
+
+        $keyedFeed = [];
+
+        // 1. Build the lookup table
+        foreach ($feed as $item) {
+            // Cast object to array immediately to handle stdClass safely
+            $itemArray = (array) $item;
+
+            // Create the unique composite key
+            $key = $itemArray['flock_id'].'_'.$itemArray['d'];
+            $keyedFeed[$key] = $itemArray;
+        }
+
+        $result = [];
+
+        // 2. Loop through water data and merge
+        foreach ($water as $item) {
+            // Cast object to array here as well
+            $itemArray = (array) $item;
+
+            $key = $itemArray['flock_id'].'_'.$itemArray['d'];
+
+            // Check if the matching feed data exists
+            if (isset($keyedFeed[$key])) {
+                // Now both are arrays, so array_merge works perfectly
+                $result[] = array_merge($itemArray, $keyedFeed[$key]);
+            } else {
+                $result[] = $itemArray;
+            }
+        }
+
+        return response()->json(['data' => $result]);
+    }
 }
