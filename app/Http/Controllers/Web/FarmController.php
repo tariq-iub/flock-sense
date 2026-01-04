@@ -15,8 +15,25 @@ class FarmController extends Controller
      */
     public function index()
     {
-        $farms = Farm::with(['owner', 'managers', 'sheds', 'province', 'district', 'city'])
-            ->get();
+        $user = auth()->user();
+
+        // Build query based on user role
+        $farmsQuery = Farm::with(['owner', 'managers', 'sheds', 'province', 'district', 'city']);
+
+        if ($user->hasRole('admin')) {
+            // Admin: No restriction, get all farms
+            $farms = $farmsQuery->get();
+        } elseif ($user->hasRole('owner')) {
+            // Owner: Only farms they own
+            $farms = $farmsQuery->where('owner_id', $user->id)->get();
+        } elseif ($user->hasRole('manager')) {
+            // Manager: Only farms they manage
+            $managedFarmIds = $user->managedFarms()->pluck('id')->toArray();
+            $farms = $farmsQuery->whereIn('id', $managedFarmIds)->get();
+        } else {
+            // Default: No access
+            $farms = collect([]);
+        }
 
         $owners = User::all();
         $managers = User::all();
@@ -46,6 +63,11 @@ class FarmController extends Controller
      */
     public function store(Request $request)
     {
+        // Only admins can create farms
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Unauthorized action. Only admins can create farms.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'province_id' => 'nullable|exists:pakistan_provinces,id',
@@ -86,6 +108,11 @@ class FarmController extends Controller
      */
     public function update(Request $request, Farm $farm)
     {
+        // Only admins can update farms
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Unauthorized action. Only admins can update farms.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'province_id' => 'nullable|exists:pakistan_provinces,id',
@@ -109,6 +136,18 @@ class FarmController extends Controller
      */
     public function destroy(Farm $farm)
     {
+        // Only admins can delete farms
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Unauthorized action. Only admins can delete farms.');
+        }
+
+        // Check if the farm has any sheds assigned
+        if ($farm->sheds()->count() > 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cannot delete farm. One or more sheds are assigned to this farm.');
+        }
+
         $farm->delete();
 
         return redirect()
@@ -139,6 +178,13 @@ class FarmController extends Controller
 
     public function assignManager(Request $request, Farm $farm)
     {
+        // Admins, Owners, and Managers can assign managers
+        $user = auth()->user();
+
+        if (!$user->hasRole('admin') && !$user->hasRole('owner') && !$user->hasRole('manager')) {
+            abort(403, 'Unauthorized action. You do not have permission to assign managers.');
+        }
+
         $request->validate([
             'manager_id' => 'required|exists:users,id',
         ]);

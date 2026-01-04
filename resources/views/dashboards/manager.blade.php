@@ -6,7 +6,7 @@
         <div class="d-lg-flex align-items-center justify-content-between mb-4">
             <div>
                 <h2 class="mb-1">Welcome, {{ $user->name }}</h3>
-                    <p>You are <span class="text-primary fw-bold">Farm Manager</span> | {{ $user->phone }}</p>
+                    <p>You are privileged as <span class="text-primary fw-bold">Farm Manager</span> | {{ $user->phone }}</p>
             </div>
             <ul class="table-top-head">
                 <li>
@@ -367,6 +367,26 @@
                 plugins: [mortalityLimitLine]
             });
         });
+    </script>
+
+    <script>
+        // Normalize datasets: object -> array
+        const raw = @json($datasets ?? []);
+        const datasetsArr = Array.isArray(raw) ? raw : Object.values(raw);
+
+        // Prepare series: ensure numbers + {x,y} parsing disabled
+        const prepared = datasetsArr.map((ds, i) => ({
+            label: ds.label ?? `Series ${i+1}`,
+            data: (Array.isArray(ds.data) ? ds.data : []).map(p => ({
+                x: Number(p.x),
+                y: Number(p.y)
+            })),
+            parsing: false,
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.2
+        }));
+
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

@@ -26,9 +26,21 @@ class DashboardController extends Controller
         if ($user->hasRole('admin')) {
             return view('dashboards.admin', compact('user'));
         } elseif ($user->hasRole('owner')) {
-            $farm = $user->managedFarms()
-                ->first()
-                ->load('sheds.latestFlock');
+            $farm = $user->farms()
+                ->with('sheds.latestFlock')
+                ->first();
+
+            if (!$farm) {
+                return view('dashboards.owner', [
+                    'user' => $user,
+                    'farm' => null,
+                    'data' => null,
+                    'datasets' => [],
+                    'adgData' => [],
+                    'shedEnvironment' => [],
+                    'environmentAlerts' => [],
+                ]);
+            }
 
             $filters['farm_id'] = $farm->id;
             $flocks = $farm->sheds->pluck('latestFlock')->toArray();
@@ -61,8 +73,22 @@ class DashboardController extends Controller
             );
         } elseif ($user->hasRole('manager')) {
             $farm = $user->managedFarms()
-                ->first()
-                ->load('sheds.latestFlock');
+                ->with('sheds.latestFlock')
+                ->first();
+
+            if (!$farm) {
+                return view('dashboards.flocksense', [
+                    'user' => $user,
+                    'farm' => null,
+                    'flocks' => [],
+                    'data' => null,
+                    'datasets' => [],
+                    'adgData' => [],
+                    'shedEnvironment' => [],
+                    'environmentAlerts' => [],
+                    'iotChartData' => [],
+                ]);
+            }
 
             $filters['farm_id'] = $farm->id;
             $flocks = $farm->sheds->pluck('latestFlock')->toArray();
@@ -87,7 +113,7 @@ class DashboardController extends Controller
             $iotChartData = $this->managerAnalyticsService->getIotChartData($shedId, 0, $start_date, $end_date);
 
             return view(
-                'dashboards.manager',
+                'dashboards.flocksense',
                 [
                     'user' => $user,
                     'farm' => $farm,

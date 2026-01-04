@@ -38,6 +38,18 @@
                 </div>
                 @endif
 
+                @if (session('error'))
+                <div class="alert alert-danger d-flex align-items-center justify-content-between" role="alert">
+                    <div>
+                        <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
+                        {{ session('error') }}
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                @endif
+
                 @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>

@@ -16,9 +16,36 @@ class FlockController extends Controller
      */
     public function index(Request $request)
     {
-        $sheds = Shed::with(['farm.owner', 'latestFlock'])->get();
+        $user = auth()->user();
+
+        // Build query based on user role
+        $shedsQuery = Shed::with(['farm.owner', 'latestFlock']);
+
+        if ($user->hasRole('admin')) {
+            // Admin: No restriction, get all sheds
+            $sheds = $shedsQuery->get();
+            $farms = Farm::all();
+        } elseif ($user->hasRole('owner')) {
+            // Owner: Only sheds from farms they own
+            $sheds = $shedsQuery->whereHas('farm', function ($query) use ($user) {
+                $query->where('owner_id', $user->id);
+            })->get();
+            $farms = Farm::where('owner_id', $user->id)->get();
+        } elseif ($user->hasRole('manager')) {
+            // Manager: Only sheds from farms they manage
+            $managedFarmIds = $user->managedFarms()->pluck('id')->toArray();
+
+            $sheds = $shedsQuery->whereHas('farm', function ($query) use ($managedFarmIds) {
+                $query->whereIn('id', $managedFarmIds);
+            })->get();
+            $farms = Farm::whereIn('id', $managedFarmIds)->get();
+        } else {
+            // Default: No access
+            $sheds = collect([]);
+            $farms = collect([]);
+        }
+
         $breeds = Breed::all();
-        $farms = Farm::all();
         $types = [];
 
         return view(

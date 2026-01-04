@@ -50,6 +50,16 @@ class Farm extends Model
             ->withPivot('link_date');
     }
 
+    /**
+     * Get the latest manager linked to this farm.
+     */
+    public function latestManager()
+    {
+        return $this->managers()
+            ->orderByPivot('link_date', 'desc')
+            ->first();
+    }
+
     public function staff()
     {
         return $this->belongsToMany(User::class, 'farm_staff', 'farm_id', 'worker_id')
@@ -124,7 +134,6 @@ class Farm extends Model
                 'longitude',
             ])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn (string $eventName) => "Farm {$this->name} was {$eventName} by ".optional(auth()->user())->name
-            );
+            ->setDescriptionForEvent(fn (string $eventName) => "Farm {$this->name} was {$eventName} by ".optional(auth()->user())->name);
     }
 }

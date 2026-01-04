@@ -18,11 +18,13 @@
                     </a>
                 </li>
             </ul>
+            @if(auth()->user()->hasRole('admin'))
             <div class="page-btn">
                 <a href="javascript:void(0)" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFarmModal">
                     <i class="ti ti-circle-plus me-1"></i>Add Farm
                 </a>
             </div>
+            @endif
         </div>
         <div class="container-fluid">
             <div class="row mb-3">
@@ -31,6 +33,18 @@
                         <div>
                             <i class="feather-check-circle flex-shrink-0 me-2"></i>
                             {{ session('success') }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger d-flex align-items-center justify-content-between" role="alert">
+                        <div>
+                            <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
+                            {{ session('error') }}
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                             <i class="fas fa-xmark"></i>
@@ -121,6 +135,7 @@
                                 <td class="text-center">{{ round($farm->longitude, 4) }}</td>
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
+                                        @if(auth()->user()->hasRole('admin'))
                                         <a href="javascript:void(0)"
                                            class="p-2 border rounded me-2 edit-farm"
                                            data-bs-toggle="tooltip"
@@ -131,6 +146,8 @@
                                            data-farm-name="{{ $farm->name }}">
                                             <i class="ti ti-edit"></i>
                                         </a>
+                                        @endif
+
                                         <a href="javascript:void(0)"
                                            class="p-2 border rounded me-2 manage-staff"
                                            data-bs-toggle="tooltip"
@@ -141,6 +158,8 @@
                                            data-farm-name="{{ $farm->name }}">
                                             <i class="ti ti-users"></i>
                                         </a>
+
+                                        @if(auth()->user()->hasRole('admin'))
                                         <a href="javascript:void(0);"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
@@ -155,6 +174,7 @@
                                             @csrf
                                             @method('DELETE')
                                         </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -250,8 +270,12 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success me-2">Save Farm</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="ti ti-device-floppy me-2"></i>Save Farm
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-x me-2"></i>Cancel
+                        </button>
                     </div>
                 </form>
             </div>
@@ -325,8 +349,50 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success me-2">Update Farm</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="ti ti-device-floppy me-2"></i>Update Farm
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-x me-2"></i>Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Management Modal -->
+    <div class="modal fade" id="manageStaffModal" tabindex="-1" aria-labelledby="manageStaffModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="manageStaffForm" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="manageStaffModalLabel">Manage Farm Staff</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="staff_farm_id" name="farm_id">
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Manager</label>
+                            <select id="manager_id" name="manager_id" class="form-select basic-select3" required>
+                                @foreach($managers as $manager)
+                                    <option value="{{ $manager->id }}">{{ $manager->name }} ({{ $manager->email }})</option>
+                                @endforeach
+                            </select>
+                            <div class="invalid-feedback">Please select a manager.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="ti ti-device-floppy me-2"></i>Save Manager
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-x me-2"></i>Cancel
+                        </button>
                     </div>
                 </form>
             </div>
@@ -359,41 +425,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Staff Management Modal -->
-    <div class="modal fade" id="manageStaffModal" tabindex="-1" aria-labelledby="manageStaffModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="manageStaffForm" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="manageStaffModalLabel">Manage Farm Staff</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="staff_farm_id" name="farm_id">
-
-                        <div class="mb-3">
-                            <label class="form-label">Select Manager</label>
-                            <select id="manager_id" name="manager_id" class="form-select basic-select3" required>
-                                @foreach($managers as $manager)
-                                    <option value="{{ $manager->id }}">{{ $manager->name }} ({{ $manager->email }})</option>
-                                @endforeach
-                            </select>
-                            <div class="invalid-feedback">Please select a manager.</div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success me-2">Save Manager</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
 @endsection
 
 @push('js')
