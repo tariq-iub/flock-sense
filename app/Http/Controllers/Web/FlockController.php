@@ -72,6 +72,13 @@ class FlockController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        // Managers and owners can create flocks, but not farms/sheds; admins unlimited
+        if (! $user->hasAnyRole('admin', 'owner', 'manager')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'shed_id' => 'required|integer|exists:sheds,id',
@@ -80,6 +87,28 @@ class FlockController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'nullable|date',
         ]);
+
+        // Scope shed ownership/management for owner/manager
+        if ($user->hasRole('owner')) {
+            $isOwnerShed = Shed::where('id', $validated['shed_id'])
+                ->whereHas('farm', function ($q) use ($user) {
+                    $q->where('owner_id', $user->id);
+                })
+                ->exists();
+            if (! $isOwnerShed) {
+                abort(403, 'You can only add flocks to your own sheds.');
+            }
+        }
+
+        if ($user->hasRole('manager')) {
+            $managedFarmIds = $user->managedFarms()->pluck('id');
+            $isManagedShed = Shed::where('id', $validated['shed_id'])
+                ->whereIn('farm_id', $managedFarmIds)
+                ->exists();
+            if (! $isManagedShed) {
+                abort(403, 'You can only add flocks to sheds you manage.');
+            }
+        }
 
         Flock::create($validated);
 

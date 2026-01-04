@@ -63,9 +63,22 @@ class FarmController extends Controller
      */
     public function store(Request $request)
     {
-        // Only admins can create farms
-        if (!auth()->user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only admins can create farms.');
+        $user = auth()->user();
+
+        // Admins: unlimited, Owners: only one, Managers: not allowed
+        if ($user->hasRole('manager')) {
+            abort(403, 'Unauthorized action. Managers cannot create farms.');
+        }
+
+        if ($user->hasRole('owner')) {
+            $existing = Farm::where('owner_id', $user->id)->count();
+            if ($existing >= 1) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'You can only create one farm.');
+            }
+        } elseif (! $user->hasRole('admin')) {
+            abort(403, 'Unauthorized action.');
         }
 
         $validated = $request->validate([
@@ -74,10 +87,17 @@ class FarmController extends Controller
             'district_id' => 'nullable|exists:pakistan_districts,id',
             'city_id' => 'nullable|exists:pakistan_tehsils,id',
             'address' => 'required|string|max:500',
-            'owner_id' => 'required|exists:users,id',
+            'owner_id' => 'nullable|exists:users,id',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
         ]);
+
+        // Force owner_id for owner role
+        if ($user->hasRole('owner')) {
+            $validated['owner_id'] = $user->id;
+        } elseif (! isset($validated['owner_id'])) {
+            $validated['owner_id'] = $user->id;
+        }
 
         $farm = Farm::create($validated);
 

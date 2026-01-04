@@ -30,7 +30,7 @@ class DashboardController extends Controller
                 ->with('sheds.latestFlock')
                 ->first();
 
-            if (!$farm) {
+            if (! $farm) {
                 return view('dashboards.owner', [
                     'user' => $user,
                     'farm' => null,
@@ -76,7 +76,7 @@ class DashboardController extends Controller
                 ->with('sheds.latestFlock')
                 ->first();
 
-            if (!$farm) {
+            if (! $farm) {
                 return view('dashboards.flocksense', [
                     'user' => $user,
                     'farm' => null,
