@@ -74,7 +74,7 @@
             // Support both plain query params and Spatie QueryBuilder style `filter[...]`
             $farmSelected = request('filter.farm_id', request('farm_id'));
             $shedSelected = request('filter.shed_id', request('shed_id'));
-            $headSelected = request('filter.head_id', request('head_id'));
+            $headSelected = request('filter.expense_head_id', request('expense_head_id'));
             $dateFrom = request('filter.date_from', request('date_from'));
             $dateTo = request('filter.date_to', request('date_to'));
         @endphp
@@ -109,7 +109,7 @@
                     </div>
 
                     <div class="col-md-2">
-                        <select id="headFilter" name="filter[head_id]" class="form-select">
+                        <select id="headFilter" name="filter[expense_head_id]" class="form-select">
                             <option value="">All Expense Heads</option>
                             @foreach($expenseHeadGroups as $category => $items)
                                 <optgroup label="{{ $category }}">
@@ -178,7 +178,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($expenses as $expense)
+                        @foreach($expenses as $expense)
                             <tr>
                                 <td>
                                     <a href="javascript:void(0);" class="fw-semibold text-info text-decoration-none show-expense"
@@ -229,30 +229,26 @@
                                             <i class="ti ti-edit"></i>
                                         </a>
 
-                                        <a href="javascript:void(0);"
-                                           data-bs-toggle="tooltip"
-                                           data-bs-placement="top"
-                                           data-bs-original-title="Delete"
-                                           data-expense-id="{{ $expense->id }}"
-                                           data-expense-name="{{ $expense->description ?? ('Expense #' . $expense->id) }}"
-                                           class="p-2 open-delete-modal">
-                                            <i data-feather="trash-2" class="feather-trash-2"></i>
-                                        </a>
+                                        @if(auth()->user()->hasAnyRole('admin', 'owner'))
+                                            <a href="javascript:void(0);"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               data-bs-original-title="Delete"
+                                               data-expense-id="{{ $expense->id }}"
+                                               data-expense-name="{{ $expense->description ?? ('Expense #' . $expense->id) }}"
+                                               class="p-2 open-delete-modal">
+                                                <i data-feather="trash-2" class="feather-trash-2"></i>
+                                            </a>
 
-                                        <form action="{{ route('farm.expenses.destroy', $expense->id) }}" method="POST" id="delete{{ $expense->id }}" class="d-none">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
+                                            <form action="{{ route('farm.expenses.destroy', $expense->id) }}" method="POST" id="delete{{ $expense->id }}" class="d-none">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="9" class="text-center py-4 text-muted">
-                                    No expenses found for the selected filters.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                         </tbody>
                     </table>
                 </div>

@@ -99,7 +99,7 @@ class FarmExpenseController extends Controller
         // --- Expenses query via Spatie Query Builder
         $baseExpensesQuery = FarmExpense::query()
             ->with([
-                'farm:id,name',
+                'farm:id,name,owner_id',
                 'shed:id,farm_id,name',
                 'flock:id,shed_id,name,chicken_count,start_date',
                 'head:id,category,item',
@@ -121,7 +121,7 @@ class FarmExpenseController extends Controller
                 }),
 
                 // Optional extras (keep/remove as you like)
-                AllowedFilter::exact('head_id'),
+                AllowedFilter::exact('expense_head_id'),
                 AllowedFilter::partial('remarks'),
             ])
             ->allowedSorts(['expense_date', 'amount', 'created_at'])
@@ -276,6 +276,12 @@ class FarmExpenseController extends Controller
      */
     public function destroy(FarmExpense $farmExpense)
     {
+        $user = auth()->user();
+
+        if (! $user->hasAnyRole(['admin', 'owner'])) {
+            abort(403, 'You are not authorized to delete farm expenses.');
+        }
+
         $farmExpense->delete();
 
         return redirect()
