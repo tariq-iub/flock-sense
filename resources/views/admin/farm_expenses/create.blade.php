@@ -40,12 +40,13 @@
                     @include('admin.farm_expenses.partials.form-fields', ['farmExpense' => null])
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ route('farm.expenses.index') }}" class="btn btn-outline-secondary">
-                            Cancel
-                        </a>
                         <button type="submit" class="btn btn-success">
-                            <i class="ti ti-device-floppy me-1"></i>Save Expense
+                            <i class="ti ti-device-floppy me-2"></i>Save Expense
                         </button>
+
+                        <a href="{{ route('farm.expenses.index') }}" class="btn btn-secondary">
+                            <i class="ti ti-x me-2"></i>Cancel
+                        </a>
                     </div>
                 </form>
             </div>
