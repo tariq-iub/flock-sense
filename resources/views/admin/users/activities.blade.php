@@ -124,7 +124,7 @@
                             <th style="width: 14%">Date / Time</th>
                             <th style="width: 36%">Description</th>
                             <th style="width: 15%">Model</th>
-                            <th style="width: 15%">User Name</th>
+                            <th style="width: 15%">Action By</th>
                             <th style="width: 10%" class="text-center">Properties</th>
                         </tr>
                         </thead>
