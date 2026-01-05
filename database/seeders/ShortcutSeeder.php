@@ -106,7 +106,7 @@ class ShortcutSeeder extends Seeder
             ],
             [
                 'title' => 'Expenses',
-                'url' => '/admin/expenses',
+                'url' => '/admin/farm-expenses',
                 'icon' => 'ti ti-cash',
                 'group' => 'user',
                 'default' => true,
