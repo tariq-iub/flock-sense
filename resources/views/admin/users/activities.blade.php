@@ -220,9 +220,16 @@
                     </table>
                 </div>
 
-                <div class="p-3">
-                    {{ $activities->links() }}
-                </div>
+                @if($activities instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator && $activities->hasPages())
+                    <div class="card-footer border-top-0 d-flex flex-wrap align-items-center row-gap-2">
+                        <div class="text-muted small">
+                            Showing {{ $activities->firstItem() ?? 0 }} - {{ $activities->lastItem() ?? 0 }} of {{ $activities->total() }} activities
+                        </div>
+                        <div class="ms-auto">
+                            {{ $activities->onEachSide(1)->links('vendor.pagination.bootstrap-5-no-summary') }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

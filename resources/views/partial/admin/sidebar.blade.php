@@ -101,12 +101,14 @@
                             </a>
                             <ul>
                                 <li>
-                                    <a href="{{ route('clients.index') }}" class="{{ Route::is('clients.*') ? 'active' : '' }}">
+                                    <a href="{{ route('clients.index') }}"
+                                       class="{{ Route::is('clients.index') ? 'active' : '' }}">
                                         Users List
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('roles.index') }}" class="{{ Route::is('roles.*') ? 'active' : '' }}">
+                                    <a href="{{ route('roles.index') }}"
+                                       class="{{ Route::is('roles.*') ? 'active' : '' }}">
                                         User Roles
                                     </a>
                                 </li>
