@@ -152,7 +152,7 @@ class ProductionLogController extends ApiController
 
     public function show(ProductionLog $productionLog)
     {
-        return response()->json($productionLog->load(['shed', 'flock', 'user']));
+        return response()->json($productionLog);
     }
 
     public function update(Request $request, ProductionLog $productionLog)
