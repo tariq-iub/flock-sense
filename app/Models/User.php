@@ -71,16 +71,16 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-//    protected function initials(): Attribute
-//    {
-//        return Attribute::make(
-//            fn () => Str::of($this->name)
-//                ->explode(' ')
-//                ->take(2)
-//                ->map(fn ($word) => Str::substr($word, 0, 1))
-//                ->implode('')
-//        );
-//    }
+    //    protected function initials(): Attribute
+    //    {
+    //        return Attribute::make(
+    //            fn () => Str::of($this->name)
+    //                ->explode(' ')
+    //                ->take(2)
+    //                ->map(fn ($word) => Str::substr($word, 0, 1))
+    //                ->implode('')
+    //        );
+    //    }
 
     public function canImpersonate(): bool
     {

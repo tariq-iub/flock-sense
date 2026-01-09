@@ -115,6 +115,7 @@ Route::get('/uniformity', [GraphDataController::class, 'uniformity']);
 Route::get('/vaccination-history', [GraphDataController::class, 'vaccinationHistory']);
 Route::get('/feed-consumption-history', [GraphDataController::class, 'feedConsumptionHistory']);
 Route::get('/water-consumption-history', [GraphDataController::class, 'waterConsumptionHistory']);
+Route::get('/feed-water-consumption-history', [GraphDataController::class, 'feedWaterConsumptionHistory']);
 Route::get('weight-log/history', [WeightLogController::class, 'history'])->name('weight-log.history');
 
 // Address Credentials

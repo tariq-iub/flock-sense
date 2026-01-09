@@ -34,11 +34,8 @@
                                class="{{ Route::is('charts.*') ||
                                          Route::is('breeding.*') ||
                                          Route::is('feeds.*') ||
-                                         Route::is('expenses.*') ||
+                                         Route::is('expense.heads.*') ||
                                          Route::is('pricing-plans.*') ||
-                                         Route::is('admin.farms.*') ||
-                                         Route::is('admin.sheds.*') ||
-                                         Route::is('admin.flocks.*') ||
                                          Route::is('partners.*') ||
                                          Route::is('shortcuts.*') ||
                                          Route::is('admin.medicines.*') ? 'subdrop active' : '' }}">
@@ -71,8 +68,8 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('expenses.index') }}"
-                                       class="{{ request()->routeIs('expenses.index') ? 'active' : '' }}">
+                                    <a href="{{ route('expense.heads.index') }}"
+                                       class="{{ request()->routeIs('expense.heads.index') ? 'active' : '' }}">
                                         Expense Heads
                                     </a>
                                 </li>
@@ -80,24 +77,6 @@
                                     <a href="{{ route('pricing-plans.index') }}"
                                        class="{{ request()->routeIs('pricing-plans.*') ? 'active' : '' }}">
                                         Pricing Plans
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.farms.index') }}"
-                                       class="{{ request()->routeIs('admin.farms.*') ? 'active' : '' }}">
-                                        Farms
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.sheds.index') }}"
-                                       class="{{ request()->routeIs('admin.sheds.*') ? 'active' : '' }}">
-                                        Sheds
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.flocks.index') }}"
-                                       class="{{ request()->routeIs('admin.flocks.*') ? 'active' : '' }}">
-                                        Flock Management
                                     </a>
                                 </li>
                                 <li>
@@ -122,12 +101,14 @@
                             </a>
                             <ul>
                                 <li>
-                                    <a href="{{ route('clients.index') }}" class="{{ Route::is('clients.*') ? 'active' : '' }}">
+                                    <a href="{{ route('clients.index') }}"
+                                       class="{{ Route::is('clients.index') ? 'active' : '' }}">
                                         Users List
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('roles.index') }}" class="{{ Route::is('roles.*') ? 'active' : '' }}">
+                                    <a href="{{ route('roles.index') }}"
+                                       class="{{ Route::is('roles.*') ? 'active' : '' }}">
                                         User Roles
                                     </a>
                                 </li>
@@ -189,6 +170,41 @@
                             </ul>
                         </li>
                         @endadmin
+
+                        <li class="submenu">
+                            <a href="javascript:void(0);"
+                               class="{{ Route::is('admin.farms.*') ||
+                                         Route::is('admin.sheds.*') ||
+                                         Route::is('admin.flocks.*') ? 'subdrop active' : '' }}">
+                                <i class="ti ti-building-warehouse fs-16 me-2"></i><span>Farm Structure</span>
+                                <span class="menu-arrow"></span>
+                            </a>
+                            <ul>
+                                @if(Auth::user()->hasRole('admin') || Auth::user()->hasRole('owner'))
+                                <li>
+                                    <a href="{{ route('admin.farms.index') }}"
+                                       class="{{ request()->routeIs('admin.farms.*') ? 'active' : '' }}">
+                                        Farms
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.sheds.index') }}"
+                                       class="{{ request()->routeIs('admin.sheds.*') ? 'active' : '' }}">
+                                        Sheds
+                                    </a>
+                                </li>
+                                @endif
+
+                                @if(Auth::user()->hasRole('admin') || Auth::user()->hasRole('owner') || Auth::user()->hasRole('manager'))
+                                <li>
+                                    <a href="{{ route('admin.flocks.index') }}"
+                                       class="{{ request()->routeIs('admin.flocks.*') ? 'active' : '' }}">
+                                        Flock Management
+                                    </a>
+                                </li>
+                                @endif
+                            </ul>
+                        </li>
                     </ul>
                 </li>
                 @admin
@@ -294,9 +310,9 @@
                                     </li>
                                 </ul>
                             </li>
-                            <li>
-                                <a href="#">
-                                    <i class="ti ti-file-stack fs-16 me-2"></i><span>Expenses</span>
+                            <li class="{{ request()->routeIs('farm.expenses.*') ? 'active' : '' }}">
+                                <a href="{{ route('farm.expenses.index') }}">
+                                    <i class="ti ti-file-stack fs-16 me-2"></i><span>Farm Expenses</span>
                                 </a>
                             </li>
                             <li>

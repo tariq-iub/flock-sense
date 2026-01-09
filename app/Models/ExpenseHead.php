@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Expense extends Model
+class ExpenseHead extends Model
 {
-    use HasFactory;
     use LogsActivity;
 
     /**
@@ -68,7 +66,7 @@ class Expense extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName('expenses') // goes into log_name
+            ->useLogName('expense-head') // goes into log_name
             ->logOnly([
                 'category',
                 'item',
@@ -76,7 +74,6 @@ class Expense extends Model
                 'is_active',
             ])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn (string $eventName) => "Expense {$this->name} was {$eventName} by ".optional(auth()->user())->name
-            );
+            ->setDescriptionForEvent(fn (string $eventName) => "Expense head {$this->name} was {$eventName} by ".optional(auth()->user())->name);
     }
 }

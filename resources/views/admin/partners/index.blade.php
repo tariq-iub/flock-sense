@@ -134,19 +134,15 @@
                                 </td>
 
                                 <td class="text-center">
-                                    @php
-                                        $keywords = $partner->support_keywords
-                                            ? preg_split('/\s*,\s*/', $partner->support_keywords)
-                                            : [];
-                                    @endphp
-
-                                    @foreach($keywords as $keyword)
-                                        @if($keyword !== '')
-                                            <span class="badge bg-light text-dark border me-1 mb-1">
-                                                {{ $keyword }}
-                                            </span>
-                                        @endif
-                                    @endforeach
+                                    @if(is_array($partner->support_keywords))
+                                        @foreach($partner->support_keywords as $keyword)
+                                            @if($keyword !== '')
+                                                <span class="badge bg-light text-dark border me-1 mb-1">
+                                                    {{ $keyword }}
+                                                </span>
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </td>
 
                                 <td class="text-center">
@@ -177,26 +173,26 @@
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
                                         <a href="javascript:void(0)"
-                                           class="me-2 d-flex align-items-center p-2 border rounded edit-pricing"
+                                           class="me-2 d-flex align-items-center p-2 border rounded edit-partner"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Edit Plan"
-                                           data-pricing-id="{{ $partner->id }}"
-                                           data-pricing-name="{{ $partner->company_name }}">
+                                           data-bs-original-title="Edit Partner"
+                                           data-partner-id="{{ $partner->id }}"
+                                           data-partner-name="{{ $partner->company_name }}">
                                             <i class="ti ti-edit"></i>
                                         </a>
                                         <a href="javascript:void(0);"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
                                            title=""
-                                           data-bs-original-title="Delete Plan"
-                                           data-pricing-id="{{ $partner->id }}"
-                                           data-pricing-name="{{ $partner->company_name }}"
+                                           data-bs-original-title="Delete Partner"
+                                           data-partner-id="{{ $partner->id }}"
+                                           data-partner-name="{{ $partner->company_name }}"
                                            class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
-                                        <form action="{{ route('pricing-plans.destroy', $partner->id) }}" method="POST" id="delete{{ $partner->id }}">
+                                        <form action="{{ route('partners.destroy', $partner->id) }}" method="POST" id="delete{{ $partner->id }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -211,10 +207,10 @@
         </div>
     </div>
 
-    <!-- Add Pricing Modal -->
+    <!-- Add Partner Modal -->
     @include('admin.partners._add_modal')
 
-    <!-- Edit Pricing Modal -->
+    <!-- Edit Partner Modal -->
     @include('admin.partners._edit_modal')
 
     <!-- Delete Modal -->
@@ -292,23 +288,23 @@
             }
         });
 
-        // Edit modal JS (to be filled by AJAX if needed)
+        // Edit modal JS
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.edit-pricing').forEach(function(button) {
+            document.querySelectorAll('.edit-partner').forEach(function(button) {
                 button.addEventListener('click', function() {
-                    var pricingId = this.getAttribute('data-pricing-id');
-                    var pricingName = this.getAttribute('data-pricing-name');
+                    var partnerId = this.getAttribute('data-partner-id');
+                    var partnerName = this.getAttribute('data-partner-name');
 
-                    var form = document.getElementById('editPricingForm');
-                    var updateUrl = '/admin/pricing-plans/' + pricingId;
+                    var form = document.getElementById('editPartnerForm');
+                    var updateUrl = '/admin/partners/' + partnerId;
 
-                    document.getElementById('editPricingModalLabel').textContent = "Edit Plan - " + pricingName;
+                    document.getElementById('editPartnerModalLabel').textContent = "Edit Partner - " + partnerName;
 
-                    $.get('/admin/pricing-plans/' + pricingId, function(plan) {
+                    $.get('/admin/partners/' + partnerId, function(partner) {
                         // Populate fields
-                        fillEditPricingModal(plan, updateUrl);
+                        fillEditPartnerModal(partner, updateUrl);
 
-                        var modal = new bootstrap.Modal(document.getElementById('editPricingModal'));
+                        var modal = new bootstrap.Modal(document.getElementById('editPartnerModal'));
                         modal.show();
                     });
                 });
@@ -319,10 +315,10 @@
             let deleteId = null;
             document.querySelectorAll('.open-delete-modal').forEach(function(el) {
                 el.addEventListener('click', function() {
-                    deleteId = this.getAttribute('data-pricing-id');
-                    const planName = this.getAttribute('data-pricing-name');
+                    deleteId = this.getAttribute('data-partner-id');
+                    const partnerName = this.getAttribute('data-partner-name');
                     document.getElementById('delete-modal-message').textContent =
-                        `Are you sure you want to delete "${planName}" plan?`;
+                        `Are you sure you want to delete "${partnerName}" partner?`;
 
                     var modal = new bootstrap.Modal(document.getElementById('delete-modal'));
                     modal.show();
@@ -351,8 +347,20 @@
                     const content = this.getAttribute('data-content') || '';
 
                     titleEl.textContent = title;
-                    // Convert newlines to <br> for nicer display
-                    bodyEl.innerHTML = content.replace(/\n/g, '<br>');
+
+                    // Word wrap every 15 words
+                    const words = content.split(/\s+/);
+                    let formattedContent = '';
+                    for (let i = 0; i < words.length; i++) {
+                        formattedContent += words[i];
+                        if ((i + 1) % 15 === 0 && i !== words.length - 1) {
+                            formattedContent += '<br>';
+                        } else if (i !== words.length - 1) {
+                            formattedContent += ' ';
+                        }
+                    }
+
+                    bodyEl.innerHTML = formattedContent;
 
                     bsOffcanvas.show();
                 });

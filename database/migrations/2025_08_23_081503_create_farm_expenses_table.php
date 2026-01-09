@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('farm_expenses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('farm_id');
-            $table->unsignedBigInteger('shed_id')->nullable();
-            $table->unsignedBigInteger('flock_id')->nullable();
-            $table->unsignedBigInteger('expense_id')->nullable();
+            $table->foreignId('farm_id');
+            $table->foreignId('shed_id')->nullable();
+            $table->foreignId('flock_id')->nullable();
+            $table->foreignId('expense_head_id')->nullable();
             $table->date('expense_date');
             $table->string('description')->nullable();
 
@@ -30,20 +30,14 @@ return new class extends Migration
             $table->unsignedBigInteger('vendor_id')->nullable();
             $table->string('reference_no')->nullable();
 
-            $table->unsignedBigInteger('created_by')->nullable();
+            $table->foreignId('created_by');
+            $table->softDeletes();
             $table->timestamps();
-
-            $table->foreign('farm_id')->references('id')->on('farms')->cascadeOnDelete();
-            $table->foreign('shed_id')->references('id')->on('sheds')->nullOnDelete();
-            $table->foreign('flock_id')->references('id')->on('flocks')->nullOnDelete();
-            $table->foreign('expense_id')->references('id')->on('expenses')->nullOnDelete();
-            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
-//            $table->foreign('vendor_id')->references('id')->on('vendors')->nullOnDelete();
 
             $table->index(['farm_id', 'expense_date']);
             $table->index(['shed_id', 'expense_date']);
             $table->index(['flock_id', 'expense_date']);
-            $table->index(['farm_id', 'expense_id']);
+            $table->index(['farm_id', 'expense_head_id']);
         });
     }
 

@@ -56,20 +56,28 @@ class PartnerController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = $request->validate([
+        $validated = $request->validate([
             'company_name' => 'required|string|max:255',
             'url' => 'nullable|url',
             'introduction' => 'nullable|string',
             'partnership_detail' => 'nullable|string',
-            'support_keywords' => 'nullable|json',
+            'support_keywords' => 'nullable|string',
+            'is_active' => 'boolean',
+            'sort_order' => 'nullable|integer|min:0',
             'logo' => 'nullable|mimes:jpeg,jpg,png,svg|max:2000',
         ]);
 
-        $data = $request->only([
-            'company_name', 'url', 'introduction', 'partnership_detail', 'support_keywords',
-        ]);
+        // Parse support_keywords if it's a string (from tagsinput)
+        if (isset($validated['support_keywords']) && is_string($validated['support_keywords'])) {
+            $keywords = json_decode($validated['support_keywords'], true);
+            $validated['support_keywords'] = is_array($keywords) ? $keywords : [];
+        }
 
-        $partner = Partner::create($data);
+        // Set defaults
+        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+
+        $partner = Partner::create($validated);
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
@@ -79,7 +87,7 @@ class PartnerController extends Controller
 
         return redirect()
             ->route('partners.index')
-            ->with('success', 'Partner is added successfully.');
+            ->with('success', 'Partner added successfully.');
     }
 
     /**
@@ -87,7 +95,9 @@ class PartnerController extends Controller
      */
     public function show(Partner $partner)
     {
-        return $partner;
+        $partner->load('media');
+
+        return response()->json($partner);
     }
 
     /**
@@ -103,36 +113,44 @@ class PartnerController extends Controller
      */
     public function update(Request $request, Partner $partner)
     {
-        $validator = Validator::make($request->all(), [
-            'company_name' => 'sometimes|required|string|max:255',
+        $validated = $request->validate([
+            'company_name' => 'required|string|max:255',
             'url' => 'nullable|url',
             'introduction' => 'nullable|string',
             'partnership_detail' => 'nullable|string',
-            'support_keywords' => 'nullable|array',
-            'support_keywords.*' => 'string|max:50',
+            'support_keywords' => 'nullable|string',
             'is_active' => 'boolean',
-            'sort_order' => 'integer',
-            'logo' => 'image|mimes:jpeg,png,jpg|max:2000',
+            'sort_order' => 'nullable|integer|min:0',
+            'logo' => 'nullable|mimes:jpeg,jpg,png,svg|max:2000',
         ]);
 
-        $data = $request->only([
-            'company_name', 'url', 'introduction', 'partnership_detail', 'support_keywords', 'is_active', 'sort_order',
-        ]);
+        // Parse support_keywords if it's a string (from tagsinput)
+        if (isset($validated['support_keywords']) && is_string($validated['support_keywords'])) {
+            $keywords = json_decode($validated['support_keywords'], true);
+            $validated['support_keywords'] = is_array($keywords) ? $keywords : [];
+        }
 
-        $partner->update($data);
+        // Set defaults
+        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['sort_order'] = $validated['sort_order'] ?? $partner->sort_order;
 
-        // Handle logo upload
+        $partner->update($validated);
+
+        // Handle logo upload (replace existing)
         if ($request->hasFile('logo')) {
-            $file = $request->file('file');
-            if ($partner->media != null && $partner->media->first()) {
+            $file = $request->file('logo');
+
+            // Delete old media if exists
+            if ($partner->media->first()) {
                 $partner->deleteMedia($partner->media->first()->id);
             }
+
             $partner->addMedia($file);
         }
 
         return redirect()
             ->route('partners.index')
-            ->with('success', 'Partner is updated successfully.');
+            ->with('success', 'Partner updated successfully.');
     }
 
     /**
@@ -208,9 +226,11 @@ class PartnerController extends Controller
 
     public function toggleStatus(Partner $partner, Request $request)
     {
-        // Either trust the toggle, or use $request->boolean('is_active')
-        $partner->is_active = ! $partner->is_active;
-        $partner->save();
+        $validated = $request->validate([
+            'is_active' => 'required|boolean',
+        ]);
+
+        $partner->update(['is_active' => $validated['is_active']]);
 
         return response()->json([
             'success' => true,

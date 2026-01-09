@@ -6,8 +6,9 @@ use App\Http\Controllers\Web\ChartController;
 use App\Http\Controllers\Web\ClientController;
 use App\Http\Controllers\Web\DailyReportsController;
 use App\Http\Controllers\Web\DashboardController;
-use App\Http\Controllers\Web\ExpenseController;
+use App\Http\Controllers\Web\ExpenseHeadController;
 use App\Http\Controllers\Web\FarmController;
+use App\Http\Controllers\Web\FarmExpenseController;
 use App\Http\Controllers\Web\FeedController;
 use App\Http\Controllers\Web\FlockController;
 use App\Http\Controllers\Web\IotController;
@@ -110,69 +111,7 @@ Route::post('/email/verification-notification', [AuthController::class, 'resendV
 // Impersonation routes (requires authentication)
 Route::group(['middleware' => 'auth'], function () {
     Route::impersonate();
-});
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin_or_impersonator:admin,owner,manager']], function () {
-
-    // Logout route (POST)
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-    Route::get('/dashboard', DashboardController::class)->name('dashboard');
-
-    Route::prefix('clients')->controller(ClientController::class)->group(function () {
-        Route::get('/{user}', 'show')->name('clients.show');
-        Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
-    });
-
-    // Productions Logs
-    Route::prefix('productions')->controller(ProductionLogController::class)->group(function () {
-        Route::get('/', 'index')->name('productions.index');
-        Route::get('/export/excel', 'exportExcel')->name('productions.export.excel');
-    });
-
-    Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
-    Route::get('/iot/export/excel', [LogsController::class, 'exportExcel'])->name('iot.export.excel');
-
-    // Daily Reports
-    Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
-    Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
-
-    // Personal Settings
-    Route::get('/web-setting/personal', [WebSettingController::class, 'personal'])->name('setting.personal');
-
-    Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
-        return Shed::where('farm_id', $request->farm_id)
-            ->select('id', 'name', 'capacity', 'type')
-            ->orderBy('name')
-            ->get();
-    });
-
-    Route::get('/get-flocks', function (\Illuminate\Http\Request $request) {
-        return Flock::where('shed_id', $request->shed_id)
-            ->select('id', 'name', 'start_date', 'end_date')
-            ->orderBy('start_date', 'desc')
-            ->get();
-    });
-
-    Route::get('/get-devices', function (\Illuminate\Http\Request $request) {
-        $shed = Shed::findOrFail($request->shed_id);
-
-        return $shed->devices()
-            ->wherePivot('is_active', true)
-            ->get();
-    });
-
-    // Reports
-    Route::prefix('reports')->controller(ReportsController::class)->group(function () {
-        Route::get('/income', 'income')->name('reports.income');
-        Route::get('/expenses', 'expenses')->name('reports.expenses');
-        Route::get('/tax', 'tax')->name('reports.tax');
-        Route::get('/devices-sold', 'devices_sales')->name('reports.devices.sales');
-        Route::get('/annual', 'annual')->name('reports.annual');
-    });
-});
-
-Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin-shortcuts', [ShortcutController::class, 'getAdminShortcuts']);
     Route::get('/user-shortcuts', [ShortcutController::class, 'getUserShortcuts']);
     Route::get('/my-shortcuts', [ShortcutController::class, 'getUserPersonalizedShortcuts']);
@@ -239,42 +178,22 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::delete('/{user}', 'destroy')->name('clients.destroy');
     });
 
-    // Farms
-    Route::prefix('farms')->controller(FarmController::class)->group(function () {
-        Route::get('/', 'index')->name('admin.farms.index');
-        Route::post('/', 'store')->name('admin.farms.store');
-        Route::get('/{farm}', 'show')->name('admin.farms.show');
-        Route::put('/{farm}', 'update')->name('admin.farms.update');
-        Route::delete('/{farm}', 'destroy')->name('admin.farms.destroy');
-        Route::get('/{farm}/data', 'farmData')->name('farms.data');
-        Route::put('/{farm}/assign-manager', 'assignManager');
-    });
-
-    // Sheds
-    Route::prefix('sheds')->controller(ShedController::class)->group(function () {
-        Route::get('/', 'index')->name('admin.sheds.index');
-        Route::post('/', 'store')->name('admin.sheds.store');
-        Route::get('/{shed}', 'show')->name('admin.sheds.show');
-        Route::put('/{shed}', 'update')->name('admin.sheds.update');
-        Route::delete('/{shed}', 'destroy')->name('admin.sheds.destroy');
-        Route::get('/{shed}/data', 'shedData')->name('sheds.data');
-    });
-
-    // Flocks
-    Route::prefix('flocks')->controller(FlockController::class)->group(function () {
-        Route::get('/', 'index')->name('admin.flocks.index');
-        Route::post('/', 'store')->name('admin.flocks.store');
-        Route::get('/{flock}', 'show')->name('admin.flocks.show');
-        Route::put('/{flock}', 'update')->name('admin.flocks.update');
-        Route::delete('/{flock}', 'destroy')->name('admin.flocks.destroy');
-    });
-
     // Medicines
     Route::prefix('medicines')->controller(MedicineController::class)->group(function () {
         Route::get('/', 'index')->name('admin.medicines.index');
         Route::post('/', 'store')->name('admin.medicines.store');
         Route::put('/{user}', 'update')->name('admin.medicines.update');
         Route::delete('/{user}', 'destroy')->name('admin.medicines.destroy');
+    });
+
+    // Expense Heads
+    Route::prefix('expense-heads')->controller(ExpenseHeadController::class)->group(function () {
+        Route::get('/', 'index')->name('expense.heads.index');
+        Route::post('/', 'store')->name('expense.heads.store');
+        Route::get('/{expenseHead}', 'show')->name('expense.heads.show');
+        Route::put('/{expenseHead}', 'update')->name('expense.heads.update');
+        Route::delete('/{expenseHead}', 'destroy')->name('expense.heads.destroy');
+        Route::get('/{expenseHead}/toggle', 'toggle')->name('expense.heads.toggle');
     });
 
     // Charts (Standard) Data Routes
@@ -330,16 +249,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::post('/{notification}/mark-read', 'markAsRead')->name('notifications.mark-read');
     });
 
-    // Expenses
-    Route::prefix('expenses')->controller(ExpenseController::class)->group(function () {
-        Route::get('/', 'index')->name('expenses.index');
-        Route::post('/', 'store')->name('expenses.store');
-        Route::get('/{expense}', 'show')->name('expenses.show');
-        Route::put('/{expense}', 'update')->name('expenses.update');
-        Route::delete('/{expense}', 'destroy')->name('expenses.destroy');
-        Route::get('/{expense}/toggle', 'toggle')->name('expenses.toggle');
-    });
-
     // Productions Logs
     Route::prefix('productions')->controller(ProductionLogController::class)->group(function () {
         Route::get('/create', 'create')->name('productions.create');
@@ -348,5 +257,112 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin']], func
         Route::get('/{productionLog}/edit', 'edit')->name('productions.edit');
         Route::put('/{productionLog}', 'update')->name('productions.update');
         Route::delete('/{productionLog}', 'destroy')->name('productions.destroy');
+    });
+});
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner']], function () {
+    // Farms
+    Route::prefix('farms')->controller(FarmController::class)->group(function () {
+        Route::get('/', 'index')->name('admin.farms.index');
+        Route::post('/', 'store')->name('admin.farms.store');
+        Route::get('/{farm}', 'show')->name('admin.farms.show');
+        Route::put('/{farm}', 'update')->name('admin.farms.update');
+        Route::delete('/{farm}', 'destroy')->name('admin.farms.destroy');
+        Route::get('/{farm}/data', 'farmData')->name('farms.data');
+        Route::put('/{farm}/assign-manager', 'assignManager');
+    });
+
+    // Sheds
+    Route::prefix('sheds')->controller(ShedController::class)->group(function () {
+        Route::get('/', 'index')->name('admin.sheds.index');
+        Route::post('/', 'store')->name('admin.sheds.store');
+        Route::get('/{shed}', 'show')->name('admin.sheds.show');
+        Route::put('/{shed}', 'update')->name('admin.sheds.update');
+        Route::delete('/{shed}', 'destroy')->name('admin.sheds.destroy');
+    });
+
+});
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'role:admin|owner|manager']], function () {
+
+    // Logout route (POST)
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::prefix('clients')->controller(ClientController::class)->group(function () {
+        Route::get('/{user}', 'show')->name('clients.show');
+        Route::put('/{user}/update-password', 'updatePassword')->name('user.update-password');
+    });
+
+    // Productions Logs
+    Route::prefix('productions')->controller(ProductionLogController::class)->group(function () {
+        Route::get('/', 'index')->name('productions.index');
+        Route::get('/export/excel', 'exportExcel')->name('productions.export.excel');
+    });
+
+    Route::get('/iot/logs', [LogsController::class, 'deviceLogs'])->name('iot.logs');
+    Route::get('/iot/export/excel', [LogsController::class, 'exportExcel'])->name('iot.export.excel');
+
+    // Daily Reports
+    Route::get('/daily-reports', [DailyReportsController::class, 'index'])->name('daily.reports');
+    Route::get('/daily-report-card/{version}', [DailyReportsController::class, 'getReportCard'])->name('daily.report.card');
+
+    // Personal Settings
+    Route::get('/web-setting/personal', [WebSettingController::class, 'personal'])->name('setting.personal');
+
+    Route::get('/get-sheds', function (\Illuminate\Http\Request $request) {
+        return Shed::where('farm_id', $request->farm_id)
+            ->select('id', 'name', 'capacity', 'type')
+            ->orderBy('name')
+            ->get();
+    });
+
+    Route::get('/get-flocks', function (\Illuminate\Http\Request $request) {
+        return Flock::where('shed_id', $request->shed_id)
+            ->select('id', 'name', 'start_date', 'end_date')
+            ->orderBy('start_date', 'desc')
+            ->get();
+    });
+
+    Route::get('/get-devices', function (\Illuminate\Http\Request $request) {
+        $shed = Shed::findOrFail($request->shed_id);
+
+        return $shed->devices()
+            ->wherePivot('is_active', true)
+            ->get();
+    });
+
+    Route::get('sheds/{shed}/data', [ShedController::class, 'shedData'])->name('sheds.data');
+
+    // Flocks
+    Route::prefix('flocks')->controller(FlockController::class)->group(function () {
+        Route::get('/', 'index')->name('admin.flocks.index');
+        Route::post('/', 'store')->name('admin.flocks.store');
+        Route::get('/{flock}', 'show')->name('admin.flocks.show');
+        Route::put('/{flock}', 'update')->name('admin.flocks.update');
+        Route::delete('/{flock}', 'destroy')->name('admin.flocks.destroy');
+    });
+
+    // Farm Expenses
+    Route::prefix('farm-expenses')->controller(FarmExpenseController::class)->group(function () {
+        Route::get('/', 'index')->name('farm.expenses.index');
+        Route::get('/create', 'create')->name('farm.expenses.create');
+        Route::post('/', 'store')->name('farm.expenses.store');
+        Route::get('/{farmExpense}/edit', 'edit')->name('farm.expenses.edit');
+        Route::get('/{farmExpense}', 'show')->name('farm.expenses.show');
+        Route::put('/{farmExpense}', 'update')->name('farm.expenses.update');
+        Route::delete('/{farmExpense}', 'destroy')->name('farm.expenses.destroy');
+        Route::get('/sheds-by-farm/{farm}', 'getShedsByFarm')->name('farm.expenses.sheds-by-farm');
+        Route::get('/flocks-by-shed/{shed}', 'getFlocksByShed')->name('farm.expenses.flocks-by-shed');
+    });
+
+    // Reports
+    Route::prefix('reports')->controller(ReportsController::class)->group(function () {
+        Route::get('/income', 'income')->name('reports.income');
+        Route::get('/expenses', 'expenses')->name('reports.expenses');
+        Route::get('/tax', 'tax')->name('reports.tax');
+        Route::get('/devices-sold', 'devices_sales')->name('reports.devices.sales');
+        Route::get('/annual', 'annual')->name('reports.annual');
     });
 });

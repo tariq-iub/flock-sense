@@ -27,7 +27,7 @@
         <div class="container-fluid">
             <div class="row mb-3">
                 @if (session('success'))
-                <div class="alert alert-success d-flex align-items-center justify-content-between" expense="alert">
+                <div class="alert alert-success d-flex align-items-center justify-content-between" role="alert">
                     <div>
                         <i class="feather-check-circle flex-shrink-0 me-2"></i>
                         {{ session('success') }}
@@ -39,7 +39,7 @@
                 @endif
 
                 @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" expense="alert">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>
                                 <i class="feather-alert-triangle flex-shrink-0 me-2"></i>
                                 There were some errors with your submission:
@@ -73,6 +73,7 @@
                     </select>
                 </div>
             </div>
+
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table datatable-custom">
@@ -86,17 +87,17 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($expenses as $expense)
+                        @foreach($expenseHeads as $head)
                             <tr>
                                 <td>
-                                    {{ $expense->category }}
+                                    {{ $head->category }}
                                 </td>
-                                <td>{{ $expense->item }}</td>
+                                <td>{{ $head->item }}</td>
                                 <td class="text-wrap">
-                                   {{ $expense->description }}
+                                   {{ $head->description }}
                                 </td>
                                 <td>
-                                    @if($expense->is_active)
+                                    @if($head->is_active)
                                         <span class="badge bg-success">Active</span>
                                     @else
                                         <span class="badge bg-danger">Blocked</span>
@@ -104,7 +105,7 @@
                                 </td>
                                 <td class="action-table-data">
                                     <div class="action-icon d-inline-flex">
-                                        <a href="{{ route('expenses.toggle', $expense) }}"
+                                        <a href="{{ route('expense.heads.toggle', $head) }}"
                                            class="me-2 d-flex align-items-center p-2 border rounded"
                                            data-bs-toggle="tooltip"
                                            data-bs-placement="top"
@@ -119,8 +120,8 @@
                                            data-bs-placement="top"
                                            title=""
                                            data-bs-original-title="Edit Expense"
-                                           data-expense-id="{{ $expense->id }}"
-                                           data-expense-name="{{ $expense->item }}">
+                                           data-expense-id="{{ $head->id }}"
+                                           data-expense-name="{{ $head->item }}">
                                             <i class="ti ti-edit"></i>
                                         </a>
 
@@ -130,12 +131,12 @@
                                            data-bs-placement="top"
                                            title=""
                                            data-bs-original-title="Delete Expense"
-                                           data-expense-id="{{ $expense->id }}"
-                                           data-expense-name="{{ $expense->item }}"
+                                           data-expense-id="{{ $head->id }}"
+                                           data-expense-name="{{ $head->item }}"
                                            class="p-2 open-delete-modal">
                                             <i data-feather="trash-2" class="feather-trash-2"></i>
                                         </a>
-                                        <form action="{{ route('expenses.destroy', $expense->id) }}" method="POST" id="delete{{ $expense->id }}">
+                                        <form action="{{ route('expense.heads.destroy', $head->id) }}" method="POST" id="delete{{ $head->id }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -155,7 +156,7 @@
     <div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('expenses.store') }}" method="POST" class="needs-validation" novalidate>
+                <form action="{{ route('expense.heads.store') }}" method="POST" class="needs-validation" novalidate>
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="addExpenseModalLabel">Add Expense</h5>
@@ -199,8 +200,12 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success me-2">Save Expense</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="ti ti-device-floppy me-2"></i>Save Expense Head
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-x me-2"></i>Close
+                        </button>
                     </div>
                 </form>
             </div>
@@ -251,8 +256,12 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-success me-2">Update Expense</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="ti ti-device-floppy me-2"></i>Update Expense Head
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ti ti-x me-2"></i>Close
+                        </button>
                     </div>
                 </form>
             </div>
@@ -328,12 +337,12 @@
                 var expenseName = $(this).data('expense-name');
 
                 var form = document.getElementById('editExpenseForm');
-                form.action = '/admin/expenses/' + expenseId;
+                form.action = '/admin/expense-heads/' + expenseId;
 
                 $('#editExpenseModalLabels').text('Edit Expense - ' + expenseName);
 
                 // Fetch the attached expenses via AJAX
-                $.get('/admin/expenses/' + expenseId, function(data) {
+                $.get('/admin/expense-heads/' + expenseId, function(data) {
                     // Populate fields
                     $('#edit_expense_id').val(data.id);
                     $('#edit_category').val(data.category);
@@ -356,7 +365,7 @@
                     var expenseName = this.getAttribute('data-expense-name');
                     // Set the form action dynamically
                     var form = document.getElementById('editexpenseForm');
-                    form.action = '/admin/expenses/' + expenseId;
+                    form.action = '/admin/expense-heads/' + expenseId;
 
                     // Set hidden and visible values
                     document.getElementById('edit-expense-id').value = expenseId;

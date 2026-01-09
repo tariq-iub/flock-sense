@@ -3,22 +3,22 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\Expense;
+use App\Models\ExpenseHead;
 use Illuminate\Http\Request;
 
-class ExpenseController extends Controller
+class ExpenseHeadController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $expenses = Expense::all();
-        $categories = Expense::categories();
+        $expenseHeads = ExpenseHead::all();
+        $categories = ExpenseHead::categories();
 
         return view(
-            'admin.expenses.index',
-            compact('expenses', 'categories')
+            'admin.expense_heads.index',
+            compact('expenseHeads', 'categories')
         );
     }
 
@@ -34,23 +34,23 @@ class ExpenseController extends Controller
         ]);
         $validated['is_active'] = (isset($request->is_active)) ? true : false;
 
-        Expense::create($validated);
+        ExpenseHead::create($validated);
 
         return redirect()
-            ->route('expenses.index')
+            ->route('expense.heads.index')
             ->with('success', 'Expense has been created successfully.');
     }
 
     public function show($id)
     {
-        $expense = Expense::findOrFail($id);
-        return response()->json($expense);
+        $expenseHead = ExpenseHead::findOrFail($id);
+        return response()->json($expenseHead);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Expense $expense)
+    public function update(Request $request, ExpenseHead $expenseHead)
     {
         $validated = $request->validate([
             'category' => 'required|string|max:255',
@@ -58,32 +58,32 @@ class ExpenseController extends Controller
             'description' => 'nullable|string',
         ]);
         $validated['is_active'] = (isset($request->is_active)) ? true : false;
-        $expense->update($validated);
+        $expenseHead->update($validated);
 
         return redirect()
-            ->route('expenses.index')
+            ->route('expense.heads.index')
             ->with('success', 'Expense has been updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Expense $expense)
+    public function destroy(ExpenseHead $expenseHead)
     {
-        $expense->delete();
+        $expenseHead->delete();
 
         return redirect()
-            ->route('expenses.index')
+            ->route('expense.heads.index')
             ->with('success', 'Expense has been deleted successfully.');
     }
 
-    public function toggle(Expense $expense)
+    public function toggle(ExpenseHead $expenseHead)
     {
-        $toggle = ($expense->is_active) ? 'blocked' : 'activated';
-        $expense->is_active = ! $expense->is_active;
-        $expense->save();
+        $toggle = ($expenseHead->is_active) ? 'blocked' : 'activated';
+        $expenseHead->is_active = ! $expenseHead->is_active;
+        $expenseHead->save();
 
         return redirect()->back()
-            ->with('success', "Status of Expense: {$expense->item} has been {$toggle} successfully.");
+            ->with('success', "Status of Expense: {$expenseHead->item} has been {$toggle} successfully.");
     }
 }

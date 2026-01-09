@@ -131,5 +131,19 @@
             img.src = url;
             img.onload = () => URL.revokeObjectURL(url);
         });
+
+        // Initialize tagsinput for keywords
+        $(document).ready(function() {
+            $('#support_keywords_display').tagsinput({
+                confirmKeys: [13, 188],
+                trimValue: true
+            });
+
+            // Sync tags to hidden field on add/remove
+            $('#support_keywords_display').on('itemAdded itemRemoved', function() {
+                const tags = $(this).tagsinput('items');
+                $('#support_keywords').val(JSON.stringify(tags));
+            });
+        });
     </script>
 @endpush

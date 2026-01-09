@@ -23,8 +23,33 @@ class ShedController extends Controller
      */
     public function index()
     {
-        $farms = Farm::all();
-        $sheds = Shed::with(['farm.owner', 'latestFlock'])->get();
+        $user = auth()->user();
+
+        // Build query based on user role
+        $shedsQuery = Shed::with(['farm.owner', 'latestFlock']);
+
+        if ($user->hasRole('admin')) {
+            // Admin: No restriction, get all sheds and farms
+            $sheds = $shedsQuery->get();
+            $farms = Farm::all();
+        } elseif ($user->hasRole('owner')) {
+            // Owner: Only sheds from farms they own
+            $sheds = $shedsQuery->whereHas('farm', function ($query) use ($user) {
+                $query->where('owner_id', $user->id);
+            })->get();
+            $farms = Farm::where('owner_id', $user->id)->get();
+        } elseif ($user->hasRole('manager')) {
+            // Manager: Only sheds from farms they manage
+            $managedFarmIds = $user->managedFarms()->pluck('id')->toArray();
+            $sheds = $shedsQuery->whereHas('farm', function ($query) use ($managedFarmIds) {
+                $query->whereIn('id', $managedFarmIds);
+            })->get();
+            $farms = Farm::whereIn('id', $managedFarmIds)->get();
+        } else {
+            // Default: No access
+            $sheds = collect([]);
+            $farms = collect([]);
+        }
 
         $cities = $sheds->pluck('farm.city.name')
             ->unique()
@@ -55,6 +80,27 @@ class ShedController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        if ($user->hasRole('manager')) {
+            abort(403, 'Unauthorized action. Managers cannot create sheds.');
+        }
+
+        if ($user->hasRole('owner')) {
+            // Owner can create only one shed (across their farms)
+            $ownerShedCount = Shed::whereHas('farm', function ($q) use ($user) {
+                $q->where('owner_id', $user->id);
+            })->count();
+
+            if ($ownerShedCount >= 1) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'You can only create one shed.');
+            }
+        } elseif (! $user->hasRole('admin')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'farm_id' => 'required|exists:farms,id',
             'name' => 'required|string|min:3|max:190',
@@ -62,6 +108,14 @@ class ShedController extends Controller
             'type' => 'required|string|in:'.implode(',', $this->types),
             'description' => 'nullable|string',
         ]);
+
+        // Ownership guard for owners
+        if ($user->hasRole('owner')) {
+            $farmOwnerId = Farm::where('id', $validated['farm_id'])->value('owner_id');
+            if ($farmOwnerId !== $user->id) {
+                abort(403, 'You can only create sheds for your own farm.');
+            }
+        }
 
         Shed::create($validated);
 
@@ -112,6 +166,13 @@ class ShedController extends Controller
      */
     public function destroy(Shed $shed)
     {
+        // Check if the shed has any flocks assigned
+        if ($shed->flocks()->count() > 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Cannot delete shed. One or more flocks are assigned to this shed.');
+        }
+
         $shed->delete();
         return redirect()
             ->route('admin.sheds.index')
