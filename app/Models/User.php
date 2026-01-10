@@ -4,14 +4,12 @@ namespace App\Models;
 
 use App\Traits\HasMedia;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
 use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Cashier\Billable;
 use Laravel\Sanctum\HasApiTokens;
@@ -70,17 +68,6 @@ class User extends Authenticatable implements MustVerifyEmail
             'password_reset_required' => 'boolean',
         ];
     }
-
-    //    protected function initials(): Attribute
-    //    {
-    //        return Attribute::make(
-    //            fn () => Str::of($this->name)
-    //                ->explode(' ')
-    //                ->take(2)
-    //                ->map(fn ($word) => Str::substr($word, 0, 1))
-    //                ->implode('')
-    //        );
-    //    }
 
     public function canImpersonate(): bool
     {

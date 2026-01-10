@@ -37,8 +37,18 @@ class WeightLogService
             throw new \Exception('No flock found for this ProductionLog');
         }
 
-        $lastWeightLog = WeightLog::where('flock_id', $flock->id)
-            ->orderByDesc('production_log_id')->first();
+        $beforeProductionLogId = $options['before_production_log_id'] ?? null;
+
+        $lastWeightLogQuery = WeightLog::where('flock_id', $flock->id);
+
+        // When recalculating history, allow caller to provide a cutoff so we only look at prior weight logs
+        if ($beforeProductionLogId !== null) {
+            $lastWeightLogQuery->where('production_log_id', '<', $beforeProductionLogId);
+        }
+
+        $lastWeightLog = $lastWeightLogQuery
+            ->orderByDesc('production_log_id')
+            ->first();
 
         $lastProductionLog = $lastWeightLog
             ? ProductionLog::find($lastWeightLog->production_log_id)

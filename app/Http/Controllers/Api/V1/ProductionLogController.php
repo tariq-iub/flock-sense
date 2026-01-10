@@ -12,6 +12,7 @@ use App\Services\WeightLogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -155,30 +156,98 @@ class ProductionLogController extends ApiController
 
     public function update(Request $request, ProductionLog $productionLog)
     {
-        $validatedData = $request->validate([
-            'chicken_count' => 'integer|min:0',
-            'age' => 'integer|min:0',
-            'mortality_count' => 'integer|min:0',
-            'total_weight' => 'numeric|min:0',
-            'water_consumed' => 'numeric|min:0',
-            'feed_consumed' => 'numeric|min:0',
-            'day_lowest_temperature' => 'numeric|nullable',
-            'day_lowest_temperature_time' => 'date|nullable',
-            'day_peak_temperature' => 'numeric|nullable',
-            'day_peak_temperature_time' => 'date|nullable',
-            'day_lowest_humidity' => 'numeric|nullable',
-            'day_lowest_humidity_time' => 'date|nullable',
-            'day_peak_humidity' => 'numeric|nullable',
-            'day_peak_humidity_time' => 'date|nullable',
-            'fcr' => 'numeric|min:0',
-            'fcr_standard_diff' => 'numeric',
-            'vet_visited' => 'boolean',
-            'is_vaccinated' => 'boolean',
+        $validated = $request->validate([
+            'shed_id' => 'required|exists:sheds,id',
+            'flock_id' => 'required|exists:flocks,id',
+            'day_mortality_count' => 'required|integer|min:0',
+            'night_mortality_count' => 'required|integer|min:0',
+            'net_count' => 'nullable|integer|min:0',
+            'day_feed_consumed' => 'required|numeric|min:0',
+            'night_feed_consumed' => 'required|numeric|min:0',
+            'day_water_consumed' => 'required|numeric|min:0',
+            'night_water_consumed' => 'required|numeric|min:0',
+            'is_vaccinated' => 'required|boolean',
+            'day_medicine' => 'nullable|string',
+            'night_medicine' => 'nullable|string',
+            'with_weight_log' => 'nullable|boolean',
+            'weighted_chickens_count' => 'nullable|numeric|min:0',
+            'total_weight' => 'nullable|numeric|min:0',
         ]);
 
-        $productionLog->update($validatedData);
+        $flock = Flock::findOrFail($validated['flock_id']);
 
-        return response()->json($productionLog);
+        DB::transaction(function () use ($productionLog, $validated, $flock) {
+            // Find the last production log in the same flock/shed (by production_log_date) to calculate cumulative fields correctly
+            $lastLog = ProductionLog::where('flock_id', $validated['flock_id'])
+                ->where('shed_id', $validated['shed_id'])
+                ->whereDate('production_log_date', '<', $productionLog->production_log_date)
+                ->orderBy('production_log_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $lastNetCount = $lastLog ? $lastLog->net_count : $flock->chicken_count;
+
+            // Calculate net_count for the updated log
+            $net_count = $lastNetCount - ($validated['day_mortality_count'] + $validated['night_mortality_count']);
+
+            // Calculate age (days since flock's start_date)
+            $age = $flock->start_date->diffInDays(today()) ?? 0;
+
+            // Calculate livability
+            $livability = $flock->chicken_count > 0
+                ? daily_livability($net_count, $flock->chicken_count)
+                : 0;
+
+            // Update ProductionLog
+            $productionLog->update([
+                'shed_id' => $validated['shed_id'],
+                'flock_id' => $validated['flock_id'],
+                'age' => $age,
+                'day_mortality_count' => $validated['day_mortality_count'],
+                'night_mortality_count' => $validated['night_mortality_count'],
+                'todate_mortality_count' => $lastLog
+                    ? $lastLog->todate_mortality_count + $validated['day_mortality_count'] + $validated['night_mortality_count']
+                    : $validated['day_mortality_count'] + $validated['night_mortality_count'],
+                'net_count' => $net_count,
+                'livability' => $livability,
+                'day_feed_consumed' => $validated['day_feed_consumed'],
+                'night_feed_consumed' => $validated['night_feed_consumed'],
+                'todate_feed_consumed' => $lastLog
+                    ? $lastLog->todate_feed_consumed + $validated['day_feed_consumed'] + $validated['night_feed_consumed']
+                    : $validated['day_feed_consumed'] + $validated['night_feed_consumed'],
+                'day_water_consumed' => $validated['day_water_consumed'],
+                'night_water_consumed' => $validated['night_water_consumed'],
+                'todate_water_consumed' => $lastLog
+                    ? $lastLog->todate_water_consumed + $validated['day_water_consumed'] + $validated['night_water_consumed']
+                    : $validated['day_water_consumed'] + $validated['night_water_consumed'],
+                'is_vaccinated' => $validated['is_vaccinated'],
+                'day_medicine' => $validated['day_medicine'],
+                'night_medicine' => $validated['night_medicine'],
+                'user_id' => Auth::id(),
+            ]);
+
+            // Recalculate downstream logs to keep cumulative values consistent
+            $this->recalculateSubsequentLogs($productionLog, $flock);
+
+            // Update weight log if provided and valid
+            if (
+                ! empty($validated['with_weight_log']) &&
+                ! empty($validated['weighted_chickens_count']) &&
+                ! empty($validated['total_weight'])
+            ) {
+                app(WeightLogService::class)->createOrUpdateWeightLog(
+                    $productionLog,
+                    $validated['weighted_chickens_count'],
+                    $validated['total_weight'],
+                    [
+                        'mode' => 'update',
+                        'before_production_log_id' => $productionLog->id,
+                    ]
+                );
+            }
+        });
+
+        return response()->json($productionLog->refresh());
     }
 
     public function destroy(ProductionLog $productionLog)
@@ -436,5 +505,53 @@ class ProductionLogController extends ApiController
                 'all_time' => $allTime,
             ],
         ], 200);
+    }
+
+    /**
+     * Propagate recalculated cumulative fields to all logs after the provided one within the same flock/shed.
+     */
+    private function recalculateSubsequentLogs(ProductionLog $startingLog, Flock $flock): void
+    {
+        $subsequentLogs = ProductionLog::with('weightLog')
+            ->where('flock_id', $flock->id)
+            ->where('shed_id', $startingLog->shed_id)
+            ->whereDate('production_log_date', '>', $startingLog->production_log_date)
+            ->orderBy('production_log_date')
+            ->orderBy('id')
+            ->get();
+
+        $previousLog = $startingLog->fresh(['weightLog']);
+
+        foreach ($subsequentLogs as $log) {
+            $dayMortality = $log->day_mortality_count;
+            $nightMortality = $log->night_mortality_count;
+
+            $netCount = $previousLog->net_count - ($dayMortality + $nightMortality);
+
+            $log->update([
+                'todate_mortality_count' => $previousLog->todate_mortality_count + $dayMortality + $nightMortality,
+                'net_count' => $netCount,
+                'livability' => $flock->chicken_count > 0
+                    ? daily_livability($netCount, $flock->chicken_count)
+                    : 0,
+                'todate_feed_consumed' => $previousLog->todate_feed_consumed + $log->day_feed_consumed + $log->night_feed_consumed,
+                'todate_water_consumed' => $previousLog->todate_water_consumed + $log->day_water_consumed + $log->night_water_consumed,
+            ]);
+
+            // Re-run weight log calculations if a weight log exists for this entry
+            $log = $log->refresh()->load('weightLog');
+            if ($log->weightLog && $log->weightLog->weighted_chickens_count && $log->weightLog->total_weight) {
+                app(WeightLogService::class)->createOrUpdateWeightLog(
+                    $log,
+                    (int) $log->weightLog->weighted_chickens_count,
+                    (float) $log->weightLog->total_weight,
+                    ['before_production_log_id' => $log->id]
+                );
+                // Refresh after weight log recalculation to keep totals in sync for the next loop iteration
+                $log = $log->refresh();
+            }
+
+            $previousLog = $log->fresh(['weightLog']);
+        }
     }
 }
