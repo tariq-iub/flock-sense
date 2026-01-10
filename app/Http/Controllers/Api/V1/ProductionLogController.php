@@ -12,6 +12,7 @@ use App\Services\WeightLogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -148,26 +149,16 @@ class ProductionLogController extends ApiController
         return response()->json($productionLog, 201);
     }
 
-    public function show(ProductionLog $production)
+    public function show(ProductionLog $productionLog)
     {
-        $productionLog = $production;
+        $productionLog->load(['shed', 'flock', 'user', 'weightLog']);
 
-        // ------------------------------
-        // Load Required Relations
-        // ------------------------------
-        $productionLog->load([
-            'shed',
-            'flock',
-            'user',
-            'weightLog',
-        ]);
-
-        $shed = $productionLog->shed;
-        $flock = $productionLog->flock;
-
-        if (!$shed || !$flock) {
+        if (! $productionLog->shed || ! $productionLog->flock) {
             return response()->json(['message' => 'Invalid production log data.'], 404);
         }
+
+        return response()->json($productionLog);
+    }
 
     public function update(Request $request, ProductionLog $productionLog)
     {
@@ -256,7 +247,7 @@ class ProductionLogController extends ApiController
                     $validated['total_weight'],
                     [
                         'mode' => 'update',
-                        'before_production_log_id' => $productionLog->id,
+                        'before_production_log_date' => $productionLog->production_log_date,
                     ]
                 );
             }
@@ -276,7 +267,7 @@ class ProductionLogController extends ApiController
     {
         if ($shedId) {
             $shed = Shed::with('latestFlock.productionLogs')->find($shedId);
-            if (!$shed) {
+            if (! $shed) {
                 return response()->json(['message' => 'Shed not found'], 404);
             }
 
@@ -331,9 +322,9 @@ class ProductionLogController extends ApiController
 
         try {
             $payload = $this->dailyReportService->build(
-                (int)$request->input('shed_id'),
-                (string)$request->input('date'),
-                (string)$version
+                (int) $request->input('shed_id'),
+                (string) $request->input('date'),
+                (string) $version
             );
 
             return response()->json($payload, 200);
@@ -406,17 +397,17 @@ class ProductionLogController extends ApiController
         $formatted = $logs->map(function ($data) {
             return [
                 'date' => $data->production_log_date->format('d-m-Y'),
-                'age' => $data->age . ' Days',
+                'age' => $data->age.' Days',
                 'day_mortality_count' => $data->day_mortality_count,
                 'night_mortality_count' => $data->night_mortality_count,
                 'net_count' => $data->net_count,
-                'livability' => $data->livability . ' %',
-                'day_feed_consumed' => round($data->day_feed_consumed / 1000, 2) . ' Kg',
-                'night_feed_consumed' => round($data->night_feed_consumed / 1000, 2) . ' Kg',
-                'avg_feed_consumed' => round($data->avg_feed_consumed / 1000, 2) . ' Kg',
-                'day_water_consumed' => round($data->day_water_consumed / 1000, 2) . ' L',
-                'night_water_consumed' => round($data->night_water_consumed / 1000, 2) . ' L',
-                'avg_water_consumed' => round($data->avg_water_consumed / 1000, 2) . ' L',
+                'livability' => $data->livability.' %',
+                'day_feed_consumed' => round($data->day_feed_consumed / 1000, 2).' Kg',
+                'night_feed_consumed' => round($data->night_feed_consumed / 1000, 2).' Kg',
+                'avg_feed_consumed' => round($data->avg_feed_consumed / 1000, 2).' Kg',
+                'day_water_consumed' => round($data->day_water_consumed / 1000, 2).' L',
+                'night_water_consumed' => round($data->night_water_consumed / 1000, 2).' L',
+                'avg_water_consumed' => round($data->avg_water_consumed / 1000, 2).' L',
                 'is_vaccinated' => ($data->is_vaccinated ? 'Yes' : 'No'),
                 'day_medicine' => $data->day_medicine ?? '',
                 'night_medicine' => $data->night_medicine ?? '',
@@ -445,7 +436,7 @@ class ProductionLogController extends ApiController
             ->latest('start_date') // adjust if different column
             ->first();
 
-        if (!$latestFlock) {
+        if (! $latestFlock) {
             return response()->json(['message' => 'No flock found for this shed.'], 404);
         }
 
@@ -455,7 +446,7 @@ class ProductionLogController extends ApiController
             ->latest('production_log_date')
             ->first();
 
-        if (!$latestLog) {
+        if (! $latestLog) {
             return response()->json(['message' => 'No production data found for the latest flock.'], 404);
         }
 
@@ -473,8 +464,8 @@ class ProductionLogController extends ApiController
             $logs = $query->get();
 
             return [
-                'feed' => round(($logs->sum('day_feed_consumed') + $logs->sum('night_feed_consumed')) / 1000, 2) . ' kg',
-                'water' => round(($logs->sum('day_water_consumed') + $logs->sum('night_water_consumed')) / 1000, 2) . ' L',
+                'feed' => round(($logs->sum('day_feed_consumed') + $logs->sum('night_feed_consumed')) / 1000, 2).' kg',
+                'water' => round(($logs->sum('day_water_consumed') + $logs->sum('night_water_consumed')) / 1000, 2).' L',
             ];
         };
 
@@ -488,20 +479,20 @@ class ProductionLogController extends ApiController
         // ------------------------------
         $formatted = [
             'date' => $latestLog->production_log_date->format('d-m-Y'),
-            'age' => $latestLog->age . ' Days',
+            'age' => $latestLog->age.' Days',
             'day_mortality_count' => $latestLog->day_mortality_count,
             'night_mortality_count' => $latestLog->night_mortality_count,
             '24h_mortality_count' => $latestLog->total_mortality_count,
             'net_count' => $latestLog->net_count,
-            'livability' => $latestLog->livability . ' %',
-            'day_feed_consumed' => round($latestLog->day_feed_consumed / 1000, 2) . ' kg',
-            'night_feed_consumed' => round($latestLog->night_feed_consumed / 1000, 2) . ' kg',
-            '24h_feed_consumed' => round($latestLog->total_feed_consumed / 1000, 2) . ' kg',
-            'avg_feed_consumed' => round($latestLog->avg_feed_consumed / 1000, 2) . ' kg',
-            'day_water_consumed' => round($latestLog->day_water_consumed / 1000, 2) . ' L',
-            'night_water_consumed' => round($latestLog->night_water_consumed / 1000, 2) . ' L',
-            '24h_water_consumed' => round($latestLog->total_water_consumed / 1000, 2) . ' L',
-            'avg_water_consumed' => round($latestLog->avg_water_consumed / 1000, 2) . ' L',
+            'livability' => $latestLog->livability.' %',
+            'day_feed_consumed' => round($latestLog->day_feed_consumed / 1000, 2).' kg',
+            'night_feed_consumed' => round($latestLog->night_feed_consumed / 1000, 2).' kg',
+            '24h_feed_consumed' => round($latestLog->total_feed_consumed / 1000, 2).' kg',
+            'avg_feed_consumed' => round($latestLog->avg_feed_consumed / 1000, 2).' kg',
+            'day_water_consumed' => round($latestLog->day_water_consumed / 1000, 2).' L',
+            'night_water_consumed' => round($latestLog->night_water_consumed / 1000, 2).' L',
+            '24h_water_consumed' => round($latestLog->total_water_consumed / 1000, 2).' L',
+            'avg_water_consumed' => round($latestLog->avg_water_consumed / 1000, 2).' L',
             'is_vaccinated' => ($latestLog->is_vaccinated ? 'Yes' : 'No'),
             'day_medicine' => $latestLog->day_medicine ?? '',
             'night_medicine' => $latestLog->night_medicine ?? '',
@@ -560,7 +551,7 @@ class ProductionLogController extends ApiController
                     $log,
                     (int) $log->weightLog->weighted_chickens_count,
                     (float) $log->weightLog->total_weight,
-                    ['before_production_log_id' => $log->id]
+                    ['before_production_log_date' => $log->production_log_date]
                 );
                 // Refresh after weight log recalculation to keep totals in sync for the next loop iteration
                 $log = $log->refresh();

@@ -37,17 +37,17 @@ class WeightLogService
             throw new \Exception('No flock found for this ProductionLog');
         }
 
-        $beforeProductionLogId = $options['before_production_log_id'] ?? null;
+        $cutoffDate = $options['before_production_log_date'] ?? null;
 
-        $lastWeightLogQuery = WeightLog::where('flock_id', $flock->id);
-
-        // When recalculating history, allow caller to provide a cutoff so we only look at prior weight logs
-        if ($beforeProductionLogId !== null) {
-            $lastWeightLogQuery->where('production_log_id', '<', $beforeProductionLogId);
-        }
-
-        $lastWeightLog = $lastWeightLogQuery
-            ->orderByDesc('production_log_id')
+        $lastWeightLog = WeightLog::query()
+            ->select('weight_logs.*')
+            ->join('production_logs as pl', 'pl.id', '=', 'weight_logs.production_log_id')
+            ->where('weight_logs.flock_id', $flock->id)
+            ->when($cutoffDate, function ($query) use ($cutoffDate) {
+                $query->whereDate('pl.production_log_date', '<', $cutoffDate);
+            })
+            ->orderBy('pl.production_log_date', 'desc')
+            ->orderBy('weight_logs.production_log_id', 'desc')
             ->first();
 
         $lastProductionLog = $lastWeightLog
