@@ -152,7 +152,121 @@ class ProductionLogController extends ApiController
 
     public function show(ProductionLog $production)
     {
-        return response()->json([$production]);
+        $productionLog = $production;
+
+        // ------------------------------
+        // 🔹 Load Required Relations
+        // ------------------------------
+        $productionLog->load([
+            'shed',
+            'flock',
+            'user',
+            'weightLog',
+        ]);
+
+        $shed = $productionLog->shed;
+        $flock = $productionLog->flock;
+
+        if (!$shed || !$flock) {
+            return response()->json(['message' => 'Invalid production log data.'], 404);
+        }
+
+        // ------------------------------
+        // 🔹 Derived Calculations
+        // ------------------------------
+        $totalMortality =
+            $productionLog->day_mortality_count +
+            $productionLog->night_mortality_count;
+
+        $totalFeed =
+            $productionLog->day_feed_consumed +
+            $productionLog->night_feed_consumed;
+
+        $totalWater =
+            $productionLog->day_water_consumed +
+            $productionLog->night_water_consumed;
+
+        // Average calculations (fallback if not stored)
+        $avgFeed = $productionLog->avg_feed_consumed
+            ?? ($productionLog->age > 0
+                ? $productionLog->todate_feed_consumed / $productionLog->age
+                : 0);
+
+        $avgWater = $productionLog->avg_water_consumed
+            ?? ($productionLog->age > 0
+                ? $productionLog->todate_water_consumed / $productionLog->age
+                : 0);
+
+        // ------------------------------
+        // 🔹 Build Response (Daily Report Style)
+        // ------------------------------
+        return response()->json([
+            'shed' => $shed->name,
+            'flock' => $flock->name,
+            'flock_count' => $flock->chicken_count,
+
+            'date' => $productionLog->production_log_date->format('d-m-Y'),
+            'age' => $productionLog->age . ' Days',
+
+            'day_mortality_count' => $productionLog->day_mortality_count,
+            'night_mortality_count' => $productionLog->night_mortality_count,
+            '24h_mortality' => $totalMortality,
+            'todate_mortality_count' => $productionLog->todate_mortality_count,
+
+            'net_count' => $productionLog->net_count,
+            'livability' => $productionLog->livability . ' %',
+
+            'day_feed_consumed' => round($productionLog->day_feed_consumed / 1000, 2) . ' Kg',
+            'night_feed_consumed' => round($productionLog->night_feed_consumed / 1000, 2) . ' Kg',
+            'avg_feed_consumed' => round($avgFeed / 1000, 2) . ' Kg',
+            '24h_feed_consumed' => round($totalFeed / 1000, 2) . ' Kg',
+            'todate_feed_consumed' => round($productionLog->todate_feed_consumed / 1000, 2) . ' Kg',
+
+            'day_water_consumed' => round($productionLog->day_water_consumed, 2) . ' L',
+            'night_water_consumed' => round($productionLog->night_water_consumed, 2) . ' L',
+            'avg_water_consumed' => round($avgWater, 2) . ' L',
+            '24h_water_consumed' => round($totalWater, 2) . ' L',
+            'total_water_consumed' => round($productionLog->todate_water_consumed, 2) . ' L',
+
+            'is_vaccinated' => $productionLog->is_vaccinated ? 'Yes' : 'No',
+            'day_medicine' => $productionLog->day_medicine ?? '',
+            'night_medicine' => $productionLog->night_medicine ?? '',
+
+            'weighted_chickens' => optional($productionLog->weightLog)->weighted_chickens_count ?? '',
+            'recorded_weight' => $productionLog->weightLog
+                ? round($productionLog->weightLog->total_weight / 1000, 2) . ' Kg'
+                : '',
+            'avg_weight' => $productionLog->weightLog
+                ? round($productionLog->weightLog->avg_weight / 1000, 2) . ' Kg'
+                : '',
+            'avg_weight_gain' => $productionLog->weightLog
+                ? round($productionLog->weightLog->avg_weight_gain / 1000, 2) . ' Kg'
+                : '',
+            'flock_weight' => $productionLog->weightLog
+                ? round($productionLog->weightLog->aggregated_total_weight / 1000, 2) . ' Kg'
+                : '',
+            'feed_efficiency' => $productionLog->weightLog
+                ? round($productionLog->weightLog->feed_efficiency, 2)
+                : '',
+            'fcr' => $productionLog->weightLog
+                ? round($productionLog->weightLog->feed_conversion_ratio, 2)
+                : '',
+            'adjusted_fcr' => $productionLog->weightLog
+                ? round($productionLog->weightLog->adjusted_feed_conversion_ratio, 2)
+                : '',
+            'fcr_diff' => $productionLog->weightLog
+                ? round($productionLog->weightLog->fcr_standard_diff, 2)
+                : '',
+            'cv' => $productionLog->weightLog
+                ? round($productionLog->weightLog->coefficient_of_variation, 2) . ' %'
+                : '',
+            'pef' => $productionLog->weightLog
+                ? round($productionLog->weightLog->production_efficiency_factor, 2)
+                : '',
+
+            'submit_by' => $productionLog->user->name,
+            'submit_at' => $productionLog->created_at->diffForHumans(),
+        ], 200);
     }
 
     public function update(Request $request, ProductionLog $production)
