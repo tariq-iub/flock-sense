@@ -157,28 +157,52 @@ class ProductionLogController extends ApiController
 
     public function update(Request $request, ProductionLog $production)
     {
-        $validatedData = $request->validate([
-            'chicken_count' => 'integer|min:0',
-            'age' => 'integer|min:0',
-            'mortality_count' => 'integer|min:0',
-            'total_weight' => 'numeric|min:0',
-            'water_consumed' => 'numeric|min:0',
-            'feed_consumed' => 'numeric|min:0',
-            'day_lowest_temperature' => 'numeric|nullable',
-            'day_lowest_temperature_time' => 'date|nullable',
-            'day_peak_temperature' => 'numeric|nullable',
-            'day_peak_temperature_time' => 'date|nullable',
-            'day_lowest_humidity' => 'numeric|nullable',
-            'day_lowest_humidity_time' => 'date|nullable',
-            'day_peak_humidity' => 'numeric|nullable',
-            'day_peak_humidity_time' => 'date|nullable',
-            'fcr' => 'numeric|min:0',
-            'fcr_standard_diff' => 'numeric',
-            'vet_visited' => 'boolean',
-            'is_vaccinated' => 'boolean',
+        $validated = $request->validate([
+            'age' => 'sometimes|integer|min:0',
+
+            'day_mortality_count' => 'sometimes|integer|min:0',
+            'night_mortality_count' => 'sometimes|integer|min:0',
+
+            'day_feed_consumed' => 'sometimes|numeric|min:0',
+            'night_feed_consumed' => 'sometimes|numeric|min:0',
+
+            'day_water_consumed' => 'sometimes|numeric|min:0',
+            'night_water_consumed' => 'sometimes|numeric|min:0',
+
+            'is_vaccinated' => 'sometimes|boolean',
+            'day_medicine' => 'nullable|string',
+            'night_medicine' => 'nullable|string',
         ]);
 
-        $production->update($validatedData);
+        /*
+         * ⚠️ Optional but RECOMMENDED:
+         * If mortality is updated, recalculate net_count & livability
+         */
+        if (
+            isset($validated['day_mortality_count']) ||
+            isset($validated['night_mortality_count'])
+        ) {
+            $day = $validated['day_mortality_count'] ?? $production->day_mortality_count;
+            $night = $validated['night_mortality_count'] ?? $production->night_mortality_count;
+
+            $lastLog = ProductionLog::where('flock_id', $production->flock_id)
+                ->where('id', '<', $production->id)
+                ->latest()
+                ->first();
+
+            $lastNet = $lastLog
+                ? $lastLog->net_count
+                : $production->flock->chicken_count;
+
+            $netCount = $lastNet - ($day + $night);
+
+            $validated['net_count'] = $netCount;
+            $validated['livability'] = $production->flock->chicken_count > 0
+                ? daily_livability($netCount, $production->flock->chicken_count)
+                : 0;
+        }
+
+        $production->update($validated);
 
         return response()->json($production);
     }
