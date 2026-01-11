@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -160,7 +161,7 @@ class ProductionLogController extends ApiController
         return response()->json($productionLog);
     }
 
-    public function update(Request $request, ProductionLog $productionLog)
+    public function update(Request $request, ProductionLog $production)
     {
         $validated = $request->validate([
             'shed_id' => 'required|exists:sheds,id',
@@ -182,11 +183,11 @@ class ProductionLogController extends ApiController
 
         $flock = Flock::findOrFail($validated['flock_id']);
 
-        DB::transaction(function () use ($productionLog, $validated, $flock) {
+        DB::transaction(function () use ($production, $validated, $flock) {
             // Find the last production log in the same flock/shed (by production_log_date) to calculate cumulative fields correctly
             $lastLog = ProductionLog::where('flock_id', $validated['flock_id'])
                 ->where('shed_id', $validated['shed_id'])
-                ->whereDate('production_log_date', '<', $productionLog->production_log_date)
+                ->whereDate('production_log_date', '<', $production->production_log_date)
                 ->orderBy('production_log_date', 'desc')
                 ->orderBy('id', 'desc')
                 ->first();
@@ -205,7 +206,7 @@ class ProductionLogController extends ApiController
                 : 0;
 
             // Update ProductionLog
-            $productionLog->update([
+            $production->update([
                 'shed_id' => $validated['shed_id'],
                 'flock_id' => $validated['flock_id'],
                 'age' => $age,
@@ -233,7 +234,7 @@ class ProductionLogController extends ApiController
             ]);
 
             // Recalculate downstream logs to keep cumulative values consistent
-            $this->recalculateSubsequentLogs($productionLog, $flock);
+            $this->recalculateSubsequentLogs($production, $flock);
 
             // Update weight log if provided and valid
             if (
@@ -242,18 +243,18 @@ class ProductionLogController extends ApiController
                 ! empty($validated['total_weight'])
             ) {
                 app(WeightLogService::class)->createOrUpdateWeightLog(
-                    $productionLog,
+                    $production,
                     $validated['weighted_chickens_count'],
                     $validated['total_weight'],
                     [
                         'mode' => 'update',
-                        'before_production_log_date' => $productionLog->production_log_date,
+                        'before_production_log_date' => $production->production_log_date,
                     ]
                 );
             }
         });
 
-        return response()->json($productionLog->refresh());
+        return response()->json($production->refresh());
     }
 
     public function destroy(ProductionLog $productionLog)

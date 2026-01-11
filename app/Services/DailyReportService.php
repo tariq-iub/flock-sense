@@ -57,6 +57,7 @@ class DailyReportService
     private function formatEnglish($shed, $flock, $data): array
     {
         return [
+            'production_log_id' => $data->id,
             'shed' => $shed->name,
             'flock' => $flock->name,
             'flock_count' => $flock->chicken_count,
@@ -104,6 +105,7 @@ class DailyReportService
     private function formatUrdu($shed, $flock, $data): array
     {
         return [
+            'production_log_id' => $data->id,
             'شیڈ' => $shed->name,
             'فلاک' => $flock->name,
             'فلاک تعداد' => $flock->chicken_count.'',
